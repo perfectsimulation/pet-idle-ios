@@ -7,10 +7,10 @@
     public string Personality;
 
     // Minutes before earliest arrival to yard
-    public double EarliestArrivalInMinutes;
+    public float EarliestArrivalInMinutes;
 
     // Minutes before latest arrival to yard
-    public double LatestArrivalInMinutes;
+    public float LatestArrivalInMinutes;
 
     // Priority for tie-breaking guest selection
     public int PowerLevel;
@@ -23,8 +23,8 @@
     {
         this.Name = "Guest";
         this.Personality = "Fun";
-        this.EarliestArrivalInMinutes = 0.1d;
-        this.LatestArrivalInMinutes = 1.1d;
+        this.EarliestArrivalInMinutes = 0.1f;
+        this.LatestArrivalInMinutes = 1.1f;
         this.PowerLevel = 0;
         this.CurrencyRewardForVisit = 100;
     }
@@ -33,8 +33,8 @@
     public Guest(
         string name,
         string personality,
-        double earliestArrivalInMinutes,
-        double latestArrivalInMinutes,
+        float earliestArrivalInMinutes,
+        float latestArrivalInMinutes,
         int powerLevel,
         int currencyRewardForVisit)
     {
