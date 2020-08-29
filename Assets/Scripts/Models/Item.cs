@@ -16,4 +16,5 @@ public class Item
         this.GuestVisitChances = GuestVisitChances;
         this.Price = Price;
     }
+
 }
