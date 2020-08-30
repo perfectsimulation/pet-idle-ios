@@ -61,5 +61,8 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+# Mac OS hidden file
+.DS_Store*
+
 # Custom persistence
-Persistence.json
+UserData.json

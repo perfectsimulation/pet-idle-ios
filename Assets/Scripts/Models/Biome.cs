@@ -1,16 +1,23 @@
-﻿public class Biome
+﻿using System;
+
+[Serializable]
+public class Biome
 {
     public string Name;
     public Guest[] AllowedGuests;
-    public Slot[] Slots;
 
-    public Biome() { }
-
-    public Biome(string Name, Guest[] AllowedGuests, Slot[] Slots)
+    /* Default no-arg constructor */
+    public Biome()
     {
-        this.Name = Name;
-        this.AllowedGuests = AllowedGuests;
-        this.Slots = Slots;
+        this.Name = "Default Biome";
+        this.AllowedGuests = new Guest[] { DataInitializer.GuestB };
+    }
+
+    /* Construct a biome */
+    public Biome(string name, Guest[] allowedGuests)
+    {
+        this.Name = name;
+        this.AllowedGuests = allowedGuests;
     }
 
 }

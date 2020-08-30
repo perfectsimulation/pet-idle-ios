@@ -1,35 +1,38 @@
-﻿public class Guest
+﻿using System;
+
+[Serializable]
+public class Guest
 {
-    // Name of this Guest
+    // Name of this guest
     public string Name;
 
-    // Personality of this Guest
+    // Personality of this guest
     public string Personality;
 
-    // Minutes before earliest arrival to yard
+    // Minutes before earliest arrival to active biome
     public float EarliestArrivalInMinutes;
 
-    // Minutes before latest arrival to yard
+    // Minutes before latest arrival to active biome
     public float LatestArrivalInMinutes;
 
     // Priority for tie-breaking guest selection
     public int PowerLevel;
 
-    // Currency rewarded to Player upon completion of Guest visit
+    // Currency rewarded to user upon completion of guest visit
     public int CurrencyRewardForVisit;
 
     /* Default no-arg constructor */
     public Guest()
     {
-        this.Name = "Guest";
-        this.Personality = "Fun";
+        this.Name = "Default Guest";
+        this.Personality = "Default Personality";
         this.EarliestArrivalInMinutes = 0.1f;
         this.LatestArrivalInMinutes = 1.1f;
         this.PowerLevel = 0;
-        this.CurrencyRewardForVisit = 100;
+        this.CurrencyRewardForVisit = 10;
     }
 
-    /* Constructor */
+    /* Construct a guest */
     public Guest(
         string name,
         string personality,
