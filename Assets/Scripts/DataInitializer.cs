@@ -3,10 +3,10 @@
 public static class DataInitializer
 {
     /* Guests */
-    public static readonly Guest GuestA = new Guest("Alex", "Ambient", 0.2f, 2.2f, 20, 5);
-    public static readonly Guest GuestB = new Guest("Beanman", "Legendary", 1f, 5f, 80, 8);
-    public static readonly Guest GuestC = new Guest("Cherry", "Charming", 0.4f, 4f, 55, 13);
-    public static readonly Guest GuestD = new Guest("Dahlia", "Delightful", 5f, 9f, 11, 20);
+    public static readonly Guest GuestA = new Guest("Alex", "Ambient", 0.2f, 2.2f, 20, 5, "Assets/Images/hamster-black.png");
+    public static readonly Guest GuestB = new Guest("Beanman", "Legendary", 1f, 5f, 80, 8, "Assets/Images/hamster-cream.png");
+    public static readonly Guest GuestC = new Guest("Cherry", "Charming", 0.4f, 4f, 55, 13, "Assets/Images/hamster-grey.png");
+    public static readonly Guest GuestD = new Guest("Dahlia", "Delightful", 5f, 9f, 11, 20, "Assets/Images/hamster-orange.png");
 
 
 

@@ -21,6 +21,9 @@ public class Guest
     // Currency rewarded to user upon completion of guest visit
     public int CurrencyRewardForVisit;
 
+    // Pathname to the png to use for the GuestObject that owns this Guest
+    public string ImageAssetPathname;
+
     /* Default no-arg constructor */
     public Guest()
     {
@@ -30,6 +33,7 @@ public class Guest
         this.LatestArrivalInMinutes = 1.1f;
         this.PowerLevel = 0;
         this.CurrencyRewardForVisit = 10;
+        this.ImageAssetPathname = "";
     }
 
     /* Construct a guest */
@@ -39,7 +43,8 @@ public class Guest
         float earliestArrivalInMinutes,
         float latestArrivalInMinutes,
         int powerLevel,
-        int currencyRewardForVisit)
+        int currencyRewardForVisit,
+        string imageAssetPathname)
     {
         this.Name = name;
         this.Personality = personality;
@@ -47,6 +52,7 @@ public class Guest
         this.LatestArrivalInMinutes = latestArrivalInMinutes;
         this.PowerLevel = powerLevel;
         this.CurrencyRewardForVisit = currencyRewardForVisit;
+        this.ImageAssetPathname = imageAssetPathname;
     }
 
 }

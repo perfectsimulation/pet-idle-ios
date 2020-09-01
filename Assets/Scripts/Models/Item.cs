@@ -7,6 +7,8 @@ public class Item
     public string Name;
     public int Price;
     public Dictionary<Guest, float> VisitChances;
+    // Pathname to the png to use for the GuestObject that owns this Guest
+    public string ImageAssetPathname;
 
     /* Default no-arg constructor */
     public Item()

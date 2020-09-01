@@ -6,6 +6,7 @@ public class User
     public int Currency;
     public List<Item> Inventory;
     public List<Biome> UnlockedBiomes;
+    public Biome ActiveBiome;
 
     /* Default no-arg constructor */
     public User()
@@ -13,6 +14,7 @@ public class User
         this.Currency = 300;
         this.Inventory = new List<Item>() { DataInitializer.ItemD };
         this.UnlockedBiomes = new List<Biome>() { DataInitializer.Field };
+        this.ActiveBiome = DataInitializer.Field;
     }
 
     /* Deserialize a user */
@@ -31,6 +33,7 @@ public class User
         this.Currency = serializedUser.Currency;
         this.Inventory = deserializedItems;
         this.UnlockedBiomes = Serializer.ArrayToList(serializedUser.UnlockedBiomes);
+        this.ActiveBiome = serializedUser.ActiveBiome;
     }
 
 }
@@ -41,6 +44,7 @@ public class SerializedUser
     public int Currency;
     public SerializedItem[] Inventory;
     public Biome[] UnlockedBiomes;
+    public Biome ActiveBiome;
 
     /* Serialize a user */
     public SerializedUser(User user)
@@ -58,6 +62,7 @@ public class SerializedUser
         this.Currency = user.Currency;
         this.Inventory = serializedItems;
         this.UnlockedBiomes = Serializer.ListToArray(user.UnlockedBiomes);
+        this.ActiveBiome = user.ActiveBiome;
     }
 
 }

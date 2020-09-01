@@ -3,7 +3,6 @@
 public class BiomeObject : MonoBehaviour
 {
     public Biome Biome;
-    public Slot[] Slots;
 
     private bool IsOpen;
 
