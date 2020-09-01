@@ -4,20 +4,27 @@ using System.Linq;
 
 public class Item
 {
+    // Name of this item
     public string Name;
+
+    // Price to buy this item in the shop
     public int Price;
-    public Dictionary<Guest, float> VisitChances;
-    // Pathname to the png to use for the GuestObject that owns this Guest
+
+    // Pathname to the png to use for the ItemObject that owns this Item
     public string ImageAssetPathname;
+
+    // Dictionary with guest keys and visit chance values
+    public Dictionary<Guest, float> VisitChances;
 
     /* Default no-arg constructor */
     public Item()
     {
         this.Name = "Default Item";
         this.Price = 10;
+        this.ImageAssetPathname = "";
         this.VisitChances = new Dictionary<Guest, float>()
         {
-            { DataInitializer.GuestB, 0.4f }
+            { DataInitializer.GuestB, 1f }
         };
     }
 
@@ -25,10 +32,12 @@ public class Item
     public Item(
         string name,
         int price,
+        string imageAssetPathname,
         Dictionary<Guest, float> visitChances)
     {
         this.Name = name;
         this.Price = price;
+        this.ImageAssetPathname = imageAssetPathname;
         this.VisitChances = visitChances;
     }
 
@@ -47,6 +56,7 @@ public class Item
 
         this.Name = serializedItem.Name;
         this.Price = serializedItem.Price;
+        this.ImageAssetPathname = serializedItem.ImageAssetPathname;
         this.VisitChances = visitChances;
     }
 
@@ -57,6 +67,7 @@ public class SerializedItem
 {
     public string Name;
     public int Price;
+    public string ImageAssetPathname;
     public Guest[] VisitChancesDictionaryKeys;
     public float[] VisitChancesDictionaryValues;
 
@@ -65,6 +76,7 @@ public class SerializedItem
     {
         this.Name = item.Name;
         this.Price = item.Price;
+        this.ImageAssetPathname = item.ImageAssetPathname;
         this.VisitChancesDictionaryKeys = item.VisitChances.Keys.ToArray();
         this.VisitChancesDictionaryValues = item.VisitChances.Values.ToArray();
     }
