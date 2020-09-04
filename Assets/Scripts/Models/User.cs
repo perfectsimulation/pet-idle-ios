@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class User
 {
     public int Currency;
-    public List<Item> Inventory;
+    public Inventory Inventory;
     public List<Biome> UnlockedBiomes;
     public Biome ActiveBiome;
 
@@ -12,7 +12,13 @@ public class User
     public User()
     {
         this.Currency = 300;
-        this.Inventory = new List<Item>() { DataInitializer.ItemD };
+        this.Inventory = new Inventory(new List<Item>()
+        {
+            DataInitializer.ItemA,
+            DataInitializer.ItemB,
+            DataInitializer.ItemC,
+            DataInitializer.ItemD
+        });
         this.UnlockedBiomes = new List<Biome>() { DataInitializer.Field };
         this.ActiveBiome = DataInitializer.Field;
     }
@@ -31,7 +37,7 @@ public class User
         }
 
         this.Currency = serializedUser.Currency;
-        this.Inventory = deserializedItems;
+        this.Inventory = new Inventory(deserializedItems);
         this.UnlockedBiomes = Serializer.ArrayToList(serializedUser.UnlockedBiomes);
         this.ActiveBiome = serializedUser.ActiveBiome;
     }
