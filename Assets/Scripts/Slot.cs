@@ -1,5 +1,4 @@
-﻿using System.IO;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class Slot : MonoBehaviour
@@ -14,10 +13,12 @@ public class Slot : MonoBehaviour
     {
         this.ItemObject.SetItem(item);
 
-        // Set item sprite renderer texture from image file path on item
-        Texture2D itemTexture = this.CreateTexture2DFromPng(item.ImageAssetPathname);
-        Sprite itemSprite = Sprite.Create(itemTexture, new Rect(0.0f, 0.0f, itemTexture.width, itemTexture.height), new Vector2(0.5f, 0.5f), 100.0f);
-        this.Image.sprite = itemSprite;
+        // Sprite properties for item image
+        int width = 128;
+        int height = 128;
+
+        // Set image sprite of item with the png designated by its image asset pathname
+        this.Image.sprite = ImageUtility.CreateSpriteFromPng(item.ImageAssetPathname, width, height);
     }
 
     public void SetGuest(Guest guest)
@@ -27,17 +28,13 @@ public class Slot : MonoBehaviour
         // TODO: lookup item+guest combined image and set it to image
     }
 
-    private Texture2D CreateTexture2DFromPng(string imageAssetPathname)
+    public void RemoveItem()
     {
-        Texture2D texture2d = new Texture2D(128, 128);
+        // Reset the image sprite
+        this.Image.sprite = null;
 
-        if (File.Exists(imageAssetPathname))
-        {
-            byte[] imageFileData = File.ReadAllBytes(imageAssetPathname);
-            texture2d.LoadImage(imageFileData);
-        }
-
-        return texture2d;
+        // Remove the item in the item object
+        this.ItemObject.RemoveItem();
     }
 
 }

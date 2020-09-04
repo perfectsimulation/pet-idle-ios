@@ -9,4 +9,9 @@ public class ItemObject : MonoBehaviour
         this.Item = item;
     }
 
+    public void RemoveItem()
+    {
+        this.Item = null;
+    }
+
 }

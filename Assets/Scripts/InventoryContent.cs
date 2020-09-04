@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class InventoryContent : MonoBehaviour
@@ -8,26 +6,36 @@ public class InventoryContent : MonoBehaviour
     // The item button prefab
     public GameObject Prefab;
 
+    // The rect transform of this inventory container
+    private RectTransform RectTransform;
+
     // The user inventory, set from the start() of the game manager
     private Inventory Inventory;
 
     // The number of items in the user inventory
     private int InventoryCount;
 
-    // The rect transform of this inventory container
-    private RectTransform RectTransform;
+    [HideInInspector]
+    public delegate void ItemPlacementDelegate(Item item);
+    private ItemPlacementDelegate SelectedItemPlacementDelegate;
 
-    void Start()
+    void Awake()
     {
         this.RectTransform = this.gameObject.GetComponent<RectTransform>();
     }
 
-    public void SetInventory(Inventory inventory)
+    // Assign item placement delegate, called from menu manager
+    public void SetupItemPlacementCallback(ItemPlacementDelegate callback)
+    {
+        this.SelectedItemPlacementDelegate = callback;
+    }
+
+    public void SetupInventory(Inventory inventory)
     {
         this.Inventory = inventory;
         this.InventoryCount = inventory.Count;
 
-        // Set the height of the rect transform so the scroll view works properly
+        // Set the height of the rect transform for proper scroll behavior
         // TODO finalize layout and change these values accordingly
         float height = (float)this.InventoryCount;
         height /= 3f; // three items per row
@@ -52,6 +60,27 @@ public class InventoryContent : MonoBehaviour
 
             // TODO Set custom properties dependent on the item
             prefabObject.name = this.Inventory[i].Name;
+
+            // Get the image component on the item button prefab
+            Image image = prefabObject.GetComponent<Image>();
+
+            // Null check for image component
+            if (image == null) continue;
+
+            // Create and set item image sprite
+            image.sprite = ImageUtility.CreateSpriteFromPng(this.Inventory[i].ImageAssetPathname, 128, 128);
+
+            // Get the button component on the item button prefab
+            Button button = prefabObject.GetComponent<Button>();
+
+            // Null check for button component
+            if (button == null) continue;
+
+            // Set onClick of the new item button with the item placement
+            // delegate passed down from game manager
+            int j = i;
+            button.onClick.AddListener
+                (() => this.SelectedItemPlacementDelegate(this.Inventory[j]));
         }
 
     }

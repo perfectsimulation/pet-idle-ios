@@ -7,11 +7,14 @@ public class GameManager : MonoBehaviour
     // Slots on the active biome
     public Slot[] Slots;
 
-    // Inventory menu content
-    public InventoryContent InventoryContent;
+    // Menu manager
+    public MenuManager MenuManager;
 
     // User
     private User User;
+
+    // Item selected from inventory awaiting slot placement
+    private Item ItemToPlaceInActiveBiome;
 
     // Load user data from local persistence
     void Awake()
@@ -19,20 +22,46 @@ public class GameManager : MonoBehaviour
         this.User = Persistence.LoadUser();
     }
 
-    // Give user inventory data to the inventory menu
+    // Provide other scripts with user data and initialize their parameters
     void Start()
     {
-        this.InventoryContent.SetInventory(this.User.Inventory);
+        // Give the menu manager a callback to select an item to place in a slot
+        this.MenuManager.SetupItemPlacementCallback(this.SelectItemForSlotPlacement);
+
+        // Give the user inventory data to the inventory content
+        this.MenuManager.SetupInventory(this.User.Inventory);
     }
 
-    // Place an item in a slot
-    public void PlaceItemInSlot(Item item, int slotIndex)
+    // Delegate used in inventory content to select an item for slot placement
+    public void SelectItemForSlotPlacement(Item item)
     {
-        // Set the item object in the slot
-        this.Slots[slotIndex].SetItem(item);
+        this.ItemToPlaceInActiveBiome = item;
+    }
+
+    // Place the selected item in a slot
+    public void PlaceItemInSlot(int slotIndex)
+    {
+        // Do not continue if no item is awaiting slot placement
+        if (this.ItemToPlaceInActiveBiome == null) return;
+
+        // Check if item is already placed in a slot
+        int oldSlotIndex = this.GetIndexOfSlotContainingItem(this.ItemToPlaceInActiveBiome);
+
+        // If the item is already placed, oldSlotIndex will be non-negative
+        if (oldSlotIndex >= 0)
+        {
+            // Remove the item from the previous slot before placing it in a new one
+            this.Slots[oldSlotIndex].RemoveItem();
+        }
+
+        // Set the item object in the new slot
+        this.Slots[slotIndex].SetItem(this.ItemToPlaceInActiveBiome);
 
         // Select a guest to visit
-        this.SelectGuestToVisit(item, slotIndex);
+        this.SelectGuestToVisit(this.ItemToPlaceInActiveBiome, slotIndex);
+
+        // Clear selected item cache to ensure only one slot placement per item
+        this.ItemToPlaceInActiveBiome = null;
     }
 
     // Randomly select a guest to visit based on item visit chances
@@ -70,6 +99,23 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         this.Slots[slotIndex].SetGuest(guest);
+    }
+
+    // Get the index of the slot that contains the item, or -1 if the item is not placed
+    private int GetIndexOfSlotContainingItem(Item item)
+    {
+        // Go through each slot and check if the item matches the slot item
+        for (int i = 0; i < this.Slots.Length; i++)
+        {
+            // If there is no item in the slot, skip to the next one
+            if (this.Slots[i].ItemObject.Item == null) continue;
+
+            // If the item matches the slot item, return the index of that slot
+            if (this.Slots[i].ItemObject.Item.Equals(item)) return i;
+        }
+
+        // No match in the slots, so item is not currently placed
+        return -1;
     }
 
 }

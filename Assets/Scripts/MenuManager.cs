@@ -8,11 +8,29 @@ public class MenuManager : MonoBehaviour
     public Button CloseButton;
     public Button InventoryMenuButton;
     public GameObject InventoryMenuPanel;
+    public InventoryContent InventoryContent;
 
-    // Start with no active menus, only the main menu button showing
+    [HideInInspector]
+    public delegate void ItemPlacementDelegate(Item item);
+    private ItemPlacementDelegate SelectedItemPlacementDelegate;
+
+    // Start with no active menus and only the main menu button showing
     void Start()
     {
         this.FocusActiveBiome();
+    }
+
+    // Assign item placement delegate to inventory content, called from Start() in game manager
+    public void SetupItemPlacementCallback(ItemPlacementDelegate callback)
+    {
+        this.SelectedItemPlacementDelegate = callback;
+        this.InventoryContent.SetupItemPlacementCallback(this.SelectItemToPlaceInActiveBiome);
+    }
+
+    // Assign inventory to inventory content, called from Start() in game manager
+    public void SetupInventory(Inventory inventory)
+    {
+        this.InventoryContent.SetupInventory(inventory);
     }
 
     // Display the main menu panel and close button
@@ -31,7 +49,7 @@ public class MenuManager : MonoBehaviour
         this.InventoryMenuPanel.SetActive(true);
     }
 
-    // Close out of all menus
+    // Close out of all menus and enable the main menu button
     public void OnCloseButtonPress()
     {
         this.FocusActiveBiome();
@@ -44,6 +62,13 @@ public class MenuManager : MonoBehaviour
         this.MainMenuButton.gameObject.SetActive(true);
         this.CloseButton.gameObject.SetActive(false);
         this.InventoryMenuPanel.SetActive(false);
+    }
+
+    // Delegate used in inventory content to select an item for slot placement
+    public void SelectItemToPlaceInActiveBiome(Item item)
+    {
+        this.FocusActiveBiome();
+        this.SelectedItemPlacementDelegate(item);
     }
 
 }
