@@ -5,16 +5,30 @@ public class GuestObject : MonoBehaviour
 {
     public Guest Guest;
     public DateTime ArrivalDateTime;
+    public DateTime DepartureDateTime;
 
     public void SetGuest(Guest guest)
     {
         this.Guest = guest;
     }
 
-    // Set the arrival datetime from save data
+    // Set the arrival datetime from save data or when guest is initially slotted
     public void SetGuestArrivalDateTime(DateTime arrival)
     {
         this.ArrivalDateTime = arrival;
+    }
+
+    // Set the departure datetime from save data or when guest is initially slotted
+    public void SetGuestDepartureDateTime(DateTime departure)
+    {
+        this.DepartureDateTime = departure;
+    }
+
+    public void RemoveGuest()
+    {
+        this.Guest = null;
+        this.ArrivalDateTime = DateTime.MinValue;
+        this.DepartureDateTime = DateTime.MinValue;
     }
 
 }
@@ -33,7 +47,7 @@ public struct SerializedDateTime
     public static implicit operator SerializedDateTime(DateTime dateTime)
     {
         SerializedDateTime serializedDateTime = new SerializedDateTime();
-        serializedDateTime.stringValue = dateTime.ToShortDateString();
+        serializedDateTime.stringValue = dateTime.ToString();
         return serializedDateTime;
     }
 
@@ -44,14 +58,30 @@ public class SerializedGuestObject
 {
     public Guest Guest;
     public SerializedDateTime ArrivalDateTime;
+    public SerializedDateTime DepartureDateTime;
 
     /* Serialize a guest object */
-    public SerializedGuestObject() { }
+    public SerializedGuestObject()
+    {
+        this.Guest = null;
+        this.ArrivalDateTime = DateTime.MinValue;
+        this.DepartureDateTime = DateTime.MinValue;
+    }
 
     public SerializedGuestObject(GuestObject guestObject)
     {
-        this.Guest = guestObject.Guest;
-        this.ArrivalDateTime = guestObject.ArrivalDateTime;
+        if (guestObject.Guest != null)
+        {
+            this.Guest = guestObject.Guest;
+            this.ArrivalDateTime = guestObject.ArrivalDateTime;
+            this.DepartureDateTime = guestObject.DepartureDateTime;
+        }
+        else
+        {
+            this.Guest = null;
+            this.ArrivalDateTime = DateTime.MinValue;
+            this.DepartureDateTime = DateTime.MinValue;
+        }
     }
 
 }

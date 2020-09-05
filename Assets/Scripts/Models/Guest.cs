@@ -13,6 +13,12 @@ public class Guest
     // Minutes before latest arrival to active biome
     public float LatestArrivalInMinutes;
 
+    // Minutes before earliest departure relative to arrival in active biome
+    public float EarliestDepartureInMinutes;
+
+    // Minutes before latest departure relative to arrival in active biome
+    public float LatestDepartureInMinutes;
+
     // Priority for tie-breaking guest selection
     public int PowerLevel;
 
@@ -31,6 +37,8 @@ public class Guest
         string personality,
         float earliestArrivalInMinutes,
         float latestArrivalInMinutes,
+        float earliestDepartureInMinutes,
+        float latestDepartureInMinutes,
         int powerLevel,
         int currencyRewardForVisit,
         string imageAssetPathname)
@@ -39,6 +47,8 @@ public class Guest
         this.Personality = personality;
         this.EarliestArrivalInMinutes = earliestArrivalInMinutes;
         this.LatestArrivalInMinutes = latestArrivalInMinutes;
+        this.EarliestDepartureInMinutes = earliestDepartureInMinutes;
+        this.LatestDepartureInMinutes = latestDepartureInMinutes;
         this.PowerLevel = powerLevel;
         this.CurrencyRewardForVisit = currencyRewardForVisit;
         this.ImageAssetPathname = imageAssetPathname;
