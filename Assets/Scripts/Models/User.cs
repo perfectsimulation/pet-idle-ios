@@ -17,7 +17,12 @@ public class User
             DataInitializer.ItemA,
             DataInitializer.ItemB,
             DataInitializer.ItemC,
-            DataInitializer.ItemD
+            DataInitializer.ItemD,
+            DataInitializer.ItemE,
+            DataInitializer.ItemF,
+            DataInitializer.ItemG,
+            DataInitializer.ItemH,
+            DataInitializer.ItemI
         });
         this.UnlockedBiomes = new List<Biome>() { DataInitializer.Field };
         this.ActiveBiome = DataInitializer.Field;

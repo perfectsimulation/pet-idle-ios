@@ -36,10 +36,15 @@ public static class DataInitializer
     };
 
     /* Items */
-    public static readonly Item ItemA = new Item("Sunflower seed", 3, "Assets/Images/Hamsters/hamster-black.png", ItemADictionary);
-    public static readonly Item ItemB = new Item("Peanut", 5, "Assets/Images/Hamsters/hamster-cream.png", ItemBDictionary);
-    public static readonly Item ItemC = new Item("Wildflower", 8, "Assets/Images/Hamsters/hamster-grey.png", ItemCDictionary);
-    public static readonly Item ItemD = new Item("Honey pot", 13, "Assets/Images/Hamsters/hamster-tabby.png", ItemDDictionary);
+    public static readonly Item ItemA = new Item("Sunflower seed", 3, "Assets/Images/Items/item-block-green.png", ItemADictionary);
+    public static readonly Item ItemB = new Item("Peanut", 5, "Assets/Images/Items/item-block-pink.png", ItemBDictionary);
+    public static readonly Item ItemC = new Item("Wildflower", 8, "Assets/Images/Items/item-block-yellow.png", ItemCDictionary);
+    public static readonly Item ItemD = new Item("Honey pot", 13, "Assets/Images/Items/item-block-green.png", ItemDDictionary);
+    public static readonly Item ItemE = new Item("Ball", 3, "Assets/Images/Items/item-block-pink.png", ItemADictionary);
+    public static readonly Item ItemF = new Item("Wood block", 5, "Assets/Images/Items/item-block-yellow.png", ItemBDictionary);
+    public static readonly Item ItemG = new Item("Chewy", 8, "Assets/Images/Items/item-block-green.png", ItemCDictionary);
+    public static readonly Item ItemH = new Item("Rope", 13, "Assets/Images/Items/item-block-pink.png", ItemDDictionary);
+    public static readonly Item ItemI = new Item("Doll", 13, "Assets/Images/Items/item-block-yellow.png", ItemDDictionary);
 
 
 
