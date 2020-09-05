@@ -15,6 +15,7 @@ public class InventoryContent : MonoBehaviour
     // The user inventory, set from the start() of the game manager
     private Inventory Inventory;
 
+    // Callback to place an item in a slot of the active biome
     [HideInInspector]
     public delegate void ItemPlacementDelegate(Item item);
     private ItemPlacementDelegate SelectedItemPlacementDelegate;
@@ -102,8 +103,7 @@ public class InventoryContent : MonoBehaviour
             // Null check for button component
             if (button == null) continue;
 
-            // Set onClick of the new item button with the item placement
-            // delegate passed down from game manager
+            // Set onClick of the new item button with the delegate passed down from game manager
             int j = i;
             button.onClick.AddListener(() => this.SelectedItemPlacementDelegate(this.Inventory[j]));
         }

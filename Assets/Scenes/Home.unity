@@ -408,7 +408,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 2112614673}
+      objectReference: {fileID: 1036304484}
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
@@ -616,7 +616,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 2112614673}
+      objectReference: {fileID: 1036304484}
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
@@ -752,7 +752,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 2112614673}
+      objectReference: {fileID: 1036304484}
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
@@ -977,7 +977,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 2112614673}
+      objectReference: {fileID: 1036304484}
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
@@ -1567,6 +1567,7 @@ GameObject:
   - component: {fileID: 1036304481}
   - component: {fileID: 1036304483}
   - component: {fileID: 1036304482}
+  - component: {fileID: 1036304484}
   m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
@@ -1629,6 +1630,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1036304480}
   m_CullTransparentMesh: 0
+--- !u!114 &1036304484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1036304480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d01122f087e24c13b59ee90d0f1f35c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Biome:
+    Name: Default Biome
+    AllowedGuests:
+    - Name: Beanman
+      Personality: Legendary
+      EarliestArrivalInMinutes: 1
+      LatestArrivalInMinutes: 5
+      PowerLevel: 80
+      CurrencyRewardForVisit: 8
+      ImageAssetPathname: Assets/Images/Hamsters/hamster-cream.png
+  Slots:
+  - {fileID: 1962114740}
+  - {fileID: 285713106}
+  - {fileID: 406028092}
+  - {fileID: 127424348}
+  - {fileID: 1253015659}
+  - {fileID: 532116698}
 --- !u!224 &1055388314 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3441979517549045655, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
@@ -1809,7 +1839,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 2112614673}
+      objectReference: {fileID: 1036304484}
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
@@ -2239,7 +2269,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 2112614673}
+      objectReference: {fileID: 1036304484}
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
@@ -2805,14 +2835,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2393173a8865c4b4c9a1c439407747ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Slots:
-  - {fileID: 1962114740}
-  - {fileID: 285713106}
-  - {fileID: 406028092}
-  - {fileID: 127424348}
-  - {fileID: 1253015659}
-  - {fileID: 532116698}
   MenuManager: {fileID: 18852524}
+  ActiveBiome: {fileID: 1036304484}
 --- !u!4 &2112614674
 Transform:
   m_ObjectHideFlags: 0

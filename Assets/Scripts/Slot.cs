@@ -3,8 +3,8 @@ using UnityEngine.UI;
 
 public class Slot : MonoBehaviour
 {
-    public GuestObject GuestObject;
     public ItemObject ItemObject;
+    public GuestObject GuestObject;
     public Image Image;
 
     public Slot() { }
@@ -35,6 +35,31 @@ public class Slot : MonoBehaviour
 
         // Remove the item in the item object
         this.ItemObject.RemoveItem();
+    }
+
+}
+
+[System.Serializable]
+public class SerializedSlot
+{
+    public SerializedItem Item;
+    public Guest Guest;
+
+    public SerializedSlot() { }
+
+    /* Serialize a slot */
+    public SerializedSlot(Slot slot)
+    {
+        if (slot.ItemObject.Item != null)
+        {
+            this.Item = new SerializedItem(slot.ItemObject.Item);
+        }
+
+        if (slot.GuestObject.Guest != null)
+        {
+            this.Guest = slot.GuestObject.Guest;
+        }
+
     }
 
 }

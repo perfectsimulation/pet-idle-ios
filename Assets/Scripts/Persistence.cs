@@ -36,7 +36,11 @@ public static class Persistence
 
         // Create a new user if no local save data is found
         Debug.Log("No local user data. Created new user");
-        return new User();
+        User newUser = new User();
+
+        // Create local save file with new user
+        SaveUser(newUser);
+        return newUser;
     }
 
     /* Check if a local file exists at the provided path */

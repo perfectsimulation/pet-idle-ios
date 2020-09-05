@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -2341065627555328165}
   - component: {fileID: 5990870465239929654}
   - component: {fileID: -4484612482777126067}
-  - component: {fileID: -3109237575459258005}
+  - component: {fileID: 918004468877766575}
   m_Layer: 0
   m_Name: Slot
   m_TagString: Untagged
@@ -132,8 +132,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e09f1f44172843ae97dbf2db0786da2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GuestObject: {fileID: -3109237575459258005}
   ItemObject: {fileID: -4484612482777126067}
+  GuestObject: {fileID: 918004468877766575}
   Image: {fileID: 8925424965260359812}
 --- !u!114 &-4484612482777126067
 MonoBehaviour:
@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3edb8212c7a194c3386d3b4f31e28cb7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &-3109237575459258005
+--- !u!114 &918004468877766575
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -160,10 +160,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Guest:
-    Name: Default Guest
-    Personality: Default Personality
-    EarliestArrivalInMinutes: 0.1
-    LatestArrivalInMinutes: 1.1
+    Name: 
+    Personality: 
+    EarliestArrivalInMinutes: 0
+    LatestArrivalInMinutes: 0
     PowerLevel: 0
-    CurrencyRewardForVisit: 10
+    CurrencyRewardForVisit: 0
     ImageAssetPathname: 

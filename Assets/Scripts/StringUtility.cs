@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public static class StringUtility
@@ -57,7 +56,7 @@ public static class StringUtility
         return JsonUtility.ToJson(wrapper, true);
     }
 
-    [Serializable]
+    [System.Serializable]
     private class Wrapper<T>
     {
         public T[] data;

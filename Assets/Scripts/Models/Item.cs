@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 public class Item
@@ -17,16 +16,7 @@ public class Item
     public Dictionary<Guest, float> VisitChances;
 
     /* Default no-arg constructor */
-    public Item()
-    {
-        this.Name = "Default Item";
-        this.Price = 10;
-        this.ImageAssetPathname = "";
-        this.VisitChances = new Dictionary<Guest, float>()
-        {
-            { DataInitializer.GuestB, 1f }
-        };
-    }
+    public Item() { }
 
     /* Construct an item */
     public Item(
@@ -85,7 +75,7 @@ public class Item
 
 }
 
-[Serializable]
+[System.Serializable]
 public class SerializedItem
 {
     public string Name;
@@ -93,6 +83,9 @@ public class SerializedItem
     public string ImageAssetPathname;
     public Guest[] VisitChancesDictionaryKeys;
     public float[] VisitChancesDictionaryValues;
+
+    /* Default no-arg constructor */
+    public SerializedItem() { }
 
     /* Serialize an item */
     public SerializedItem(Item item)

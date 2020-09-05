@@ -1,6 +1,4 @@
-﻿using System;
-
-[Serializable]
+﻿[System.Serializable]
 public class Guest
 {
     // Name of this guest
@@ -25,16 +23,7 @@ public class Guest
     public string ImageAssetPathname;
 
     /* Default no-arg constructor */
-    public Guest()
-    {
-        this.Name = "Default Guest";
-        this.Personality = "Default Personality";
-        this.EarliestArrivalInMinutes = 0.1f;
-        this.LatestArrivalInMinutes = 1.1f;
-        this.PowerLevel = 0;
-        this.CurrencyRewardForVisit = 10;
-        this.ImageAssetPathname = "";
-    }
+    public Guest() { }
 
     /* Construct a guest */
     public Guest(

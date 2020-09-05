@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 public class User
 {
     public int Currency;
     public Inventory Inventory;
     public List<Biome> UnlockedBiomes;
-    public Biome ActiveBiome;
+    public SerializedBiomeObject ActiveBiomeState;
 
     /* Default no-arg constructor */
     public User()
@@ -25,7 +24,7 @@ public class User
             DataInitializer.ItemI
         });
         this.UnlockedBiomes = new List<Biome>() { DataInitializer.Field };
-        this.ActiveBiome = DataInitializer.Field;
+        this.ActiveBiomeState = new SerializedBiomeObject(DataInitializer.Field);
     }
 
     /* Deserialize a user */
@@ -44,18 +43,18 @@ public class User
         this.Currency = serializedUser.Currency;
         this.Inventory = new Inventory(deserializedItems);
         this.UnlockedBiomes = Serializer.ArrayToList(serializedUser.UnlockedBiomes);
-        this.ActiveBiome = serializedUser.ActiveBiome;
+        this.ActiveBiomeState = serializedUser.ActiveBiomeState;
     }
 
 }
 
-[Serializable]
+[System.Serializable]
 public class SerializedUser
 {
     public int Currency;
     public SerializedItem[] Inventory;
     public Biome[] UnlockedBiomes;
-    public Biome ActiveBiome;
+    public SerializedBiomeObject ActiveBiomeState;
 
     /* Serialize a user */
     public SerializedUser(User user)
@@ -73,7 +72,7 @@ public class SerializedUser
         this.Currency = user.Currency;
         this.Inventory = serializedItems;
         this.UnlockedBiomes = Serializer.ListToArray(user.UnlockedBiomes);
-        this.ActiveBiome = user.ActiveBiome;
+        this.ActiveBiomeState = user.ActiveBiomeState;
     }
 
 }
