@@ -24,8 +24,34 @@ public class Slot : MonoBehaviour
     public void SetGuest(Guest guest)
     {
         this.GuestObject.SetGuest(guest);
+    }
+
+    // Create a new arrival datetime when a guest is newly set for this slot
+    public void InitializeGuestArrivalDateTime(float delay)
+    {
+        // Create a new datetime
+        System.DateTime arrival = System.DateTime.UtcNow;
+
+        // TODO change this to AddMinutes
+        arrival.AddSeconds(delay);
+
+        // Set the newly created arrival datetime in the guest object
+        this.GuestObject.SetGuestArrivalDateTime(arrival);
+    }
+
+    // Only called on app start to show guests who have arrived
+    public void DisplayArrivedGuest(SerializedGuestObject guestObject)
+    {
+        // Set the saved arrival datetime in the guest object
+        this.GuestObject.SetGuestArrivalDateTime(guestObject.ArrivalDateTime);
 
         // TODO: lookup item+guest combined image and set it to image
+
+        // If the arrival datetime has passed, display the guest
+        if (guestObject.ArrivalDateTime < System.DateTime.UtcNow)
+        {
+            this.Image.sprite = ImageUtility.CreateSpriteFromPng(guestObject.Guest.ImageAssetPathname, 128, 128);
+        }
     }
 
     public void RemoveItem()
@@ -43,7 +69,7 @@ public class Slot : MonoBehaviour
 public class SerializedSlot
 {
     public SerializedItem Item;
-    public Guest Guest;
+    public SerializedGuestObject GuestObject;
 
     public SerializedSlot() { }
 
@@ -55,11 +81,7 @@ public class SerializedSlot
             this.Item = new SerializedItem(slot.ItemObject.Item);
         }
 
-        if (slot.GuestObject.Guest != null)
-        {
-            this.Guest = slot.GuestObject.Guest;
-        }
-
+        this.GuestObject = new SerializedGuestObject(slot.GuestObject);
     }
 
 }

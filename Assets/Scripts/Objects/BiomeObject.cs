@@ -22,6 +22,7 @@ public class BiomeObject : MonoBehaviour
         this.Biome = biome;
     }
 
+    // Restore active biome state from serialized slot save data
     public void LayoutSavedSlots(SerializedSlot[] serializedSlots)
     {
         // Do not continue if the array lengths of slots and serialized slots do not match
@@ -38,9 +39,13 @@ public class BiomeObject : MonoBehaviour
             }
 
             // If the serialized slot has a guest, assign it to the corresponding slot
-            if (serializedSlots[i].Guest != null)
+            if (serializedSlots[i].GuestObject != null &&
+                serializedSlots[i].GuestObject.Guest != null)
             {
-                this.Slots[i].SetGuest(serializedSlots[i].Guest);
+                this.Slots[i].SetGuest(serializedSlots[i].GuestObject.Guest);
+
+                // Display the guest if its arrival datetime is earlier than the current time
+                this.Slots[i].DisplayArrivedGuest(serializedSlots[i].GuestObject);
             }
 
         }
@@ -108,20 +113,14 @@ public class BiomeObject : MonoBehaviour
                 float latestArrival = selectedGuest.LatestArrivalInMinutes;
                 float delay = Random.Range(earliestArrival, latestArrival);
 
-                // Assign the new GuestObject to the slot after the delay
-                StartCoroutine(PlaceGuestInSlotAfterDelay(selectedGuest, slotIndex, delay));
+                // Assign the new GuestObject to the slot
+                this.Slots[slotIndex].SetGuest(selectedGuest);
+                this.Slots[slotIndex].InitializeGuestArrivalDateTime(delay);
 
                 // If a guest was selected, no need to iterate through the rest
                 break;
             }
         }
-    }
-
-    // Wait for the specified delay before setting the guest object in the slot
-    private IEnumerator PlaceGuestInSlotAfterDelay(Guest guest, int slotIndex, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        this.Slots[slotIndex].SetGuest(guest);
     }
 
     // Get the index of the slot that contains the item, or -1 if the item is not placed
