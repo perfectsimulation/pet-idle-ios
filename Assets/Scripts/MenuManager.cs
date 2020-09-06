@@ -7,7 +7,9 @@ public class MenuManager : MonoBehaviour
     public Button MainMenuButton;
     public Button CloseButton;
     public Button InventoryMenuButton;
+    public Button MarketMenuButton;
     public GameObject InventoryMenuPanel;
+    public GameObject MarketMenuPanel;
     public InventoryContent InventoryContent;
 
     [HideInInspector]
@@ -40,6 +42,8 @@ public class MenuManager : MonoBehaviour
         this.MainMenuButton.gameObject.SetActive(false);
         this.CloseButton.gameObject.SetActive(true);
         this.InventoryMenuPanel.SetActive(false);
+        this.MarketMenuPanel.SetActive(false);
+
     }
 
     // Display the inventory menu panel and hide the main menu panel
@@ -47,6 +51,13 @@ public class MenuManager : MonoBehaviour
     {
         this.MainMenuPanel.SetActive(false);
         this.InventoryMenuPanel.SetActive(true);
+    }
+
+    // Display the market menu panel and hide the main menu panel
+    public void OnMarketMenuButtonPress()
+    {
+        this.MainMenuPanel.SetActive(false);
+        this.MarketMenuPanel.SetActive(true);
     }
 
     // Close out of all menus and enable the main menu button
@@ -62,6 +73,7 @@ public class MenuManager : MonoBehaviour
         this.MainMenuButton.gameObject.SetActive(true);
         this.CloseButton.gameObject.SetActive(false);
         this.InventoryMenuPanel.SetActive(false);
+        this.MarketMenuPanel.SetActive(false);
     }
 
     // Delegate used in inventory content to select an item for slot placement
