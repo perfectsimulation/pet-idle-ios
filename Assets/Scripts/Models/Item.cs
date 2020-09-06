@@ -50,29 +50,6 @@ public class Item
         this.VisitChances = visitChances;
     }
 
-    /* Comparator */
-    public override bool Equals(object other)
-    {
-        // Null check on the other object
-        if (other == null) return false;
-
-        // If the other object is not an Item, it cannot be equal to this
-        if (other.GetType() != typeof(Item)) return false;
-
-        // The other object is an Item, so cast it as one
-        Item otherItem = (Item)other;
-
-        // If the otherItem name does not match this name, they are not equal
-        if (!string.Equals(this.Name, otherItem.Name)) return false;
-
-        return true;
-    }
-
-    public override int GetHashCode()
-    {
-        return base.GetHashCode();
-    }
-
 }
 
 [System.Serializable]

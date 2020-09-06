@@ -2,7 +2,7 @@
 
 public class User
 {
-    public int Currency;
+    public int Coins;
     public Inventory Inventory;
     public List<Biome> UnlockedBiomes;
     public SerializedBiomeObject ActiveBiomeState;
@@ -10,13 +10,9 @@ public class User
     /* Default no-arg constructor */
     public User()
     {
-        this.Currency = 300;
+        this.Coins = 300;
         this.Inventory = new Inventory(new List<Item>()
         {
-            DataInitializer.ItemA,
-            DataInitializer.ItemB,
-            DataInitializer.ItemC,
-            DataInitializer.ItemD,
             DataInitializer.ItemE,
             DataInitializer.ItemF,
             DataInitializer.ItemG,
@@ -40,7 +36,7 @@ public class User
             deserializedItems.Add(deserializedItem);
         }
 
-        this.Currency = serializedUser.Currency;
+        this.Coins = serializedUser.Coins;
         this.Inventory = new Inventory(deserializedItems);
         this.UnlockedBiomes = Serializer.ArrayToList(serializedUser.UnlockedBiomes);
         this.ActiveBiomeState = serializedUser.ActiveBiomeState;
@@ -51,7 +47,7 @@ public class User
 [System.Serializable]
 public class SerializedUser
 {
-    public int Currency;
+    public int Coins;
     public SerializedItem[] Inventory;
     public Biome[] UnlockedBiomes;
     public SerializedBiomeObject ActiveBiomeState;
@@ -69,7 +65,7 @@ public class SerializedUser
             serializedItems[i] = new SerializedItem(items[i]);
         }
 
-        this.Currency = user.Currency;
+        this.Coins = user.Coins;
         this.Inventory = serializedItems;
         this.UnlockedBiomes = Serializer.ListToArray(user.UnlockedBiomes);
         this.ActiveBiomeState = user.ActiveBiomeState;

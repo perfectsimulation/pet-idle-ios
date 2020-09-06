@@ -11,6 +11,7 @@ public class MenuManager : MonoBehaviour
     public GameObject InventoryMenuPanel;
     public GameObject MarketMenuPanel;
     public InventoryContent InventoryContent;
+    public MarketContent MarketContent;
 
     [HideInInspector]
     public delegate void ItemPlacementDelegate(Item item);
@@ -29,10 +30,22 @@ public class MenuManager : MonoBehaviour
         this.InventoryContent.SetupItemPlacementCallback(this.SelectItemToPlaceInActiveBiome);
     }
 
-    // Assign inventory to inventory content, called from Start() in game manager
+    // Assign inventory to inventory content, called from game manager
     public void SetupInventory(Inventory inventory)
     {
         this.InventoryContent.SetupInventory(inventory);
+    }
+
+    // Assign item purchase delegate to market content, called from Start() in game manager
+    public void SetupItemPurchaseCallback(MarketContent.ItemPurchaseDelegate callback)
+    {
+        this.MarketContent.SetupItemPurchaseCallback(callback);
+    }
+
+    // Assign market to market content, called from game manager
+    public void SetupMarket(Inventory inventory, int coins)
+    {
+        this.MarketContent.SetupMarket(new Market(inventory), coins);
     }
 
     // Display the main menu panel and close button

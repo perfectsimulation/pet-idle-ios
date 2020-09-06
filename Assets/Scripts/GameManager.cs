@@ -23,8 +23,14 @@ public class GameManager : MonoBehaviour
         // Give the menu manager a callback to select an item to place in a slot
         this.MenuManager.SetupItemPlacementCallback(this.SelectItemForSlotPlacement);
 
-        // Give the user inventory data to the inventory content
+        // Give the user inventory data to the inventory content in the menu manager
         this.MenuManager.SetupInventory(this.User.Inventory);
+
+        // Give the inventory and currency to the market content in the menu manager
+        this.MenuManager.SetupMarket(this.User.Inventory, this.User.Coins);
+
+        // Give the menu manager a callback to buy and add an item to user inventory
+        this.MenuManager.SetupItemPurchaseCallback(this.SaveUserPurchase);
 
         // Give the active biome a callback to update the user with new biome states
         this.ActiveBiome.SetupSaveUserCallback(this.SaveUserActiveBiomeState);
@@ -36,13 +42,29 @@ public class GameManager : MonoBehaviour
         this.ActiveBiome.LayoutSavedSlots(this.User.ActiveBiomeState.Slots);
     }
 
-    // Delegate called in inventory content to slot the selected item
+    // Delegate called in inventory content to enable placement of selected item
     public void SelectItemForSlotPlacement(Item item)
     {
         this.ActiveBiome.SelectItemForSlotPlacement(item);
     }
 
-    // Delegate called in active biome to save user data with updated biome state
+    // Delegate called in market content to update user inventory and coins
+    public void SaveUserPurchase(Item item)
+    {
+        // Add the newly purchased item to the user inventory
+        this.User.Inventory.Add(item);
+
+        // Subtract the newly purchased item price from the user coin balance
+        this.User.Coins -= item.Price;
+
+        // Update menus that need inventory data TODO optimize this
+        this.MenuManager.SetupInventory(this.User.Inventory);
+        this.MenuManager.SetupMarket(this.User.Inventory, this.User.Coins);
+
+        Persistence.SaveUser(this.User);
+    }
+
+    // Delegate called in active biome to update user active biome state
     public void SaveUserActiveBiomeState(SerializedBiomeObject updatedBiomeState)
     {
         this.User.ActiveBiomeState = updatedBiomeState;
