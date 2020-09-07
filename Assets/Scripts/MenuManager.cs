@@ -48,6 +48,12 @@ public class MenuManager : MonoBehaviour
         this.MarketContent.SetupMarket(new Market(inventory), coins);
     }
 
+    // Add a newly purchased item to inventory content
+    public void UpdateInventory(Item item)
+    {
+        this.InventoryContent.UpdateInventory(item);
+    }
+
     // Display the main menu panel and close button
     public void OnMainMenuButtonPress()
     {

@@ -57,9 +57,8 @@ public class GameManager : MonoBehaviour
         // Subtract the newly purchased item price from the user coin balance
         this.User.Coins -= item.Price;
 
-        // Update menus that need inventory data TODO optimize this
-        this.MenuManager.SetupInventory(this.User.Inventory);
-        this.MenuManager.SetupMarket(this.User.Inventory, this.User.Coins);
+        // Update inventory content with newly purchased item
+        this.MenuManager.UpdateInventory(item);
 
         Persistence.SaveUser(this.User);
     }

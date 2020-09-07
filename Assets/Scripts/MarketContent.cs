@@ -14,7 +14,8 @@ public class MarketContent : MonoBehaviour
     // Auto-layout script for the item buttons
     private GridLayoutGroup GridLayoutGroup;
 
-    private List<GameObject> InstantiatedPrefabs;
+    // Keep references of all instantiated item buttons by item name
+    private Dictionary<string, GameObject> InstantiatedPrefabs;
 
     // The user inventory, set from the game manager
     private Market Market;
@@ -29,6 +30,7 @@ public class MarketContent : MonoBehaviour
 
     void Awake()
     {
+        // Cache components to layout prefabs after receiving data from game manager
         this.RectTransform = this.gameObject.GetComponent<RectTransform>();
         this.GridLayoutGroup = this.gameObject.GetComponent<GridLayoutGroup>();
     }
@@ -44,6 +46,9 @@ public class MarketContent : MonoBehaviour
     {
         this.Market = market;
         this.UserCoins = coins;
+
+        // Initialize dictionary of instantiated item buttons
+        this.InstantiatedPrefabs = new Dictionary<string, GameObject>();
 
         // Calculate the scroll view height based on item count and layout properties
         // Note: this assumes cells are square
@@ -71,19 +76,12 @@ public class MarketContent : MonoBehaviour
         // Set the height of the rect transform for proper scroll behavior
         this.RectTransform.sizeDelta = new Vector2(screenWidth, height);
 
-        // Clear market content for new market items
-        this.DestroyOldItemButtonPrefabs();
-
-        // Reset list of instantiated item buttons
-        this.InstantiatedPrefabs = new List<GameObject>();
-        this.InstantiatedPrefabs.Capacity = this.Market.Count;
-
         // Fill the inventory menu with item buttons
         this.Populate();
     }
 
     // Create an item button prefab for each item in the market
-    public void Populate()
+    private void Populate()
     {
         GameObject prefabObject;
 
@@ -94,9 +92,6 @@ public class MarketContent : MonoBehaviour
 
             // Instantiate the prefab clone with this as the parent
             prefabObject = Instantiate(this.Prefab, this.transform);
-
-            // Add the clone to the array of instantiated prefabs
-            this.InstantiatedPrefabs.Add(prefabObject);
 
             // TODO Set custom properties dependent on the item
             prefabObject.name = item.Name;
@@ -126,8 +121,14 @@ public class MarketContent : MonoBehaviour
             // Null check for button component
             if (button == null) continue;
 
+            // If the user already owns this item, disable interaction on the button
+            button.interactable = !this.Market.ItemPurchaseRecord[item].Equals(true);
+
             // Set onClick of the new item button with the delegate passed down from game manager
             button.onClick.AddListener(() => this.TryItemPurchase(item));
+
+            // Add the new item button to the dictionary of instantiated prefabs
+            this.InstantiatedPrefabs.Add(item.Name, prefabObject);
         }
 
     }
@@ -143,20 +144,30 @@ public class MarketContent : MonoBehaviour
 
             // Callback to game manager to save the updated inventory and coins
             this.SelectedItemPurchaseDelegate(item);
+
+            // Update market and market content to reflect new item purchase
+            this.UpdateMarket(item);
         }
 
     }
 
-    // Destroy old market buttons TODO optimize with object pooling
-    private void DestroyOldItemButtonPrefabs()
+    // Update market and show purchased overlay for this item
+    private void UpdateMarket(Item item)
     {
-        if (this.InstantiatedPrefabs == null) return;
+        // Set isPurchased to true for this item
+        this.Market.PurchaseItem(item);
 
-        foreach(GameObject itemButton in this.InstantiatedPrefabs)
-        {
-            Destroy(itemButton);
-        }
+        // Get the item button object for this item and its button component
+        GameObject itemButton = this.InstantiatedPrefabs[item.Name];
+        Button itemButtonComponent = itemButton.GetComponent<Button>();
 
+        // Do not continue if there was a problem getting the button component
+        if (itemButtonComponent == null) return;
+
+        // Disable interaction on this item button
+        itemButtonComponent.interactable = false;
+
+        // TODO set active the purchase overlay image
     }
 
 }

@@ -38,4 +38,10 @@ public class Market
         }
     }
 
+    // Set value of this item key to true in item purchase record
+    public void PurchaseItem(Item item)
+    {
+        this.ItemPurchaseRecord[item] = true;
+    }
+
 }
