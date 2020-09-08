@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
@@ -17,6 +18,9 @@ public class MenuManager : MonoBehaviour
     public delegate void ItemPlacementDelegate(Item item);
     private ItemPlacementDelegate SelectedItemPlacementDelegate;
 
+    // Change close button behavior based on which menus elements are active
+    private delegate void CloseButtonListener();
+
     // Start with no active menus and only the main menu button showing
     void Start()
     {
@@ -28,6 +32,13 @@ public class MenuManager : MonoBehaviour
     {
         this.SelectedItemPlacementDelegate = callback;
         this.InventoryContent.SetupItemPlacementCallback(this.SelectItemToPlaceInActiveBiome);
+    }
+
+    // Delegate used in inventory content to select an item for slot placement
+    public void SelectItemToPlaceInActiveBiome(Item item)
+    {
+        this.FocusActiveBiome();
+        this.SelectedItemPlacementDelegate(item);
     }
 
     // Assign inventory to inventory content, called from game manager
@@ -63,6 +74,8 @@ public class MenuManager : MonoBehaviour
         this.InventoryMenuPanel.SetActive(false);
         this.MarketMenuPanel.SetActive(false);
 
+        // Set listener of close button to focus the active biome
+        this.SetCloseButtonListener(this.FocusActiveBiome);
     }
 
     // Display the inventory menu panel and hide the main menu panel
@@ -70,6 +83,9 @@ public class MenuManager : MonoBehaviour
     {
         this.MainMenuPanel.SetActive(false);
         this.InventoryMenuPanel.SetActive(true);
+
+        // Set listener of close button to focus the main menu
+        this.SetCloseButtonListener(this.FocusMainMenu);
     }
 
     // Display the market menu panel and hide the main menu panel
@@ -77,16 +93,20 @@ public class MenuManager : MonoBehaviour
     {
         this.MainMenuPanel.SetActive(false);
         this.MarketMenuPanel.SetActive(true);
+
+        // Set listener of close button to focus the main menu
+        this.SetCloseButtonListener(this.FocusMainMenu);
     }
 
-    // Close out of all menus and enable the main menu button
-    public void OnCloseButtonPress()
+    // Change close button behavior
+    private void SetCloseButtonListener(CloseButtonListener listener)
     {
-        this.FocusActiveBiome();
+        this.CloseButton.onClick.RemoveAllListeners();
+        this.CloseButton.onClick.AddListener(() => listener());
     }
 
     // Hide all menu elements except the main menu button
-    void FocusActiveBiome()
+    private void FocusActiveBiome()
     {
         this.MainMenuPanel.SetActive(false);
         this.MainMenuButton.gameObject.SetActive(true);
@@ -95,11 +115,18 @@ public class MenuManager : MonoBehaviour
         this.MarketMenuPanel.SetActive(false);
     }
 
-    // Delegate used in inventory content to select an item for slot placement
-    public void SelectItemToPlaceInActiveBiome(Item item)
+    // Hide all menus except the main menu
+    private void FocusMainMenu()
     {
-        this.FocusActiveBiome();
-        this.SelectedItemPlacementDelegate(item);
+        this.MainMenuPanel.SetActive(true);
+        this.InventoryMenuPanel.SetActive(false);
+        this.MarketMenuPanel.SetActive(false);
+
+        // Set listener of close button to focus the active biome
+        this.SetCloseButtonListener(this.FocusActiveBiome);
+
+        // Remove the highlighted state on the close button
+        EventSystem.current.SetSelectedGameObject(null);
     }
 
 }
