@@ -249,6 +249,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b412ecf4bf351481ab0fee60a3c2cf6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ActiveBiome: {fileID: 1036304484}
   MainMenuPanel: {fileID: 1173226606}
   MainMenuButton: {fileID: 648693766}
   CloseButton: {fileID: 1859934374}
@@ -3767,7 +3768,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MenuManager: {fileID: 18852524}
-  ActiveBiome: {fileID: 1036304484}
 --- !u!4 &2112614674
 Transform:
   m_ObjectHideFlags: 0

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
+    public BiomeObject ActiveBiome;
     public GameObject MainMenuPanel;
     public Button MainMenuButton;
     public Button CloseButton;
@@ -14,10 +15,6 @@ public class MenuManager : MonoBehaviour
     public InventoryContent InventoryContent;
     public MarketContent MarketContent;
 
-    [HideInInspector]
-    public delegate void ItemPlacementDelegate(Item item);
-    private ItemPlacementDelegate SelectedItemPlacementDelegate;
-
     // Change close button behavior based on which menus elements are active
     private delegate void CloseButtonListener();
 
@@ -25,20 +22,9 @@ public class MenuManager : MonoBehaviour
     void Start()
     {
         this.FocusActiveBiome();
-    }
 
-    // Assign item placement delegate to inventory content, called from Start() in game manager
-    public void SetupItemPlacementCallback(ItemPlacementDelegate callback)
-    {
-        this.SelectedItemPlacementDelegate = callback;
-        this.InventoryContent.SetupItemPlacementCallback(this.SelectItemToPlaceInActiveBiome);
-    }
-
-    // Delegate used in inventory content to select an item for slot placement
-    public void SelectItemToPlaceInActiveBiome(Item item)
-    {
-        this.FocusActiveBiome();
-        this.SelectedItemPlacementDelegate(item);
+        // Assign item placement delegate to inventory content
+        this.InventoryContent.SetupItemPlacementCallback(this.PlaceItemInActiveBiome);
     }
 
     // Assign inventory to inventory content, called from game manager
@@ -47,16 +33,28 @@ public class MenuManager : MonoBehaviour
         this.InventoryContent.SetupInventory(inventory);
     }
 
-    // Assign item purchase delegate to market content, called from Start() in game manager
+    // Assign market to market content, called from game manager
+    public void SetupMarket(Inventory inventory, int coins)
+    {
+        this.MarketContent.SetupMarket(new Market(inventory), coins);
+    }
+
+    // Assign item purchase delegate to market content, called from game manager
     public void SetupItemPurchaseCallback(MarketContent.ItemPurchaseDelegate callback)
     {
         this.MarketContent.SetupItemPurchaseCallback(callback);
     }
 
-    // Assign market to market content, called from game manager
-    public void SetupMarket(Inventory inventory, int coins)
+    // Assign update biome callback to active biome, called from game manager
+    public void SetupSaveBiomeCallback(BiomeObject.SaveDelegate callback)
     {
-        this.MarketContent.SetupMarket(new Market(inventory), coins);
+        this.ActiveBiome.SetupSaveCallback(callback);
+    }
+
+    // Assign biome to active biome, called from game manager
+    public void SetupBiome(SerializedBiomeObject biomeObject)
+    {
+        this.ActiveBiome.SetupBiome(biomeObject.Biome, biomeObject.Slots);
     }
 
     // Add a newly purchased item to inventory content
@@ -96,6 +94,14 @@ public class MenuManager : MonoBehaviour
 
         // Set listener of close button to focus the main menu
         this.SetCloseButtonListener(this.FocusMainMenu);
+    }
+
+    // Delegate called in inventory content to select an item for slot placement
+    private void PlaceItemInActiveBiome(Item item)
+    {
+        this.FocusActiveBiome();
+        // TODO implement custom close button behavior
+        this.ActiveBiome.SelectItemForSlotPlacement(item);
     }
 
     // Change close button behavior

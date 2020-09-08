@@ -5,9 +5,6 @@ public class GameManager : MonoBehaviour
     // Menu manager
     public MenuManager MenuManager;
 
-    // Active biome
-    public BiomeObject ActiveBiome;
-
     // User
     private User User;
 
@@ -20,36 +17,24 @@ public class GameManager : MonoBehaviour
     // Provide other scripts with user data and initialize their parameters
     void Start()
     {
-        // Give the menu manager a callback to select an item to place in a slot
-        this.MenuManager.SetupItemPlacementCallback(this.SelectItemForSlotPlacement);
-
-        // Give the user inventory data to the inventory content in the menu manager
+        // Give the user inventory data to the inventory content
         this.MenuManager.SetupInventory(this.User.Inventory);
 
-        // Give the inventory and currency to the market content in the menu manager
+        // Give the inventory and currency to the market content
         this.MenuManager.SetupMarket(this.User.Inventory, this.User.Coins);
 
-        // Give the menu manager a callback to buy and add an item to user inventory
-        this.MenuManager.SetupItemPurchaseCallback(this.SaveUserPurchase);
+        // Give the menu manager a callback to save item purchases
+        this.MenuManager.SetupItemPurchaseCallback(this.SaveItemPurchase);
 
-        // Give the active biome a callback to update the user with new biome states
-        this.ActiveBiome.SetupSaveUserCallback(this.SaveUserActiveBiomeState);
+        // Give the active biome a callback to save updates to active biome
+        this.MenuManager.SetupSaveBiomeCallback(this.SaveActiveBiomeState);
 
-        // Set the active biome from the saved data
-        this.ActiveBiome.SetupBiome(this.User.ActiveBiomeState.Biome);
-
-        // Fill the active biome slots from the saved data
-        this.ActiveBiome.LayoutSavedSlots(this.User.ActiveBiomeState.Slots);
-    }
-
-    // Delegate called in inventory content to enable placement of selected item
-    public void SelectItemForSlotPlacement(Item item)
-    {
-        this.ActiveBiome.SelectItemForSlotPlacement(item);
+        // Set the active biome state from the saved data
+        this.MenuManager.SetupBiome(this.User.ActiveBiomeState);
     }
 
     // Delegate called in market content to update user inventory and coins
-    public void SaveUserPurchase(Item item)
+    public void SaveItemPurchase(Item item)
     {
         // Add the newly purchased item to the user inventory
         this.User.Inventory.Add(item);
@@ -64,7 +49,7 @@ public class GameManager : MonoBehaviour
     }
 
     // Delegate called in active biome to update user active biome state
-    public void SaveUserActiveBiomeState(SerializedBiomeObject updatedBiomeState)
+    public void SaveActiveBiomeState(SerializedBiomeObject updatedBiomeState)
     {
         this.User.ActiveBiomeState = updatedBiomeState;
         Persistence.SaveUser(this.User);

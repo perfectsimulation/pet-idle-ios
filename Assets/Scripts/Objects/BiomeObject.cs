@@ -13,50 +13,19 @@ public class BiomeObject : MonoBehaviour
 
     // Callback to save user data with an updated active biome state
     [HideInInspector]
-    public delegate void SaveUserDelegate(SerializedBiomeObject updatedBiomeState);
-    private SaveUserDelegate SaveUpdatedActiveBiomeDelegate;
+    public delegate void SaveDelegate(SerializedBiomeObject updatedBiomeState);
+    private SaveDelegate SaveUpdatedActiveBiomeDelegate;
 
     // Assign save user active biome state delegate from game manager
-    public void SetupSaveUserCallback(SaveUserDelegate callback)
+    public void SetupSaveCallback(SaveDelegate callback)
     {
         this.SaveUpdatedActiveBiomeDelegate = callback;
     }
 
-    public void SetupBiome(Biome biome)
+    public void SetupBiome(Biome biome, SerializedSlot[] serializedSlots)
     {
         this.Biome = biome;
-    }
-
-    // Restore active biome state from serialized slot save data
-    public void LayoutSavedSlots(SerializedSlot[] serializedSlots)
-    {
-        // Do not continue if the array lengths of slots and serialized slots do not match
-        if (this.Slots.Length != serializedSlots.Length) return;
-
-        // Hydrate slots with serialized slot data one by one
-        for (int i = 0; i < this.Slots.Length; i++)
-        {
-            // Pass the slot a delegate to retrigger new guests
-            this.Slots[i].SetupSelectGuestCallback(this.SelectGuestToVisit);
-
-            // If the serialized slot has an item, assign it to the corresponding slot
-            if (serializedSlots[i].Item != null)
-            {
-                Item item = new Item(serializedSlots[i].Item);
-                this.Slots[i].SetItem(item);
-            }
-
-            // If the serialized slot has a guest, assign it to the corresponding slot
-            if (serializedSlots[i].GuestObject != null &&
-                serializedSlots[i].GuestObject.Guest != null)
-            {
-                this.Slots[i].SetGuest(serializedSlots[i].GuestObject.Guest);
-
-                // Show guest if it has arrived or remove it if it has departed
-                this.Slots[i].CheckGuestVisit(serializedSlots[i].GuestObject);
-            }
-
-        }
+        this.LayoutSavedSlots(serializedSlots);
     }
 
     // Delegate called in inventory content to select an item for slot placement
@@ -89,6 +58,38 @@ public class BiomeObject : MonoBehaviour
 
         // Clear selected item cache to ensure only one slot placement per item
         this.ItemToPlaceInActiveBiome = null;
+    }
+
+    // Restore active biome state from serialized slot save data
+    private void LayoutSavedSlots(SerializedSlot[] serializedSlots)
+    {
+        // Do not continue if the array lengths of slots and serialized slots do not match
+        if (this.Slots.Length != serializedSlots.Length) return;
+
+        // Hydrate slots with serialized slot data one by one
+        for (int i = 0; i < this.Slots.Length; i++)
+        {
+            // Pass the slot a delegate to retrigger new guests
+            this.Slots[i].SetupSelectGuestCallback(this.SelectGuestToVisit);
+
+            // If the serialized slot has an item, assign it to the corresponding slot
+            if (serializedSlots[i].Item != null)
+            {
+                Item item = new Item(serializedSlots[i].Item);
+                this.Slots[i].SetItem(item);
+            }
+
+            // If the serialized slot has a guest, assign it to the corresponding slot
+            if (serializedSlots[i].GuestObject != null &&
+                serializedSlots[i].GuestObject.Guest != null)
+            {
+                this.Slots[i].SetGuest(serializedSlots[i].GuestObject.Guest);
+
+                // Show guest if it has arrived or remove it if it has departed
+                this.Slots[i].CheckGuestVisit(serializedSlots[i].GuestObject);
+            }
+
+        }
     }
 
     // Randomly select a guest to visit based on item visit chances
