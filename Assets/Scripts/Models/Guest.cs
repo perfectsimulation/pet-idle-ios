@@ -25,8 +25,8 @@ public class Guest
     // Currency rewarded to user upon completion of guest visit
     public int CurrencyRewardForVisit;
 
-    // Pathname to the png to use for the GuestObject that owns this Guest
-    public string ImageAssetPathname;
+    // Path to the png to use for the GuestObject that owns this Guest
+    public string ImageAssetPath;
 
     /* Default no-arg constructor */
     public Guest() { }
@@ -41,7 +41,7 @@ public class Guest
         float latestDepartureInMinutes,
         int powerLevel,
         int currencyRewardForVisit,
-        string imageAssetPathname)
+        string imageAssetPath)
     {
         this.Name = name;
         this.Personality = personality;
@@ -51,7 +51,19 @@ public class Guest
         this.LatestDepartureInMinutes = latestDepartureInMinutes;
         this.PowerLevel = powerLevel;
         this.CurrencyRewardForVisit = currencyRewardForVisit;
-        this.ImageAssetPathname = imageAssetPathname;
+        this.ImageAssetPath = imageAssetPath;
+    }
+
+    // This is a valid guest if it has been assigned a non-empty name
+    public static bool IsValid(Guest guest)
+    {
+        if (guest.Name != null &&
+            !guest.Name.Equals(string.Empty))
+        {
+            return true;
+        }
+
+        return false;
     }
 
 }

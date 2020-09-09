@@ -9,8 +9,8 @@ public class Item
     // Price to buy this item in the shop
     public int Price;
 
-    // Pathname to the png to use for the ItemObject that owns this Item
-    public string ImageAssetPathname;
+    // Path to the png to use for the ItemObject that owns this Item
+    public string ImageAssetPath;
 
     // Dictionary with guest keys and visit chance values
     public Dictionary<Guest, float> VisitChances;
@@ -22,12 +22,12 @@ public class Item
     public Item(
         string name,
         int price,
-        string imageAssetPathname,
+        string imageAssetPath,
         Dictionary<Guest, float> visitChances)
     {
         this.Name = name;
         this.Price = price;
-        this.ImageAssetPathname = imageAssetPathname;
+        this.ImageAssetPath = imageAssetPath;
         this.VisitChances = visitChances;
     }
 
@@ -46,8 +46,36 @@ public class Item
 
         this.Name = serializedItem.Name;
         this.Price = serializedItem.Price;
-        this.ImageAssetPathname = serializedItem.ImageAssetPathname;
+        this.ImageAssetPath = serializedItem.ImageAssetPath;
         this.VisitChances = visitChances;
+    }
+
+    // Two items are equal if they have the same name
+    public override bool Equals(object obj)
+    {
+        // If the other obj is not an Item, it is not equal
+        Item otherItem = (Item)obj;
+        if (otherItem == null) return false;
+
+        // If the other item has the same name, it is equal
+        return this.Name.Equals(otherItem.Name);
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    // This is a valid item if it has been assigned a non-empty name
+    public static bool IsValid(SerializedItem serializedItem)
+    {
+        if (serializedItem.Name != null &&
+            !serializedItem.Name.Equals(string.Empty))
+        {
+            return true;
+        }
+
+        return false;
     }
 
 }
@@ -57,7 +85,7 @@ public class SerializedItem
 {
     public string Name;
     public int Price;
-    public string ImageAssetPathname;
+    public string ImageAssetPath;
     public Guest[] VisitChancesDictionaryKeys;
     public float[] VisitChancesDictionaryValues;
 
@@ -69,7 +97,7 @@ public class SerializedItem
     {
         this.Name = item.Name;
         this.Price = item.Price;
-        this.ImageAssetPathname = item.ImageAssetPathname;
+        this.ImageAssetPath = item.ImageAssetPath;
         this.VisitChancesDictionaryKeys = item.VisitChances.Keys.ToArray();
         this.VisitChancesDictionaryValues = item.VisitChances.Values.ToArray();
     }

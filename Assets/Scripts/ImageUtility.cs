@@ -5,15 +5,15 @@ public static class ImageUtility
 {
     // Create a Texture2D from the png found from the image asset pathname
     public static Texture2D CreateTexture2DFromPng(
-        string imageAssetPathname,
+        string imageAssetPath,
         int width,
         int height)
     {
         Texture2D texture2d = new Texture2D(width, height);
 
-        if (File.Exists(imageAssetPathname))
+        if (File.Exists(imageAssetPath))
         {
-            byte[] imageFileData = File.ReadAllBytes(imageAssetPathname);
+            byte[] imageFileData = File.ReadAllBytes(imageAssetPath);
             texture2d.LoadImage(imageFileData);
         }
 
@@ -22,12 +22,12 @@ public static class ImageUtility
 
     // Create a sprite from the png found from the image asset pathname
     public static Sprite CreateSpriteFromPng(
-        string imageAssetPathname,
+        string imageAssetPath,
         int width,
         int height)
     {
         // Create a Texture2D from the png designated by the asset path
-        Texture2D texture2d = CreateTexture2DFromPng(imageAssetPathname, width, height);
+        Texture2D texture2d = CreateTexture2DFromPng(imageAssetPath, width, height);
 
         // Use the following default properties
         Rect rect = new Rect(0.0f, 0.0f, texture2d.width, texture2d.height);

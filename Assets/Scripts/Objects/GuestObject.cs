@@ -31,6 +31,60 @@ public class GuestObject : MonoBehaviour
         this.DepartureDateTime = DateTime.MinValue;
     }
 
+    // Check if the arrival datetime is in the past and departure is in the future
+    public bool IsGuestCurrentlyVisiting()
+    {
+        if (this.Guest != null)
+        {
+            // Check if the current time is between the arrival and departure times
+            return (this.ArrivalDateTime < DateTime.UtcNow &&
+                this.DepartureDateTime >= DateTime.UtcNow);
+        }
+
+        // There is no guest
+        return false;
+    }
+
+    // Check if the departure datetime is in the past
+    public bool IsGuestDeparted()
+    {
+        if (this.Guest != null)
+        {
+            // True when the current time is past the departure time
+            return (this.DepartureDateTime < DateTime.UtcNow);
+        }
+
+        // There is no guest
+        return true;
+    }
+
+    // Check if the arrival datetime is in the past and departure is in the future
+    public static bool IsGuestVisiting(SerializedGuestObject serializedGuestObject)
+    {
+        if (serializedGuestObject.Guest != null)
+        {
+            // True when the current time is between the arrival and departure times
+            return (serializedGuestObject.ArrivalDateTime < DateTime.UtcNow &&
+                serializedGuestObject.DepartureDateTime >= DateTime.UtcNow);
+        }
+
+        // There is no guest
+        return false;
+    }
+
+    // Check if the departure datetime is in the past
+    public static bool IsGuestDeparted(SerializedGuestObject serializedGuestObject)
+    {
+        if (serializedGuestObject.Guest != null)
+        {
+            // True when the current time is past the departure time
+            return (serializedGuestObject.DepartureDateTime < DateTime.UtcNow);
+        }
+
+        // There is no guest
+        return true;
+    }
+
 }
 
 [Serializable]
@@ -46,8 +100,10 @@ public struct SerializedDateTime
 
     public static implicit operator SerializedDateTime(DateTime dateTime)
     {
-        SerializedDateTime serializedDateTime = new SerializedDateTime();
-        serializedDateTime.stringValue = dateTime.ToString();
+        SerializedDateTime serializedDateTime = new SerializedDateTime
+        {
+            stringValue = dateTime.ToString()
+        };
         return serializedDateTime;
     }
 

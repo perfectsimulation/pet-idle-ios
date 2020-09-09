@@ -27,25 +27,25 @@ public class MenuManager : MonoBehaviour
         this.InventoryContent.SetupItemPlacementCallback(this.PlaceItemInActiveBiome);
     }
 
-    // Assign inventory to inventory content, called from game manager
+    // Assign inventory to inventory content from game manager
     public void SetupInventory(Inventory inventory)
     {
         this.InventoryContent.SetupInventory(inventory);
     }
 
-    // Assign market to market content, called from game manager
+    // Assign market to market content from game manager
     public void SetupMarket(Inventory inventory, int coins)
     {
         this.MarketContent.SetupMarket(new Market(inventory), coins);
     }
 
-    // Assign item purchase delegate to market content, called from game manager
+    // Assign item purchase delegate to market content from game manager
     public void SetupItemPurchaseCallback(MarketContent.ItemPurchaseDelegate callback)
     {
         this.MarketContent.SetupItemPurchaseCallback(callback);
     }
 
-    // Assign update biome callback to active biome, called from game manager
+    // Assign update biome delegate to active biome from game manager
     public void SetupSaveBiomeCallback(BiomeObject.SaveDelegate callback)
     {
         this.ActiveBiome.SetupSaveCallback(callback);
