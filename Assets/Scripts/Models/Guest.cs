@@ -22,8 +22,11 @@ public class Guest
     // Priority for tie-breaking guest selection
     public int PowerLevel;
 
-    // Currency rewarded to user upon completion of guest visit
-    public int CurrencyRewardForVisit;
+    // Minimum coins awarded to user upon completion of guest visit
+    public int MinimumCoinDrop;
+
+    // Maximum coins awarded to user upon completion of guest visit
+    public int MaximumCoinDrop;
 
     // Path to the png to use for the GuestObject that owns this Guest
     public string ImageAssetPath;
@@ -40,7 +43,8 @@ public class Guest
         float earliestDepartureInMinutes,
         float latestDepartureInMinutes,
         int powerLevel,
-        int currencyRewardForVisit,
+        int minimumCoinDrop,
+        int maximumCoinDrop,
         string imageAssetPath)
     {
         this.Name = name;
@@ -50,7 +54,8 @@ public class Guest
         this.EarliestDepartureInMinutes = earliestDepartureInMinutes;
         this.LatestDepartureInMinutes = latestDepartureInMinutes;
         this.PowerLevel = powerLevel;
-        this.CurrencyRewardForVisit = currencyRewardForVisit;
+        this.MinimumCoinDrop = minimumCoinDrop;
+        this.MaximumCoinDrop = maximumCoinDrop;
         this.ImageAssetPath = imageAssetPath;
     }
 

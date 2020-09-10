@@ -3,10 +3,15 @@
 public static class DataInitializer
 {
     /* Guests */
-    public static readonly Guest GuestA = new Guest("Alex", "Ambient", 0.2f, 2.2f, 3f, 10f, 20, 5, "Assets/Images/Hamsters/hamster-black.png");
-    public static readonly Guest GuestB = new Guest("Beanman", "Legendary", 1f, 5f, 10f, 30f, 80, 8, "Assets/Images/Hamsters/hamster-cream.png");
-    public static readonly Guest GuestC = new Guest("Cherry", "Charming", 0.4f, 4f, 4f, 12f, 55, 13, "Assets/Images/Hamsters/hamster-grey.png");
-    public static readonly Guest GuestD = new Guest("Dahlia", "Delightful", 5f, 9f, 1f, 20f, 11, 20, "Assets/Images/Hamsters/hamster-orange.png");
+    public static readonly Guest Bear = new Guest("Bear", "Trickster", 0.2f, 2.2f, 3f, 10f, 20, 5, 15, "Assets/Images/Hamsters/bear.png");
+    public static readonly Guest Biscuit = new Guest("Biscuit", "Quiet", 1f, 5f, 10f, 30f, 80, 8, 20, "Assets/Images/Hamsters/biscuit.png");
+    public static readonly Guest Daisy = new Guest("Daisy", "Luminous", 0.4f, 4f, 4f, 12f, 55, 13, 30, "Assets/Images/Hamsters/daisy.png");
+    public static readonly Guest Gizmo = new Guest("Gizmo", "Otherworldly", 5f, 9f, 1f, 20f, 11, 20, 44, "Assets/Images/Hamsters/gizmo.png");
+    public static readonly Guest Hamlet = new Guest("Hamlet", "Whimsical", 0.2f, 2.2f, 3f, 10f, 20, 5, 15, "Assets/Images/Hamsters/hamlet.png");
+    public static readonly Guest Kujo = new Guest("Kujo", "Legendary", 1f, 5f, 10f, 30f, 80, 8, 20, "Assets/Images/Hamsters/kujo.png");
+    public static readonly Guest Muffin = new Guest("Muffin", "Odd", 0.4f, 4f, 4f, 12f, 55, 13, 30, "Assets/Images/Hamsters/muffin.png");
+    public static readonly Guest Nugget = new Guest("Nugget", "Elegant", 5f, 9f, 1f, 20f, 11, 20, 44, "Assets/Images/Hamsters/nugget.png");
+    public static readonly Guest Sammy = new Guest("Sammy", "Realistic", 5f, 9f, 1f, 20f, 11, 20, 44, "Assets/Images/Hamsters/sammy.png");
 
 
 
@@ -14,24 +19,24 @@ public static class DataInitializer
     /* Guest visit chance dictionaries for Items */
     private static readonly Dictionary<Guest, float> ItemADictionary = new Dictionary<Guest, float>()
     {
-        { GuestA, 0.5f },
-        { GuestB, 1f }
+        { Gizmo, 0.5f },
+        { Bear, 1f }
     };
     private static readonly Dictionary<Guest, float> ItemBDictionary = new Dictionary<Guest, float>()
     {
-        { GuestB, 0.4f },
-        { GuestA, 1f }
+        { Kujo, 0.4f },
+        { Biscuit, 1f }
     };
     private static readonly Dictionary<Guest, float> ItemCDictionary = new Dictionary<Guest, float>()
     {
-        { GuestC, 0.3f },
-        { GuestD, 1f }
+        { Muffin, 0.3f },
+        { Nugget, 1f }
     };
     private static readonly Dictionary<Guest, float> ItemDDictionary = new Dictionary<Guest, float>()
     {
-        { GuestD, 0.2f },
-        { GuestA, 0.6f },
-        { GuestC, 1f }
+        { Daisy, 0.2f },
+        { Hamlet, 0.6f },
+        { Sammy, 1f }
     };
 
     /* Items */
@@ -62,8 +67,8 @@ public static class DataInitializer
 
 
     /* Allowed Guests for Biomes */
-    public static readonly Guest[] FieldGuests = new Guest[] { GuestA, GuestB, GuestC };
-    public static readonly Guest[] ForestGuests = new Guest[] { GuestA, GuestC, GuestD };
+    public static readonly Guest[] FieldGuests = new Guest[] { Gizmo, Bear, Daisy, Hamlet };
+    public static readonly Guest[] ForestGuests = new Guest[] { Biscuit, Kujo, Nugget, Sammy, Muffin };
 
     /* Biomes */
     public static Biome Field = new Biome("Field", FieldGuests);

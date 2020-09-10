@@ -11,15 +11,25 @@ public class BiomeObject : MonoBehaviour
     // Item selected from inventory awaiting slot placement
     private Item ItemToPlaceInActiveBiome;
 
-    // Callback to save user data with an updated active biome state
+    // Delegate to save user data with an updated active biome state
     [HideInInspector]
-    public delegate void SaveDelegate(SerializedBiomeObject updatedBiomeState);
-    private SaveDelegate SaveUpdatedActiveBiomeDelegate;
+    public delegate void SaveBiomeDelegate(SerializedBiomeObject updatedBiome);
+    private SaveBiomeDelegate SaveUpdatedActiveBiomeDelegate;
 
     // Assign save user active biome state delegate from game manager
-    public void SetupSaveCallback(SaveDelegate callback)
+    public void SetupSaveBiomeDelegate(SaveBiomeDelegate callback)
     {
         this.SaveUpdatedActiveBiomeDelegate = callback;
+    }
+
+    // Assign each slot a save user award delegate from game manager
+    public void SetupSaveAwardDelegate(Slot.SaveAwardDelegate callback)
+    {
+        foreach (Slot slot in this.Slots)
+        {
+            slot.SetupSaveAwardDelegate(callback);
+        }
+
     }
 
     // Restore active biome state from saved data on app start
@@ -60,7 +70,7 @@ public class BiomeObject : MonoBehaviour
         }
 
         // Initialize the item in the newly selected slot
-        this.Slots[slotIndex].SetupSelectGuestCallback(this.SelectGuestToVisit);
+        this.Slots[slotIndex].SetupSelectGuestDelegate(this.SelectGuestToVisit);
         this.Slots[slotIndex].InitializeItem(this.ItemToPlaceInActiveBiome);
 
         // Hide item placement indicator images for all the slots
@@ -90,7 +100,7 @@ public class BiomeObject : MonoBehaviour
                 Item.IsValid(serializedSlots[i].Item))
             {
                 // Pass the slot a delegate to retrigger new guests
-                this.Slots[i].SetupSelectGuestCallback(this.SelectGuestToVisit);
+                this.Slots[i].SetupSelectGuestDelegate(this.SelectGuestToVisit);
 
                 // Assign the item to the slot
                 this.Slots[i].SetItemFromSaveData(serializedSlots[i].Item);

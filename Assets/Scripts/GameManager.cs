@@ -20,17 +20,29 @@ public class GameManager : MonoBehaviour
         // Give the user inventory data to the inventory content
         this.MenuManager.SetupInventory(this.User.Inventory);
 
-        // Give the inventory and currency to the market content
+        // Give the inventory and coin balance to the market content
         this.MenuManager.SetupMarket(this.User.Inventory, this.User.Coins);
 
         // Give the menu manager a callback to save item purchases
-        this.MenuManager.SetupItemPurchaseCallback(this.SaveItemPurchase);
+        this.MenuManager.SetupItemPurchaseDelegate(this.SaveItemPurchase);
 
         // Give the active biome a callback to save updates to active biome
-        this.MenuManager.SetupSaveBiomeCallback(this.SaveActiveBiomeState);
+        this.MenuManager.SetupSaveBiomeDelegate(this.SaveActiveBiomeState);
+
+        // Give the active biome slots a callback to save departure awards
+        this.MenuManager.SetupSaveAwardDelegate(this.SaveAwardedCoins);
 
         // Set the active biome state from the saved data
         this.MenuManager.SetupBiome(this.User.ActiveBiomeState);
+    }
+
+    // Delegate called when a departing guest leaves a coin award for the user
+    public void SaveAwardedCoins(int coins)
+    {
+        // Add the coins to user balance
+        this.User.Coins += coins;
+
+        Persistence.SaveUser(this.User);
     }
 
     // Delegate called in market content to update user inventory and coins
@@ -52,6 +64,7 @@ public class GameManager : MonoBehaviour
     public void SaveActiveBiomeState(SerializedBiomeObject updatedBiomeState)
     {
         this.User.ActiveBiomeState = updatedBiomeState;
+
         Persistence.SaveUser(this.User);
     }
 

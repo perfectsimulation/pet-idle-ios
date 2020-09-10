@@ -8,10 +8,15 @@ public class Slot : MonoBehaviour
     public Image Image;
     public GameObject ItemPlacementIndicator;
 
-    // Callback to trigger a new guest upon guest departure
+    // Delegate to trigger a new guest upon guest departure
     [HideInInspector]
     public delegate Guest SelectGuestDelegate(Item item);
     private SelectGuestDelegate SelectNewGuestDelegate;
+
+    // Delegate to save awarded coins upon guest departure
+    [HideInInspector]
+    public delegate void SaveAwardDelegate(int coins);
+    private SaveAwardDelegate SaveDepartureAwardDelegate;
 
     public Slot() { }
 
@@ -35,9 +40,15 @@ public class Slot : MonoBehaviour
     }
 
     // Assign select guest delegate from active biome object
-    public void SetupSelectGuestCallback(SelectGuestDelegate callback)
+    public void SetupSelectGuestDelegate(SelectGuestDelegate callback)
     {
         this.SelectNewGuestDelegate = callback;
+    }
+
+    // Assign save award delegate from active biome object
+    public void SetupSaveAwardDelegate(SaveAwardDelegate callback)
+    {
+        this.SaveDepartureAwardDelegate = callback;
     }
 
     // Initialize a newly placed item for this slot
@@ -91,6 +102,7 @@ public class Slot : MonoBehaviour
         this.GuestObject.SetGuest(guest);
         this.InitializeGuestArrivalDateTime();
         this.InitializeGuestDepartureDateTime();
+        this.InitializeGuestCoinDrop();
     }
 
     // Only called on app start to restore saved guest data for this session
@@ -99,6 +111,7 @@ public class Slot : MonoBehaviour
         this.GuestObject.SetGuest(serializedGuestObject.Guest);
         this.SetGuestArrivalDateTime(serializedGuestObject.ArrivalDateTime);
         this.SetGuestDepartureDateTime(serializedGuestObject.DepartureDateTime);
+        this.SetGuestCoinDrop(serializedGuestObject.CoinDrop);
         this.CheckGuestVisit(serializedGuestObject);
     }
 
@@ -135,16 +148,36 @@ public class Slot : MonoBehaviour
         this.SetGuestDepartureDateTime(departure);
     }
 
+    // Create a new coin drop when a guest is newly set for this slot
+    private void InitializeGuestCoinDrop()
+    {
+        // Randomly select a coin drop within the range allowed by the guest
+        int minCoinDrop = this.GuestObject.Guest.MinimumCoinDrop;
+        int maxCoinDrop = this.GuestObject.Guest.MaximumCoinDrop;
+
+        // Add one to the max since Random.Range has an exclusive max argument
+        int coinDrop = Random.Range(minCoinDrop, maxCoinDrop + 1);
+
+        // Set the newly created coin drop in the guest object
+        this.SetGuestCoinDrop(coinDrop);
+    }
+
     // Assign an arrival date time for the guest object of this slot
     private void SetGuestArrivalDateTime(System.DateTime arrivalDateTime)
     {
-        this.GuestObject.SetGuestArrivalDateTime(arrivalDateTime);
+        this.GuestObject.SetArrivalDateTime(arrivalDateTime);
     }
 
     // Assign a departure date time for the guest object of this slot
     private void SetGuestDepartureDateTime(System.DateTime departureDateTime)
     {
-        this.GuestObject.SetGuestDepartureDateTime(departureDateTime);
+        this.GuestObject.SetDepartureDateTime(departureDateTime);
+    }
+
+    // Assign a coin drop for the guest object of this slot
+    private void SetGuestCoinDrop(int coinDrop)
+    {
+        this.GuestObject.SetCoinDrop(coinDrop);
     }
 
     // Only called on app start to add newly arrived guests and remove departed guests
@@ -154,18 +187,18 @@ public class Slot : MonoBehaviour
         if (guestObject.Guest == null) return;
 
         // Check if there is currently a guest in the active biome
-        if (GuestObject.IsGuestVisiting(guestObject))
+        if (GuestObject.IsVisiting(guestObject))
         {
             this.SetItemGuestPairInteractionImageSprite();
         }
 
         // Remove the guest if it has departed
-        else if (GuestObject.IsGuestDeparted(guestObject))
+        else if (GuestObject.IsDeparted(guestObject))
         {
             // Remove the departed guest
             this.RemoveGuest();
 
-            // Retrigger a new guest visit
+            // Select a new guest and trigger the next visit
             Guest nextGuest = this.SelectNewGuestDelegate(this.ItemObject.Item);
             this.InitializeGuest(nextGuest);
         }
@@ -175,6 +208,9 @@ public class Slot : MonoBehaviour
     // Remove the guest from this slot
     private void RemoveGuest()
     {
+        // Tell the game manager to save the coin drop for this guest departure
+        this.SaveDepartureAwardDelegate(GuestObject.CoinDrop);
+
         // Reset the image sprite to show the item alone
         this.SetImageSprite(this.ItemObject.Item.ImageAssetPath, 256, 256);
 
@@ -188,8 +224,8 @@ public class Slot : MonoBehaviour
         // Construct asset path from item-guest pair
         string interactionAssetPath = string.Format(
             "Assets/Images/Interactions/{0}-{1}.png",
-            this.GuestObject.Guest.Name,
-            this.ItemObject.Item.Name);
+            this.GuestObject.Guest.Name.ToLower(),
+            this.ItemObject.Item.Name.ToLower());
 
         // Set the image sprite to use this interaction asset
         this.SetImageSprite(interactionAssetPath, 256, 256);

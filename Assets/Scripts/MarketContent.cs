@@ -23,7 +23,7 @@ public class MarketContent : MonoBehaviour
     // The user coin balance, set from the game manager
     private int UserCoins;
 
-    // Callback to update the user inventory with a newly purchased item
+    // Delegate to update the user inventory with a newly purchased item
     [HideInInspector]
     public delegate void ItemPurchaseDelegate(Item item);
     private ItemPurchaseDelegate SelectedItemPurchaseDelegate;
@@ -36,7 +36,7 @@ public class MarketContent : MonoBehaviour
     }
 
     // Assign item purchase delegate, called from game manager
-    public void SetupItemPurchaseCallback(ItemPurchaseDelegate callback)
+    public void SetupItemPurchaseDelegate(ItemPurchaseDelegate callback)
     {
         this.SelectedItemPurchaseDelegate = callback;
     }
@@ -142,7 +142,7 @@ public class MarketContent : MonoBehaviour
             // Subtract the item price from the user coins
             this.UserCoins -= item.Price;
 
-            // Callback to game manager to save the updated inventory and coins
+            // Delegate to game manager to save the updated inventory and coins
             this.SelectedItemPurchaseDelegate(item);
 
             // Update market and market content to reflect new item purchase

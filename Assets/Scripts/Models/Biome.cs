@@ -8,7 +8,7 @@ public class Biome
     public Biome()
     {
         this.Name = "Default Biome";
-        this.AllowedGuests = new Guest[] { DataInitializer.GuestB };
+        this.AllowedGuests = new Guest[] { new Guest() };
     }
 
     /* Construct a biome */

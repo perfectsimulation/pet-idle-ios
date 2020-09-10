@@ -24,7 +24,7 @@ public class MenuManager : MonoBehaviour
         this.FocusActiveBiome();
 
         // Assign item placement delegate to inventory content
-        this.InventoryContent.SetupItemPlacementCallback(this.PlaceItemInActiveBiome);
+        this.InventoryContent.SetupItemPlacementDelegate(this.PlaceItemInActiveBiome);
     }
 
     // Assign inventory to inventory content from game manager
@@ -40,15 +40,21 @@ public class MenuManager : MonoBehaviour
     }
 
     // Assign item purchase delegate to market content from game manager
-    public void SetupItemPurchaseCallback(MarketContent.ItemPurchaseDelegate callback)
+    public void SetupItemPurchaseDelegate(MarketContent.ItemPurchaseDelegate callback)
     {
-        this.MarketContent.SetupItemPurchaseCallback(callback);
+        this.MarketContent.SetupItemPurchaseDelegate(callback);
     }
 
     // Assign update biome delegate to active biome from game manager
-    public void SetupSaveBiomeCallback(BiomeObject.SaveDelegate callback)
+    public void SetupSaveBiomeDelegate(BiomeObject.SaveBiomeDelegate callback)
     {
-        this.ActiveBiome.SetupSaveCallback(callback);
+        this.ActiveBiome.SetupSaveBiomeDelegate(callback);
+    }
+
+    // Assign save user award delegate from game manager
+    public void SetupSaveAwardDelegate(Slot.SaveAwardDelegate callback)
+    {
+        this.ActiveBiome.SetupSaveAwardDelegate(callback);
     }
 
     // Assign biome to active biome, called from game manager

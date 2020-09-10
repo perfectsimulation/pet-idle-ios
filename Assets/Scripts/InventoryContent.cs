@@ -20,7 +20,7 @@ public class InventoryContent : MonoBehaviour
     // The user inventory, set from the start() of the game manager
     private Inventory Inventory;
 
-    // Callback to place an item in a slot of the active biome
+    // Delegate to place an item in a slot of the active biome
     [HideInInspector]
     public delegate void ItemPlacementDelegate(Item item);
     private ItemPlacementDelegate SelectedItemPlacementDelegate;
@@ -33,7 +33,7 @@ public class InventoryContent : MonoBehaviour
     }
 
     // Assign item placement delegate from menu manager
-    public void SetupItemPlacementCallback(ItemPlacementDelegate callback)
+    public void SetupItemPlacementDelegate(ItemPlacementDelegate callback)
     {
         this.SelectedItemPlacementDelegate = callback;
     }

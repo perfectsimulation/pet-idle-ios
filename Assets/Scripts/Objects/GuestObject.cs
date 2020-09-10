@@ -6,6 +6,7 @@ public class GuestObject : MonoBehaviour
     public Guest Guest;
     public DateTime ArrivalDateTime;
     public DateTime DepartureDateTime;
+    public int CoinDrop;
 
     public void SetGuest(Guest guest)
     {
@@ -13,15 +14,21 @@ public class GuestObject : MonoBehaviour
     }
 
     // Set the arrival datetime from save data or when guest is initially slotted
-    public void SetGuestArrivalDateTime(DateTime arrival)
+    public void SetArrivalDateTime(DateTime arrival)
     {
         this.ArrivalDateTime = arrival;
     }
 
     // Set the departure datetime from save data or when guest is initially slotted
-    public void SetGuestDepartureDateTime(DateTime departure)
+    public void SetDepartureDateTime(DateTime departure)
     {
         this.DepartureDateTime = departure;
+    }
+
+    // Set the coin drop value from save data or when guest is initially slotted
+    public void SetCoinDrop(int coinDrop)
+    {
+        this.CoinDrop = coinDrop;
     }
 
     public void RemoveGuest()
@@ -29,60 +36,44 @@ public class GuestObject : MonoBehaviour
         this.Guest = null;
         this.ArrivalDateTime = DateTime.MinValue;
         this.DepartureDateTime = DateTime.MinValue;
+        this.CoinDrop = 0;
     }
 
     // Check if the arrival datetime is in the past and departure is in the future
-    public bool IsGuestCurrentlyVisiting()
+    public static bool IsVisiting(SerializedGuestObject serializedGuestObject)
     {
-        if (this.Guest != null)
-        {
-            // Check if the current time is between the arrival and departure times
-            return (this.ArrivalDateTime < DateTime.UtcNow &&
-                this.DepartureDateTime >= DateTime.UtcNow);
-        }
+        // Return false if there is no guest
+        if (serializedGuestObject.Guest == null) return false;
 
-        // There is no guest
-        return false;
+        // Return true if the current time is between the arrival and departure times
+        return (serializedGuestObject.ArrivalDateTime < DateTime.UtcNow &&
+            serializedGuestObject.DepartureDateTime >= DateTime.UtcNow);
     }
 
     // Check if the departure datetime is in the past
-    public bool IsGuestDeparted()
+    public static bool IsDeparted(SerializedGuestObject serializedGuestObject)
     {
-        if (this.Guest != null)
-        {
-            // True when the current time is past the departure time
-            return (this.DepartureDateTime < DateTime.UtcNow);
-        }
+        // Return true if there is no guest
+        if (serializedGuestObject.Guest == null) return true;
 
-        // There is no guest
-        return true;
+        // Return true if the current time is past the departure time
+        return (serializedGuestObject.DepartureDateTime < DateTime.UtcNow);
     }
 
-    // Check if the arrival datetime is in the past and departure is in the future
-    public static bool IsGuestVisiting(SerializedGuestObject serializedGuestObject)
+    // Get the departure coin drop range
+    public static int[] GetCoinDropRange(SerializedGuestObject serializedGuestObject)
     {
-        if (serializedGuestObject.Guest != null)
-        {
-            // True when the current time is between the arrival and departure times
-            return (serializedGuestObject.ArrivalDateTime < DateTime.UtcNow &&
-                serializedGuestObject.DepartureDateTime >= DateTime.UtcNow);
-        }
+        // Initialize the coin drop range
+        int[] coinDropRange = new int[] { 0, 0 };
 
-        // There is no guest
-        return false;
-    }
+        // Return [0, 0] if there is no guest
+        if (serializedGuestObject.Guest == null) return coinDropRange;
 
-    // Check if the departure datetime is in the past
-    public static bool IsGuestDeparted(SerializedGuestObject serializedGuestObject)
-    {
-        if (serializedGuestObject.Guest != null)
-        {
-            // True when the current time is past the departure time
-            return (serializedGuestObject.DepartureDateTime < DateTime.UtcNow);
-        }
+        // Set the coin drop range with the properties of this guest
+        coinDropRange[0] = serializedGuestObject.Guest.MinimumCoinDrop;
+        coinDropRange[1] = serializedGuestObject.Guest.MaximumCoinDrop;
 
-        // There is no guest
-        return true;
+        return coinDropRange;
     }
 
 }
@@ -115,6 +106,7 @@ public class SerializedGuestObject
     public Guest Guest;
     public SerializedDateTime ArrivalDateTime;
     public SerializedDateTime DepartureDateTime;
+    public int CoinDrop;
 
     /* Serialize a guest object */
     public SerializedGuestObject()
@@ -122,6 +114,7 @@ public class SerializedGuestObject
         this.Guest = null;
         this.ArrivalDateTime = DateTime.MinValue;
         this.DepartureDateTime = DateTime.MinValue;
+        this.CoinDrop = 0;
     }
 
     public SerializedGuestObject(GuestObject guestObject)
@@ -131,12 +124,14 @@ public class SerializedGuestObject
             this.Guest = guestObject.Guest;
             this.ArrivalDateTime = guestObject.ArrivalDateTime;
             this.DepartureDateTime = guestObject.DepartureDateTime;
+            this.CoinDrop = guestObject.CoinDrop;
         }
         else
         {
             this.Guest = null;
             this.ArrivalDateTime = DateTime.MinValue;
             this.DepartureDateTime = DateTime.MinValue;
+            this.CoinDrop = 0;
         }
     }
 
