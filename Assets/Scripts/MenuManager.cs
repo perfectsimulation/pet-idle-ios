@@ -15,7 +15,13 @@ public class MenuManager : MonoBehaviour
     public InventoryContent InventoryContent;
     public MarketContent MarketContent;
 
-    // Change close button behavior based on which menus elements are active
+    // Simulate 'tap out to close' on focused menu element with invisible button
+    public Button TapOutToCloseButton;
+
+    // Cache the focused menu element so it can close by tapping out of it
+    //private GameObject FocusedElement;
+
+    // Close button behavior changes based on which menu elements are focused
     private delegate void CloseButtonListener();
 
     // Start with no active menus and only the main menu button showing
@@ -78,6 +84,10 @@ public class MenuManager : MonoBehaviour
         this.InventoryMenuPanel.SetActive(false);
         this.MarketMenuPanel.SetActive(false);
 
+        // Assign the main menu as the focused menu
+        //this.FocusedElement = this.MainMenuPanel;
+        this.PrepareTapOutToClose(this.MainMenuPanel);
+
         // Set listener of close button to focus the active biome
         this.SetCloseButtonListener(this.FocusActiveBiome);
     }
@@ -110,13 +120,6 @@ public class MenuManager : MonoBehaviour
         this.ActiveBiome.SelectItemForSlotPlacement(item);
     }
 
-    // Change close button behavior
-    private void SetCloseButtonListener(CloseButtonListener listener)
-    {
-        this.CloseButton.onClick.RemoveAllListeners();
-        this.CloseButton.onClick.AddListener(() => listener());
-    }
-
     // Hide all menu elements except the main menu button
     private void FocusActiveBiome()
     {
@@ -125,6 +128,11 @@ public class MenuManager : MonoBehaviour
         this.CloseButton.gameObject.SetActive(false);
         this.InventoryMenuPanel.SetActive(false);
         this.MarketMenuPanel.SetActive(false);
+
+        // Clear cache of focused menu since all menus are now closed
+        //this.FocusedElement = null;
+        this.DisableTapOutToCloseButton();
+
     }
 
     // Hide all menus except the main menu
@@ -134,11 +142,66 @@ public class MenuManager : MonoBehaviour
         this.InventoryMenuPanel.SetActive(false);
         this.MarketMenuPanel.SetActive(false);
 
+        // Assign the main menu as the focused menu
+        //this.FocusedElement = this.MainMenuPanel;
+        this.PrepareTapOutToClose(this.MainMenuPanel);
+
         // Set listener of close button to focus the active biome
         this.SetCloseButtonListener(this.FocusActiveBiome);
 
         // Remove the highlighted state on the close button
         EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    // Change behavior of close buttons
+    private void SetCloseButtonListener(CloseButtonListener listener)
+    {
+        // Change behavior of visible close button in corner
+        this.CloseButton.onClick.RemoveAllListeners();
+        this.CloseButton.onClick.AddListener(() => listener());
+
+        // Change behavior of invisible tap out close button
+        this.TapOutToCloseButton.onClick.RemoveAllListeners();
+        this.TapOutToCloseButton.onClick.AddListener(() => listener());
+    }
+
+    // Reparent the tap out button directly behind the focused menu element
+    private void PrepareTapOutToClose(GameObject focusedElement)
+    {
+        // Set to true both active and enabled for tap out button
+        this.TapOutToCloseButton.gameObject.SetActive(true);
+        this.TapOutToCloseButton.enabled = true;
+
+        // Get the sibling index of the focused element
+        int focusedSiblingIndex = focusedElement.transform.GetSiblingIndex();
+
+        // Get the parent of the focused element
+        Transform focusedElementParent = focusedElement.transform.parent;
+
+        // Get the index right behind the focused element
+        int tapOutButtonIndex = Mathf.Max(0, focusedSiblingIndex - 1);
+
+        // Set the parent of the tap out button
+        this.TapOutToCloseButton.transform.SetParent(focusedElementParent);
+
+        // Set the new index for tap out button right behind the focused element
+        this.TapOutToCloseButton.transform.SetSiblingIndex(tapOutButtonIndex);
+
+
+    }
+
+    // Disable the tap out button and place it behind everything
+    private void DisableTapOutToCloseButton()
+    {
+        // Reparent the tap out button so it is behind all other UI
+        Transform parent = this.ActiveBiome.transform.parent;
+        int childIndex = this.ActiveBiome.transform.GetSiblingIndex();
+        this.TapOutToCloseButton.transform.SetParent(parent);
+        this.TapOutToCloseButton.transform.SetSiblingIndex(childIndex);
+
+        // Set to false both active and enabled for tap out button
+        this.TapOutToCloseButton.gameObject.SetActive(false);
+        this.TapOutToCloseButton.enabled = false;
     }
 
 }
