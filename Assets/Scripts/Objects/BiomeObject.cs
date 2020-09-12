@@ -86,6 +86,18 @@ public class BiomeObject : MonoBehaviour
         this.SaveUpdatedActiveBiomeDelegate(new SerializedBiomeObject(this));
     }
 
+    // Clear selected item cache if item placement is canceled
+    public void CancelItemPlacement()
+    {
+        this.ItemToPlaceInActiveBiome = null;
+
+        // Hide item placement indicator images for all the slots
+        foreach (Slot slot in this.Slots)
+        {
+            slot.HideSlotLocation();
+        }
+    }
+
     // Restore slots of active biome state from saved slot data
     private void LayoutSavedSlots(SerializedSlot[] serializedSlots)
     {

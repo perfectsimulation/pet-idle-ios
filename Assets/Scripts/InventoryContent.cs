@@ -8,22 +8,25 @@ public class InventoryContent : MonoBehaviour
     // The item button prefab
     public GameObject Prefab;
 
-    // The rect transform of this inventory container
+    // The rect transform of this inventory content container
     private RectTransform RectTransform;
 
     // Auto-layout script for the item buttons
     private GridLayoutGroup GridLayoutGroup;
 
-    // Keep references of all instantiated item buttons by item name
+    // References of all instantiated item buttons (values) by item name (keys)
     private OrderedDictionary InstantiatedPrefabs;
 
     // The user inventory, set from the start() of the game manager
     private Inventory Inventory;
 
-    // Delegate to place an item in a slot of the active biome
+    // The inventory item detail component of the item detail panel
+    private InventoryItemDetail ItemDetail;
+
+    // Delegate to open the item detail from menu manager
     [HideInInspector]
-    public delegate void ItemPlacementDelegate(Item item);
-    private ItemPlacementDelegate SelectedItemPlacementDelegate;
+    public delegate void ItemDetailDelegate();
+    private ItemDetailDelegate OpenItemDetailDelegate;
 
     void Awake()
     {
@@ -32,10 +35,28 @@ public class InventoryContent : MonoBehaviour
         this.GridLayoutGroup = this.gameObject.GetComponent<GridLayoutGroup>();
     }
 
-    // Assign item placement delegate from menu manager
-    public void SetupItemPlacementDelegate(ItemPlacementDelegate callback)
+    // Assign inventory item detail component from menu manager
+    public void SetupItemDetail(InventoryItemDetail itemDetail)
     {
-        this.SelectedItemPlacementDelegate = callback;
+        this.ItemDetail = itemDetail;
+    }
+
+    // Assign open item detail delegate from menu manager
+    public void SetupOpenItemDetailDelegate(ItemDetailDelegate callback)
+    {
+        this.OpenItemDetailDelegate = callback;
+    }
+
+    // Assign item placement delegate from menu manager to the item detail panel
+    public void SetupItemPlacementDelegate(InventoryItemDetail.ItemPlacementDelegate callback)
+    {
+        this.ItemDetail.SetupItemPlacementDelegate(callback);
+    }
+
+    // Assign on close delegate from menu manager to the item detail panel
+    public void SetupOnCloseDetailDelegate(InventoryItemDetail.CloseDelegate callback)
+    {
+        this.ItemDetail.SetupOnCloseDelegate(callback);
     }
 
     // Prepare the scroll view before populating it with item buttons
@@ -136,22 +157,27 @@ public class InventoryContent : MonoBehaviour
             if (button == null) continue;
 
             // Set onClick of the new item button with the delegate passed down from game manager
-            button.onClick.AddListener(() => this.SelectedItemPlacementDelegate(item));
+            button.onClick.AddListener(() => this.OnItemButtonPress(item));
 
             // Add the new item button to the dictionary of instantiated prefabs
             this.InstantiatedPrefabs.Add(item.Name, prefabObject);
-
         }
 
     }
 
-    // Reparent all instantiated item buttons to accommodate an ordered insertion of a new item
+    // Open the item detail panel and hydrate it with the item of the pressed button
+    private void OnItemButtonPress(Item item)
+    {
+        this.ItemDetail.Hydrate(item);
+        this.OpenItemDetailDelegate();
+    }
+
+    // Insert the newest item button into the ordered dictionary and hierarchy
     private void InsertNewItemIntoGridLayout()
     {
-        // The inventory needs to be sorted since it just had a new item added to the end
+        // Inventory needs to be sorted since a new item was just added to the end
         this.Inventory.ItemList = Inventory.Sort(this.Inventory.ItemList);
 
-        // Currently, the newly added last element of the ordered dictionary is unsorted
         // Get arrays of the unsorted keys and values of the ordered dictionary
         ICollection unsortedKeys = this.InstantiatedPrefabs.Keys;
         ICollection unsortedValues = this.InstantiatedPrefabs.Values;
@@ -160,27 +186,25 @@ public class InventoryContent : MonoBehaviour
         unsortedKeys.CopyTo(unsortedItemNames, 0);
         unsortedValues.CopyTo(unsortedItemButtons, 0);
 
-        // Initialize variable to store the index to insert the new item
+        // Initialize variable for the index to insert the new item
         int newItemSortedIndex = -1;
 
-        // Loop through the sorted inventory and find where disorder of unsortedItemNames begins
+        // Compare items in sorted and unsorted item arrays one by one
         for (int i = 0; i < this.Inventory.Count; i++)
         {
+            // Find the first index where the item names do not match
             if (!this.Inventory[i].Name.Equals(unsortedItemNames[i]))
             {
-                // This is the index to insert the new item button into the ordered dictionary
+                // Assign index to insert the new item button
                 newItemSortedIndex = i;
 
-                // No need to continue since there is only one unsorted element
+                // No need to continue since there is only one unsorted item
                 break;
             }
         }
 
         // Do not continue if newItemSortedIndex is still -1
         if (newItemSortedIndex == -1) return;
-
-        // Remove parent of all instantiated item buttons
-        this.transform.DetachChildren();
 
         // Get the last element of the ordered dictionary
         string newItemName = unsortedItemNames[unsortedItemNames.Length - 1];
@@ -192,18 +216,8 @@ public class InventoryContent : MonoBehaviour
         // Insert the newly added element into the ordered dictionary
         this.InstantiatedPrefabs.Insert(newItemSortedIndex, newItemName, newItemButton);
 
-        // Get an array of the newly sorted item buttons
-        ICollection sortedValues = this.InstantiatedPrefabs.Values;
-        GameObject[] sortedItemButtons = new GameObject[sortedValues.Count];
-        sortedValues.CopyTo(sortedItemButtons, 0);
-
-        // Reparent sorted item buttons
-        foreach (GameObject sortedItemButton in sortedItemButtons)
-        {
-            // This sets the position of the item button, courtesy of grid layout group
-            sortedItemButton.transform.SetParent(this.transform);
-        }
-
+        // Insert the newly created item button into the hierarchy
+        newItemButton.transform.SetSiblingIndex(newItemSortedIndex);
     }
 
 }
