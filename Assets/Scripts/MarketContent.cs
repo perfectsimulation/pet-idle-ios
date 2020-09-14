@@ -23,6 +23,14 @@ public class MarketContent : MonoBehaviour
     // The user coin balance, set from the game manager
     private int UserCoins;
 
+    // The inventory item detail component of the item detail panel
+    private MarketItemDetail ItemDetail;
+
+    // Delegate to open the item detail from menu manager
+    [HideInInspector]
+    public delegate void ItemDetailDelegate();
+    private ItemDetailDelegate OpenItemDetailDelegate;
+
     // Delegate to update the user inventory with a newly purchased item
     [HideInInspector]
     public delegate void ItemPurchaseDelegate(Item item);
@@ -35,10 +43,28 @@ public class MarketContent : MonoBehaviour
         this.GridLayoutGroup = this.gameObject.GetComponent<GridLayoutGroup>();
     }
 
+    // Assign market item detail component from menu manager
+    public void SetupItemDetail(MarketItemDetail itemDetail)
+    {
+        this.ItemDetail = itemDetail;
+    }
+
+    // Assign open item detail delegate from menu manager
+    public void SetupOpenItemDetailDelegate(ItemDetailDelegate callback)
+    {
+        this.OpenItemDetailDelegate = callback;
+    }
+
     // Assign item purchase delegate, called from game manager
     public void SetupItemPurchaseDelegate(ItemPurchaseDelegate callback)
     {
         this.SelectedItemPurchaseDelegate = callback;
+    }
+
+    // Assign on close delegate from menu manager to the item detail panel
+    public void SetupOnCloseDetailDelegate(MarketItemDetail.CloseDelegate callback)
+    {
+        this.ItemDetail.SetupOnCloseDelegate(callback);
     }
 
     // Assign market to market content
@@ -46,6 +72,9 @@ public class MarketContent : MonoBehaviour
     {
         this.Market = market;
         this.UserCoins = coins;
+
+        // Setup the market item detail with purchase delegate from game manager
+        this.ItemDetail.SetupTryItemPurchaseDelegate(this.TryItemPurchase);
 
         // Initialize dictionary of instantiated item buttons
         this.InstantiatedPrefabs = new Dictionary<string, GameObject>();
@@ -125,7 +154,7 @@ public class MarketContent : MonoBehaviour
             button.interactable = !this.Market.ItemPurchaseRecord[item].Equals(true);
 
             // Set onClick of the new item button with the delegate passed down from game manager
-            button.onClick.AddListener(() => this.TryItemPurchase(item));
+            button.onClick.AddListener(() => this.OnItemButtonPress(item));
 
             // Add the new item button to the dictionary of instantiated prefabs
             this.InstantiatedPrefabs.Add(item.Name, prefabObject);
@@ -133,21 +162,33 @@ public class MarketContent : MonoBehaviour
 
     }
 
-    // Make sure the user has enough coins before purchasing the selected item
+    // Open the item detail panel and hydrate it with the item of the pressed button
+    private void OnItemButtonPress(Item item)
+    {
+        this.ItemDetail.Hydrate(item);
+        this.OpenItemDetailDelegate();
+    }
+
+    // Check for prior purchase and sufficient coins before completing the purchase
     private void TryItemPurchase(Item item)
     {
-        // Allow purchase if the user has more coins than the price of the item
+        // Do not continue if the user already purchased this item
+        if (this.Market.Contains(item)) return;
+
+            // Allow purchase if the user has more coins than the price of the item
         if (this.UserCoins > item.Price)
         {
             // Subtract the item price from the user coins
             this.UserCoins -= item.Price;
 
-            // Delegate to game manager to save the updated inventory and coins
+            // Update market and market content to reflect new item purchase
             this.SelectedItemPurchaseDelegate(item);
 
-            // Update market and market content to reflect new item purchase
+            // Indicate the new item purchase in the market content
             this.UpdateMarket(item);
+            // TODO show purchase success overlay
         }
+        // TODO else show insufficient funds dialog
 
     }
 
@@ -155,7 +196,7 @@ public class MarketContent : MonoBehaviour
     private void UpdateMarket(Item item)
     {
         // Set isPurchased to true for this item
-        this.Market.PurchaseItem(item);
+        this.Market.RecordItemPurchase(item);
 
         // Get the item button object for this item and its button component
         GameObject itemButton = this.InstantiatedPrefabs[item.Name];

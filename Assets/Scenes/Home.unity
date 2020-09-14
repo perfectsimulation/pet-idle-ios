@@ -261,6 +261,7 @@ MonoBehaviour:
   InventoryContent: {fileID: 1347589133}
   MarketContent: {fileID: 837715286}
   InventoryItemDetail: {fileID: 1648496072}
+  MarketItemDetail: {fileID: 425970691}
   TapOutToCloseButton: {fileID: 1066929009}
 --- !u!1 &80572472
 GameObject:
@@ -1544,6 +1545,7 @@ GameObject:
   - component: {fileID: 425970688}
   - component: {fileID: 425970690}
   - component: {fileID: 425970689}
+  - component: {fileID: 425970691}
   m_Layer: 5
   m_Name: ItemDetail
   m_TagString: Untagged
@@ -1611,6 +1613,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 425970687}
   m_CullTransparentMesh: 0
+--- !u!114 &425970691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 425970687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 353e72b90f1cd4b85b730fb11992a9c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Title: {fileID: 682895438}
+  Image: {fileID: 1089233140}
+  Description: {fileID: 1307160019}
+  BackButton: {fileID: 1388897511}
+  BuyButton: {fileID: 626216658}
 --- !u!224 &490818502 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3441979517549045655, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
@@ -2025,7 +2044,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 626216659}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 425970691}
+        m_MethodName: OnBuyButtonPress
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &626216659
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3802,7 +3832,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1388897512}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 425970691}
+        m_MethodName: OnBackButtonPress
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1388897512
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -29,6 +29,12 @@ public class Market
     // Get the total number of items in the item purchase record
     public int Count { get { return this.ItemPurchaseRecord.Count; } }
 
+    // Check if the item has been purchased
+    public bool Contains(Item item)
+    {
+        return (bool)this.ItemPurchaseRecord[item];
+    }
+
     // Custom indexing
     public Item this[int index]
     {
@@ -39,7 +45,7 @@ public class Market
     }
 
     // Set value of this item key to true in item purchase record
-    public void PurchaseItem(Item item)
+    public void RecordItemPurchase(Item item)
     {
         this.ItemPurchaseRecord[item] = true;
     }

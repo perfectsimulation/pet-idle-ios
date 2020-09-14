@@ -15,6 +15,7 @@ public class MenuManager : MonoBehaviour
     public InventoryContent InventoryContent;
     public MarketContent MarketContent;
     public InventoryItemDetail InventoryItemDetail;
+    public MarketItemDetail MarketItemDetail;
 
     // Simulate 'tap out to close' on focused menu element with invisible button
     public Button TapOutToCloseButton;
@@ -38,6 +39,15 @@ public class MenuManager : MonoBehaviour
 
         // Assign on close delegate to inventory item detail
         this.InventoryContent.SetupOnCloseDetailDelegate(this.CloseButton.onClick.Invoke);
+
+        // Assign market item detail to market content
+        this.MarketContent.SetupItemDetail(this.MarketItemDetail);
+
+        // Assign open market item detail to market content
+        this.MarketContent.SetupOpenItemDetailDelegate(this.OpenMarketItemDetail);
+
+        // Assign on close delegate to inventory item detail
+        this.MarketContent.SetupOnCloseDetailDelegate(this.CloseButton.onClick.Invoke);
     }
 
     // Assign inventory to inventory content from game manager
@@ -119,6 +129,21 @@ public class MenuManager : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(null);
     }
 
+    // Display the inventory item detail panel
+    private void OpenMarketItemDetail()
+    {
+        this.MarketItemDetail.gameObject.SetActive(true);
+
+        // Move tap out to close button behind the inventory item detail panel
+        this.PrepareTapOutToClose(this.MarketItemDetail.gameObject);
+
+        // Set listener of close buttons to focus the inventory menu
+        this.SetCloseButtonListener(this.FocusMarketMenu);
+
+        // Remove the highlighted state on the item button
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
     // Select an item for slot placement from inventory item button press
     private void PlaceItemInActiveBiome(Item item)
     {
@@ -142,6 +167,7 @@ public class MenuManager : MonoBehaviour
         this.InventoryMenuPanel.SetActive(false);
         this.MarketMenuPanel.SetActive(false);
         this.InventoryItemDetail.gameObject.SetActive(false);
+        this.MarketItemDetail.gameObject.SetActive(false);
 
         // Disable the tap out to close button when no menus are focused
         this.DisableTapOutToCloseButton();
@@ -156,6 +182,7 @@ public class MenuManager : MonoBehaviour
         this.InventoryMenuPanel.SetActive(false);
         this.MarketMenuPanel.SetActive(false);
         this.InventoryItemDetail.gameObject.SetActive(false);
+        this.MarketItemDetail.gameObject.SetActive(false);
 
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
@@ -173,6 +200,20 @@ public class MenuManager : MonoBehaviour
         this.MainMenuPanel.SetActive(false);
         this.InventoryMenuPanel.SetActive(true);
         this.InventoryItemDetail.gameObject.SetActive(false);
+
+        // Move tap out to close button behind the main menu
+        this.PrepareTapOutToClose(this.MainMenuPanel);
+
+        // Set listener of close buttons to focus the main menu
+        this.SetCloseButtonListener(this.FocusMainMenu);
+    }
+
+    // Hide all menus except the market
+    private void FocusMarketMenu()
+    {
+        this.MainMenuPanel.SetActive(false);
+        this.MarketMenuPanel.SetActive(true);
+        this.MarketItemDetail.gameObject.SetActive(false);
 
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
