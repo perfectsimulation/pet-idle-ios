@@ -9,11 +9,12 @@ public static class ImageUtility
         int width,
         int height)
     {
-        Texture2D texture2d = new Texture2D(width, height);
+        Texture2D texture2d = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        string fullAssetPath = GetAssetPath(imageAssetPath);
 
-        if (File.Exists(imageAssetPath))
+        if (File.Exists(fullAssetPath))
         {
-            byte[] imageFileData = File.ReadAllBytes(imageAssetPath);
+            byte[] imageFileData = File.ReadAllBytes(fullAssetPath);
             texture2d.LoadImage(imageFileData);
         }
 
@@ -38,5 +39,18 @@ public static class ImageUtility
         Sprite sprite = Sprite.Create(texture2d, rect, pivot, pixelsPerUnit);
 
         return sprite;
+    }
+
+    private static string GetAssetPath(string imageAssetPath)
+    {
+        string rootPath;
+        if (Application.isMobilePlatform)
+        {
+            rootPath = Path.Combine(Application.dataPath, "Raw");
+            return Path.Combine(rootPath, imageAssetPath);
+        }
+
+        rootPath = Path.Combine(Application.dataPath, "StreamingAssets");
+        return Path.Combine(rootPath, imageAssetPath);
     }
 }

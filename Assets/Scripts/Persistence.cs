@@ -3,7 +3,18 @@ using UnityEngine;
 
 public static class Persistence
 {
-    private static readonly string UserDataPath = "UserData.json";
+    private static string UserDataPath
+    {
+        get
+        {
+            if (Application.isMobilePlatform)
+            {
+                return Application.persistentDataPath + "/UserData.json";
+            }
+
+            return "UserData.json";
+        }
+    }
 
     /* Serialize the user and save data to local directory */
     public static void SaveUser(User user)
