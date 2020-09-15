@@ -36,6 +36,16 @@ public class MarketContent : MonoBehaviour
     public delegate void ItemPurchaseDelegate(Item item);
     private ItemPurchaseDelegate SelectedItemPurchaseDelegate;
 
+    // Delegate to show need funds panel in item detail from menu manager
+    [HideInInspector]
+    public delegate void NeedFundsDelegate();
+    private NeedFundsDelegate OpenNeedFundsDelegate;
+
+    // Delegate to show purchase success panel in item detail from menu manager
+    [HideInInspector]
+    public delegate void PurchaseSuccessDelegate();
+    private PurchaseSuccessDelegate OpenPurchaseSuccessDelegate;
+
     void Awake()
     {
         // Cache components to layout prefabs after receiving data from game manager
@@ -55,10 +65,22 @@ public class MarketContent : MonoBehaviour
         this.OpenItemDetailDelegate = callback;
     }
 
-    // Assign item purchase delegate, called from game manager
+    // Assign item purchase delegate from game manager
     public void SetupItemPurchaseDelegate(ItemPurchaseDelegate callback)
     {
         this.SelectedItemPurchaseDelegate = callback;
+    }
+
+    // Assign open need funds panel from menu manager
+    public void SetupNeedFundsDelegate(NeedFundsDelegate callback)
+    {
+        this.OpenNeedFundsDelegate = callback;
+    }
+
+    // Assign open need funds panel from menu manager
+    public void SetupPurchaseSuccessDelegate(PurchaseSuccessDelegate callback)
+    {
+        this.OpenPurchaseSuccessDelegate = callback;
     }
 
     // Assign on close delegate from menu manager to the item detail panel
@@ -184,11 +206,17 @@ public class MarketContent : MonoBehaviour
             // Update market and market content to reflect new item purchase
             this.SelectedItemPurchaseDelegate(item);
 
+            // Open the purchase success panel in the item detail
+            this.OpenPurchaseSuccessDelegate();
+
             // Indicate the new item purchase in the market content
             this.UpdateMarket(item);
-            // TODO show purchase success overlay
         }
-        // TODO else show insufficient funds dialog
+        else
+        {
+            // Open the need funds panel in the item detail
+            this.OpenNeedFundsDelegate();
+        }
 
     }
 

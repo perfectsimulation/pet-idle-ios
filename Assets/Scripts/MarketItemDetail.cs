@@ -9,10 +9,17 @@ public class MarketItemDetail : MonoBehaviour
     public TextMeshProUGUI Description;
     public Button BackButton;
     public Button BuyButton;
+    public GameObject NeedFundsPanel;
+    public GameObject PurchaseSuccessPanel;
 
     // Set when an item button of market content is pressed
     private Item Item;
-    private int Coins;
+
+    // Item purchase modal components
+    private TextMeshProUGUI NeedFundsText;
+    private Button NeedFundsButton;
+    private TextMeshProUGUI PurchaseSuccessText;
+    private Button PurchaseSuccessButton;
 
     // Delegate to try an item purchase from the menu manager
     [HideInInspector]
@@ -24,6 +31,20 @@ public class MarketItemDetail : MonoBehaviour
     public delegate void CloseDelegate();
     private CloseDelegate OnCloseDelegate;
 
+    void Start()
+    {
+        // Cache item purchase modal components
+        this.NeedFundsText = this.NeedFundsPanel.GetComponentInChildren<TextMeshProUGUI>();
+        this.NeedFundsButton = this.NeedFundsPanel.GetComponentInChildren<Button>();
+        this.PurchaseSuccessText = this.PurchaseSuccessPanel.GetComponentInChildren<TextMeshProUGUI>();
+        this.PurchaseSuccessButton = this.PurchaseSuccessPanel.GetComponentInChildren<Button>();
+
+        // Hide item purchase modals
+        this.NeedFundsPanel.SetActive(false);
+        this.PurchaseSuccessPanel.SetActive(false);
+    }
+
+    // Fill in item details from market content
     public void Hydrate(Item item)
     {
         this.Item = item;
@@ -34,18 +55,22 @@ public class MarketItemDetail : MonoBehaviour
 
         this.Title.SetText(title);
         this.Image.sprite = ImageUtility.CreateSpriteFromPng(imagePath, 128, 128);
-    }
 
-    // Assign on close delegate from menu manager
-    public void SetupOnCloseDelegate(CloseDelegate callback)
-    {
-        this.OnCloseDelegate = callback;
+        // Set up item purchase modals
+        this.HydrateNeedFunds();
+        this.HydratePurchaseSuccess();
     }
 
     // Assign item purchase delegate from menu manager
     public void SetupTryItemPurchaseDelegate(TryPurchaseDelegate callback)
     {
         this.TryItemPurchaseDelegate = callback;
+    }
+
+    // Assign on close delegate from menu manager
+    public void SetupOnCloseDelegate(CloseDelegate callback)
+    {
+        this.OnCloseDelegate = callback;
     }
 
     // Call the listener of the close button of menu manager
@@ -58,9 +83,46 @@ public class MarketItemDetail : MonoBehaviour
     public void OnBuyButtonPress()
     {
         this.TryItemPurchaseDelegate(this.Item);
+    }
 
-        // Close the market item detail
-        this.OnCloseDelegate();
+    // Set active when user has insufficient funds when trying to purchase
+    public void OpenNeedFundsPanel()
+    {
+        this.NeedFundsPanel.SetActive(true);
+    }
+
+    // Close the need funds panel
+    public void CloseNeedFundsPanel()
+    {
+        this.NeedFundsPanel.SetActive(false);
+    }
+
+    // Set active when user has successfully completed an item purchase
+    public void OpenPurchaseSuccessPanel()
+    {
+        this.PurchaseSuccessPanel.SetActive(true);
+    }
+
+    // Close the purchase success panel
+    public void ClosePurchaseSuccessPanel()
+    {
+        this.PurchaseSuccessPanel.SetActive(false);
+    }
+
+    // Fill in components of need funds panel with item details
+    private void HydrateNeedFunds()
+    {
+        this.NeedFundsText.text = "Need " + this.Item.Price + " coins";
+        this.NeedFundsButton.onClick.RemoveAllListeners();
+        this.NeedFundsButton.onClick.AddListener(() => this.OnCloseDelegate());
+    }
+
+    // Fill in components of purchase success panel with item details
+    private void HydratePurchaseSuccess()
+    {
+        this.PurchaseSuccessText.text = "Purchased " + this.Item.Name;
+        this.PurchaseSuccessButton.onClick.RemoveAllListeners();
+        this.PurchaseSuccessButton.onClick.AddListener(() => this.OnCloseDelegate());
     }
 
 }

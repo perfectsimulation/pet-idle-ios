@@ -32,7 +32,7 @@ public class MenuManager : MonoBehaviour
         this.InventoryContent.SetupItemDetail(this.InventoryItemDetail);
 
         // Assign open inventory item detail to inventory content
-        this.InventoryContent.SetupOpenItemDetailDelegate(this.OpenInventoryItemDetail);
+        this.InventoryContent.SetupOpenItemDetailDelegate(this.FocusInventoryItemDetail);
 
         // Assign item placement delegate to inventory content
         this.InventoryContent.SetupItemPlacementDelegate(this.PlaceItemInActiveBiome);
@@ -44,9 +44,15 @@ public class MenuManager : MonoBehaviour
         this.MarketContent.SetupItemDetail(this.MarketItemDetail);
 
         // Assign open market item detail to market content
-        this.MarketContent.SetupOpenItemDetailDelegate(this.OpenMarketItemDetail);
+        this.MarketContent.SetupOpenItemDetailDelegate(this.FocusMarketItemDetail);
 
-        // Assign on close delegate to inventory item detail
+        // Assign open need funds delegate to market item detail
+        this.MarketContent.SetupNeedFundsDelegate(this.FocusNeedFundsPanel);
+
+        // Assign open purchase success delegate to market item detail
+        this.MarketContent.SetupPurchaseSuccessDelegate(this.FocusPurchaseSuccessPanel);
+
+        // Assign on close delegate to market item detail
         this.MarketContent.SetupOnCloseDetailDelegate(this.CloseButton.onClick.Invoke);
     }
 
@@ -107,41 +113,7 @@ public class MenuManager : MonoBehaviour
     // Display the market menu panel and hide the main menu panel
     public void OnMarketMenuButtonPress()
     {
-        this.MainMenuPanel.SetActive(false);
-        this.MarketMenuPanel.SetActive(true);
-
-        // Set listener of close buttons to focus the main menu
-        this.SetCloseButtonListener(this.FocusMainMenu);
-    }
-
-    // Display the inventory item detail panel
-    private void OpenInventoryItemDetail()
-    {
-        this.InventoryItemDetail.gameObject.SetActive(true);
-
-        // Move tap out to close button behind the inventory item detail panel
-        this.PrepareTapOutToClose(this.InventoryItemDetail.gameObject);
-
-        // Set listener of close buttons to focus the inventory menu
-        this.SetCloseButtonListener(this.FocusInventoryMenu);
-
-        // Remove the highlighted state on the item button
-        EventSystem.current.SetSelectedGameObject(null);
-    }
-
-    // Display the inventory item detail panel
-    private void OpenMarketItemDetail()
-    {
-        this.MarketItemDetail.gameObject.SetActive(true);
-
-        // Move tap out to close button behind the inventory item detail panel
-        this.PrepareTapOutToClose(this.MarketItemDetail.gameObject);
-
-        // Set listener of close buttons to focus the inventory menu
-        this.SetCloseButtonListener(this.FocusMarketMenu);
-
-        // Remove the highlighted state on the item button
-        EventSystem.current.SetSelectedGameObject(null);
+        this.FocusMarketMenu();
     }
 
     // Select an item for slot placement from inventory item button press
@@ -214,12 +186,76 @@ public class MenuManager : MonoBehaviour
         this.MainMenuPanel.SetActive(false);
         this.MarketMenuPanel.SetActive(true);
         this.MarketItemDetail.gameObject.SetActive(false);
+        this.MarketItemDetail.CloseNeedFundsPanel();
+        this.MarketItemDetail.ClosePurchaseSuccessPanel();
 
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
 
         // Set listener of close buttons to focus the main menu
         this.SetCloseButtonListener(this.FocusMainMenu);
+    }
+
+    // Display the inventory item detail panel
+    private void FocusInventoryItemDetail()
+    {
+        this.InventoryItemDetail.gameObject.SetActive(true);
+
+        // Move tap out to close button behind the inventory item detail panel
+        this.PrepareTapOutToClose(this.InventoryItemDetail.gameObject);
+
+        // Set listener of close buttons to focus the inventory menu
+        this.SetCloseButtonListener(this.FocusInventoryMenu);
+
+        // Remove the highlighted state on the item button
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    // Show the market item detail in the market menu
+    private void FocusMarketItemDetail()
+    {
+        this.MarketItemDetail.gameObject.SetActive(true);
+        this.MarketItemDetail.CloseNeedFundsPanel();
+        this.MarketItemDetail.ClosePurchaseSuccessPanel();
+
+        // Move tap out to close button behind the inventory item detail panel
+        this.PrepareTapOutToClose(this.MarketItemDetail.gameObject);
+
+        // Set listener of close buttons to focus the inventory menu
+        this.SetCloseButtonListener(this.FocusMarketMenu);
+
+        // Remove the highlighted state on the item button
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    // Show need funds panel in market item detail
+    private void FocusNeedFundsPanel()
+    {
+        this.MarketItemDetail.OpenNeedFundsPanel();
+
+        // Move tap out to close button behind the inventory item detail panel
+        this.PrepareTapOutToClose(this.MarketItemDetail.NeedFundsPanel);
+
+        // Set listener of close buttons to focus the inventory menu
+        this.SetCloseButtonListener(this.FocusMarketItemDetail);
+
+        // Remove the highlighted state on the item button
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    // Show purchase success panel in market item detail
+    private void FocusPurchaseSuccessPanel()
+    {
+        this.MarketItemDetail.OpenPurchaseSuccessPanel();
+
+        // Move tap out to close button behind the inventory item detail panel
+        this.PrepareTapOutToClose(this.MarketItemDetail.PurchaseSuccessPanel);
+
+        // Set listener of close buttons to focus the inventory menu
+        this.SetCloseButtonListener(this.FocusMarketItemDetail);
+
+        // Remove the highlighted state on the item button
+        EventSystem.current.SetSelectedGameObject(null);
     }
 
     // Cancel item placement into active biome
@@ -251,17 +287,18 @@ public class MenuManager : MonoBehaviour
         this.TapOutToCloseButton.gameObject.SetActive(true);
         this.TapOutToCloseButton.enabled = true;
 
-        // Get the sibling index of the focused element
-        int focusedSiblingIndex = focusedElement.transform.GetSiblingIndex();
-
         // Get the parent of the focused element
         Transform focusedElementParent = focusedElement.transform.parent;
 
+        // Reparent the tap out button before getting the sibling index
+        this.TapOutToCloseButton.transform.SetParent(focusedElementParent);
+        this.TapOutToCloseButton.transform.SetAsFirstSibling();
+
+        // Get the sibling index of the focused element
+        int focusedSiblingIndex = focusedElement.transform.GetSiblingIndex();
+
         // Get the index right behind the focused element
         int tapOutButtonIndex = Mathf.Max(1, focusedSiblingIndex - 1);
-
-        // Set the parent of the tap out button
-        this.TapOutToCloseButton.transform.SetParent(focusedElementParent);
 
         // Set the new index for tap out button right behind the focused element
         this.TapOutToCloseButton.transform.SetSiblingIndex(tapOutButtonIndex);
