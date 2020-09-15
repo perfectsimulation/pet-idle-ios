@@ -173,6 +173,9 @@ public class MenuManager : MonoBehaviour
         this.InventoryMenuPanel.SetActive(true);
         this.InventoryItemDetail.gameObject.SetActive(false);
 
+        // Start at the top of the scroll view of inventory content
+        this.ScrollToTop(this.InventoryMenuPanel);
+
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
 
@@ -188,6 +191,9 @@ public class MenuManager : MonoBehaviour
         this.MarketItemDetail.gameObject.SetActive(false);
         this.MarketItemDetail.CloseNeedFundsPanel();
         this.MarketItemDetail.ClosePurchaseSuccessPanel();
+
+        // Start at the top of the scroll view of market content
+        this.ScrollToTop(this.MarketMenuPanel);
 
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
@@ -317,6 +323,19 @@ public class MenuManager : MonoBehaviour
         // Set to false both active and enabled for tap out button
         this.TapOutToCloseButton.gameObject.SetActive(false);
         this.TapOutToCloseButton.enabled = false;
+    }
+
+    // Find the scroll rect in this gameobject and scroll to the top
+    private void ScrollToTop(GameObject scrollableMenu)
+    {
+        // Get the scroll rect from the menu or its children
+        ScrollRect scrollRect = scrollableMenu.GetComponentInChildren<ScrollRect>();
+
+        // Do not continue if a scroll rect was not found
+        if (scrollRect == null) return;
+
+        // Scroll to the top of the view
+        scrollRect.verticalNormalizedPosition = 1f;
     }
 
 }

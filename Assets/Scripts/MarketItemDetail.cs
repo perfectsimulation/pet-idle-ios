@@ -59,6 +59,9 @@ public class MarketItemDetail : MonoBehaviour
         // Set up item purchase modals
         this.HydrateNeedFunds();
         this.HydratePurchaseSuccess();
+
+        // Make sure the buy button is interactable
+        this.BuyButton.interactable = true;
     }
 
     // Assign item purchase delegate from menu manager
@@ -85,7 +88,7 @@ public class MarketItemDetail : MonoBehaviour
         this.TryItemPurchaseDelegate(this.Item);
     }
 
-    // Set active when user has insufficient funds when trying to purchase
+    // Show need funds when user has insufficient funds when trying to purchase
     public void OpenNeedFundsPanel()
     {
         this.NeedFundsPanel.SetActive(true);
@@ -97,10 +100,13 @@ public class MarketItemDetail : MonoBehaviour
         this.NeedFundsPanel.SetActive(false);
     }
 
-    // Set active when user has successfully completed an item purchase
+    // Show success when user has successfully completed an item purchase
     public void OpenPurchaseSuccessPanel()
     {
         this.PurchaseSuccessPanel.SetActive(true);
+
+        // Disable buy button
+        this.BuyButton.interactable = false;
     }
 
     // Close the purchase success panel
