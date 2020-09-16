@@ -3,16 +3,16 @@ using UnityEngine;
 
 public static class ImageUtility
 {
-    // Create a Texture2D from the png found from the image asset pathname
+    // Create a Texture2D from the png found with the image asset pathname
     public static Texture2D CreateTexture2DFromPng(
         string imageAssetPath,
         int width,
         int height)
     {
         Texture2D texture2d = new Texture2D(width, height, TextureFormat.RGBA32, false);
-        string fullAssetPath = GetAssetPath(imageAssetPath);
+        string fullAssetPath = Persistence.GetAbsoluteAssetPath(imageAssetPath);
 
-        if (File.Exists(fullAssetPath))
+        if (Persistence.DoesFileExistAtPath(fullAssetPath))
         {
             byte[] imageFileData = File.ReadAllBytes(fullAssetPath);
             texture2d.LoadImage(imageFileData);
@@ -21,7 +21,7 @@ public static class ImageUtility
         return texture2d;
     }
 
-    // Create a sprite from the png found from the image asset pathname
+    // Create a sprite from the png found with the image asset pathname
     public static Sprite CreateSpriteFromPng(
         string imageAssetPath,
         int width,
@@ -41,16 +41,4 @@ public static class ImageUtility
         return sprite;
     }
 
-    private static string GetAssetPath(string imageAssetPath)
-    {
-        string rootPath;
-        if (Application.isMobilePlatform)
-        {
-            rootPath = Path.Combine(Application.dataPath, "Raw");
-            return Path.Combine(rootPath, imageAssetPath);
-        }
-
-        rootPath = Path.Combine(Application.dataPath, "StreamingAssets");
-        return Path.Combine(rootPath, imageAssetPath);
-    }
 }

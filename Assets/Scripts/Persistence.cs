@@ -3,6 +3,7 @@ using UnityEngine;
 
 public static class Persistence
 {
+    /* Save file location */
     private static string UserDataPath
     {
         get
@@ -54,8 +55,14 @@ public static class Persistence
         return newUser;
     }
 
+    /* Construct the full path to the asset */
+    public static string GetAbsoluteAssetPath(string assetPath)
+    {
+        return Path.Combine(Application.streamingAssetsPath, assetPath);
+    }
+
     /* Check if a local file exists at the provided path */
-    private static bool DoesFileExistAtPath(string path)
+    public static bool DoesFileExistAtPath(string path)
     {
         return File.Exists(path);
     }

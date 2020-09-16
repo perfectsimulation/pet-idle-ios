@@ -44,11 +44,11 @@ public static class DataInitializer
     public static readonly Item ItemB = new Item("Basket", 5, "Images/Items/basket.png", ItemBDictionary);
     public static readonly Item ItemC = new Item("Bathtub", 8, "Images/Items/bathtub.png", ItemCDictionary);
     public static readonly Item ItemD = new Item("Globe", 13, "Images/Items/globe.png", ItemDDictionary);
-    public static readonly Item ItemE = new Item("Wand", 3, "Images/Items/item-block-pink.png", ItemADictionary);
-    public static readonly Item ItemF = new Item("Wood block", 5, "Images/Items/item-block-yellow.png", ItemBDictionary);
-    public static readonly Item ItemG = new Item("Chewy", 8, "Images/Items/item-block-green.png", ItemCDictionary);
-    public static readonly Item ItemH = new Item("Rope", 13, "Images/Items/item-block-pink.png", ItemDDictionary);
-    public static readonly Item ItemI = new Item("Doll", 13, "Images/Items/item-block-yellow.png", ItemDDictionary);
+    public static readonly Item ItemE = new Item("Wand", 3, "Images/Items/ball.png", ItemADictionary);
+    public static readonly Item ItemF = new Item("Wood block", 5, "Images/Items/basket.png", ItemBDictionary);
+    public static readonly Item ItemG = new Item("Chewy", 8, "Images/Items/bathtub.png", ItemCDictionary);
+    public static readonly Item ItemH = new Item("Rope", 13, "Images/Items/globe.png", ItemDDictionary);
+    public static readonly Item ItemI = new Item("Doll", 13, "Images/Items/ball.png", ItemDDictionary);
 
     public static readonly Item[] AllItems = new Item[]
     {

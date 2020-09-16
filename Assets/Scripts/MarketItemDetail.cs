@@ -31,14 +31,17 @@ public class MarketItemDetail : MonoBehaviour
     public delegate void CloseDelegate();
     private CloseDelegate OnCloseDelegate;
 
-    void Start()
+    void Awake()
     {
         // Cache item purchase modal components
         this.NeedFundsText = this.NeedFundsPanel.GetComponentInChildren<TextMeshProUGUI>();
         this.NeedFundsButton = this.NeedFundsPanel.GetComponentInChildren<Button>();
         this.PurchaseSuccessText = this.PurchaseSuccessPanel.GetComponentInChildren<TextMeshProUGUI>();
         this.PurchaseSuccessButton = this.PurchaseSuccessPanel.GetComponentInChildren<Button>();
+    }
 
+    void Start()
+    {
         // Hide item purchase modals
         this.NeedFundsPanel.SetActive(false);
         this.PurchaseSuccessPanel.SetActive(false);

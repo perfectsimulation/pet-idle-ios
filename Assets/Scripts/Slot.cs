@@ -221,11 +221,14 @@ public class Slot : MonoBehaviour
     // Set the image sprite to an item-guest pair interaction asset
     private void SetItemGuestPairInteractionImageSprite()
     {
-        // Construct asset path from item-guest pair
-        string interactionAssetPath = string.Format(
-            "Assets/Images/Interactions/{0}-{1}.png",
+        // Construct the name of the asset from item-guest pair
+        string interactionAssetName = string.Format(
+            "Images/Interactions/{0}-{1}.png",
             this.GuestObject.Guest.Name.ToLower(),
             this.ItemObject.Item.Name.ToLower());
+
+        // Get the absolute path to the asset
+        string interactionAssetPath = Persistence.GetAbsoluteAssetPath(interactionAssetName);
 
         // Set the image sprite to use this interaction asset
         this.SetImageSprite(interactionAssetPath, 256, 256);
