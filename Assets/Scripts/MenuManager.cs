@@ -23,10 +23,13 @@ public class MenuManager : MonoBehaviour
     // Close button behavior changes based on which menu elements are focused
     private delegate void CloseButtonListener();
 
-    // Start with no active menus and only the main menu button showing
     void Start()
     {
+        // Start with no active menus and only the main menu button showing
         this.FocusActiveBiome();
+
+        // Assign focus biome delegate to active biome
+        this.ActiveBiome.SetupFocusBiomeDelegate(this.FocusActiveBiome);
 
         // Assign inventory item detail to inventory content
         this.InventoryContent.SetupItemDetail(this.InventoryItemDetail);

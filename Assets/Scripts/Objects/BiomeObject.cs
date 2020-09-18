@@ -16,6 +16,11 @@ public class BiomeObject : MonoBehaviour
     public delegate void SaveBiomeDelegate(SerializedBiomeObject updatedBiome);
     private SaveBiomeDelegate SaveUpdatedActiveBiomeDelegate;
 
+    // Delegate to focus the active biome from the menu manager
+    [HideInInspector]
+    public delegate void FocusBiomeDelegate();
+    private FocusBiomeDelegate FocusActiveBiomeDelegate;
+
     // Assign save user active biome state delegate from game manager
     public void SetupSaveBiomeDelegate(SaveBiomeDelegate callback)
     {
@@ -37,6 +42,12 @@ public class BiomeObject : MonoBehaviour
     {
         this.Biome = biome;
         this.LayoutSavedSlots(serializedSlots);
+    }
+
+    // Assign focus active biome delegate from game manager
+    public void SetupFocusBiomeDelegate(FocusBiomeDelegate callback)
+    {
+        this.FocusActiveBiomeDelegate = callback;
     }
 
     // Show slot locations when an item is selected from inventory content for placement
@@ -81,6 +92,9 @@ public class BiomeObject : MonoBehaviour
 
         // Clear selected item cache to ensure only one slot placement per item
         this.ItemToPlaceInActiveBiome = null;
+
+        // Call delegate from menu manager to show menu button and hide close button
+        this.FocusActiveBiomeDelegate();
 
         // Call delegate from game manager to save user with updated slot data
         this.SaveUpdatedActiveBiomeDelegate(new SerializedBiomeObject(this));
