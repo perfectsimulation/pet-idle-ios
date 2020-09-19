@@ -15,8 +15,13 @@ public class Slot : MonoBehaviour
 
     // Delegate to save awarded coins upon guest departure
     [HideInInspector]
-    public delegate void SaveAwardDelegate(int coins);
-    private SaveAwardDelegate SaveDepartureAwardDelegate;
+    public delegate void SaveCoinsDelegate(int coins);
+    private SaveCoinsDelegate SaveUpdatedCoinsDelegate;
+
+    // Delegate to save updated notes upon guest departure
+    [HideInInspector]
+    public delegate void SaveNotesDelegate(GuestObject guestObject);
+    private SaveNotesDelegate SaveUpdatedNotesDelegate;
 
     public Slot() { }
 
@@ -46,9 +51,15 @@ public class Slot : MonoBehaviour
     }
 
     // Assign save award delegate from active biome object
-    public void SetupSaveAwardDelegate(SaveAwardDelegate callback)
+    public void SetupSaveCoinsDelegate(SaveCoinsDelegate callback)
     {
-        this.SaveDepartureAwardDelegate = callback;
+        this.SaveUpdatedCoinsDelegate = callback;
+    }
+
+    // Assign save award delegate from active biome object
+    public void SetupSaveNotesDelegate(SaveNotesDelegate callback)
+    {
+        this.SaveUpdatedNotesDelegate = callback;
     }
 
     // Initialize a newly placed item for this slot
@@ -103,6 +114,7 @@ public class Slot : MonoBehaviour
         this.InitializeGuestArrivalDateTime();
         this.InitializeGuestDepartureDateTime();
         this.InitializeGuestCoinDrop();
+        this.InitializeGuestFriendshipPointReward();
     }
 
     // Only called on app start to restore saved guest data for this session
@@ -112,6 +124,7 @@ public class Slot : MonoBehaviour
         this.SetGuestArrivalDateTime(serializedGuestObject.ArrivalDateTime);
         this.SetGuestDepartureDateTime(serializedGuestObject.DepartureDateTime);
         this.SetGuestCoinDrop(serializedGuestObject.CoinDrop);
+        this.SetGuestFriendshipPointReward(serializedGuestObject.FriendshipPointReward);
         this.CheckGuestVisit(serializedGuestObject);
     }
 
@@ -162,6 +175,20 @@ public class Slot : MonoBehaviour
         this.SetGuestCoinDrop(coinDrop);
     }
 
+    // Create a new friendship point reward when a guest is newly set for this slot
+    private void InitializeGuestFriendshipPointReward()
+    {
+        // Randomly select a coin drop within the range allowed by the guest
+        int minFriendshipPoint = this.GuestObject.Guest.MinimumFriendshipPointReward;
+        int maxFriendshipPoint = this.GuestObject.Guest.MaximumFriendshipPointReward;
+
+        // Add one to the max since Random.Range has an exclusive max argument
+        int friendshipPoints = Random.Range(minFriendshipPoint, maxFriendshipPoint + 1);
+
+        // Set the newly created coin drop in the guest object
+        this.SetGuestFriendshipPointReward(friendshipPoints);
+    }
+
     // Assign an arrival date time for the guest object of this slot
     private void SetGuestArrivalDateTime(System.DateTime arrivalDateTime)
     {
@@ -178,6 +205,12 @@ public class Slot : MonoBehaviour
     private void SetGuestCoinDrop(int coinDrop)
     {
         this.GuestObject.SetCoinDrop(coinDrop);
+    }
+
+    // Assign a friendship point reward for the guest object of this slot
+    private void SetGuestFriendshipPointReward(int friendshipPoints)
+    {
+        this.GuestObject.SetFriendshipPointReward(friendshipPoints);
     }
 
     // Only called on app start to add newly arrived guests and remove departed guests
@@ -205,11 +238,14 @@ public class Slot : MonoBehaviour
 
     }
 
-    // Remove the guest from this slot
+    // Remove the guest from this slot and call the save delegate in game manager
     private void RemoveGuest()
     {
         // Tell the game manager to save the coin drop for this guest departure
-        this.SaveDepartureAwardDelegate(GuestObject.CoinDrop);
+        this.SaveUpdatedCoinsDelegate(this.GuestObject.CoinDrop);
+
+        // Tell the game manager to save the details of the guest visit in notes
+        this.SaveUpdatedNotesDelegate(this.GuestObject);
 
         // Reset the image sprite to show the item alone
         this.SetImageSprite(this.ItemObject.Item.ImageAssetPath, 256, 256);

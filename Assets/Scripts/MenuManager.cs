@@ -71,10 +71,10 @@ public class MenuManager : MonoBehaviour
         this.MarketContent.SetupMarket(new Market(inventory), coins);
     }
 
-    // Assign item purchase delegate to market content from game manager
-    public void SetupItemPurchaseDelegate(MarketContent.ItemPurchaseDelegate callback)
+    // Assign purchase item delegate to market content from game manager
+    public void SetupPurchaseItemDelegate(MarketContent.PurchaseItemDelegate callback)
     {
-        this.MarketContent.SetupItemPurchaseDelegate(callback);
+        this.MarketContent.SetupPurchaseItemDelegate(callback);
     }
 
     // Assign update biome delegate to active biome from game manager
@@ -83,10 +83,16 @@ public class MenuManager : MonoBehaviour
         this.ActiveBiome.SetupSaveBiomeDelegate(callback);
     }
 
-    // Assign save user award delegate from game manager
-    public void SetupSaveAwardDelegate(Slot.SaveAwardDelegate callback)
+    // Assign save coins delegate from game manager
+    public void SetupSaveCoinsDelegate(Slot.SaveCoinsDelegate callback)
     {
-        this.ActiveBiome.SetupSaveAwardDelegate(callback);
+        this.ActiveBiome.SetupSaveCoinsDelegate(callback);
+    }
+
+    // Assign save notes delegate from game manager
+    public void SetupSaveNotesDelegate(Slot.SaveNotesDelegate callback)
+    {
+        this.ActiveBiome.SetupSaveNotesDelegate(callback);
     }
 
     // Assign biome to active biome, called from game manager

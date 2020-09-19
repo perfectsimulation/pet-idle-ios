@@ -7,8 +7,18 @@ public class Inventory
     // List of all items in the user inventory
     public List<Item> ItemList;
 
-    /* Default no-arg constructor */
-    public Inventory() { }
+    /* Initialize a brand new inventory with starter items */
+    public Inventory()
+    {
+        this.ItemList = new List<Item>()
+        {
+            DataInitializer.ItemE,
+            DataInitializer.ItemF,
+            DataInitializer.ItemG,
+            DataInitializer.ItemH,
+            DataInitializer.ItemI
+        };
+    }
 
     /* Constructor from list of items */
     public Inventory(List<Item> itemList)

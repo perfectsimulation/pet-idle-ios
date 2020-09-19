@@ -33,8 +33,8 @@ public class MarketContent : MonoBehaviour
 
     // Delegate to update the user inventory with a newly purchased item
     [HideInInspector]
-    public delegate void ItemPurchaseDelegate(Item item);
-    private ItemPurchaseDelegate SelectedItemPurchaseDelegate;
+    public delegate void PurchaseItemDelegate(Item item);
+    private PurchaseItemDelegate PurchaseSelectedItemDelegate;
 
     // Delegate to show need funds panel in item detail from menu manager
     [HideInInspector]
@@ -65,10 +65,10 @@ public class MarketContent : MonoBehaviour
         this.OpenItemDetailDelegate = callback;
     }
 
-    // Assign item purchase delegate from game manager
-    public void SetupItemPurchaseDelegate(ItemPurchaseDelegate callback)
+    // Assign purchase item delegate from game manager
+    public void SetupPurchaseItemDelegate(PurchaseItemDelegate callback)
     {
-        this.SelectedItemPurchaseDelegate = callback;
+        this.PurchaseSelectedItemDelegate = callback;
     }
 
     // Assign open need funds panel from menu manager
@@ -96,7 +96,7 @@ public class MarketContent : MonoBehaviour
         this.UserCoins = coins;
 
         // Setup the market item detail with purchase delegate from game manager
-        this.ItemDetail.SetupTryItemPurchaseDelegate(this.TryItemPurchase);
+        this.ItemDetail.SetupTryPurchaseItemDelegate(this.TryPurchaseItem);
 
         // Initialize dictionary of instantiated item buttons
         this.InstantiatedPrefabs = new Dictionary<string, GameObject>();
@@ -192,19 +192,19 @@ public class MarketContent : MonoBehaviour
     }
 
     // Check for prior purchase and sufficient coins before completing the purchase
-    private void TryItemPurchase(Item item)
+    private void TryPurchaseItem(Item item)
     {
         // Do not continue if the user already purchased this item
         if (this.Market.Contains(item)) return;
 
-            // Allow purchase if the user has more coins than the price of the item
+        // Allow purchase if the user has more coins than the price of the item
         if (this.UserCoins > item.Price)
         {
             // Subtract the item price from the user coins
             this.UserCoins -= item.Price;
 
             // Update market and market content to reflect new item purchase
-            this.SelectedItemPurchaseDelegate(item);
+            this.PurchaseSelectedItemDelegate(item);
 
             // Open the purchase success panel in the item detail
             this.OpenPurchaseSuccessDelegate();

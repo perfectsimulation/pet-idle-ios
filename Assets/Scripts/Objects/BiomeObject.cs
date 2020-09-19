@@ -21,18 +21,28 @@ public class BiomeObject : MonoBehaviour
     public delegate void FocusBiomeDelegate();
     private FocusBiomeDelegate FocusActiveBiomeDelegate;
 
-    // Assign save user active biome state delegate from game manager
+    // Assign save active biome state delegate from game manager
     public void SetupSaveBiomeDelegate(SaveBiomeDelegate callback)
     {
         this.SaveUpdatedActiveBiomeDelegate = callback;
     }
 
-    // Assign each slot a save user award delegate from game manager
-    public void SetupSaveAwardDelegate(Slot.SaveAwardDelegate callback)
+    // Assign each slot a save coins delegate from game manager
+    public void SetupSaveCoinsDelegate(Slot.SaveCoinsDelegate callback)
     {
         foreach (Slot slot in this.Slots)
         {
-            slot.SetupSaveAwardDelegate(callback);
+            slot.SetupSaveCoinsDelegate(callback);
+        }
+
+    }
+
+    // Assign each slot a save notes delegate from game manager
+    public void SetupSaveNotesDelegate(Slot.SaveNotesDelegate callback)
+    {
+        foreach (Slot slot in this.Slots)
+        {
+            slot.SetupSaveNotesDelegate(callback);
         }
 
     }

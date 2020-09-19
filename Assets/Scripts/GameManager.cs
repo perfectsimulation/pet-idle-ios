@@ -24,20 +24,23 @@ public class GameManager : MonoBehaviour
         this.MenuManager.SetupMarket(this.User.Inventory, this.User.Coins);
 
         // Give the menu manager a callback to save item purchases
-        this.MenuManager.SetupItemPurchaseDelegate(this.SaveItemPurchase);
+        this.MenuManager.SetupPurchaseItemDelegate(this.SaveItemPurchase);
 
         // Give the active biome a callback to save updates to active biome
-        this.MenuManager.SetupSaveBiomeDelegate(this.SaveActiveBiomeState);
+        this.MenuManager.SetupSaveBiomeDelegate(this.SaveActiveBiome);
 
-        // Give the active biome slots a callback to save departure awards
-        this.MenuManager.SetupSaveAwardDelegate(this.SaveAwardedCoins);
+        // Give the active biome slots a callback to save coins
+        this.MenuManager.SetupSaveCoinsDelegate(this.SaveCoins);
+
+        // Give the active biome slots a callback to save notes
+        this.MenuManager.SetupSaveNotesDelegate(this.SaveNotes);
 
         // Set the active biome state from the saved data
-        this.MenuManager.SetupBiome(this.User.ActiveBiomeState);
+        this.MenuManager.SetupBiome(this.User.ActiveBiome);
     }
 
     // Delegate called when a departing guest leaves a coin award for the user
-    public void SaveAwardedCoins(int coins)
+    public void SaveCoins(int coins)
     {
         // Add the coins to user balance
         this.User.Coins += coins;
@@ -61,9 +64,17 @@ public class GameManager : MonoBehaviour
     }
 
     // Delegate called in active biome to update user active biome state
-    public void SaveActiveBiomeState(SerializedBiomeObject updatedBiomeState)
+    public void SaveActiveBiome(SerializedBiomeObject updatedBiomeState)
     {
-        this.User.ActiveBiomeState = updatedBiomeState;
+        this.User.ActiveBiome = updatedBiomeState;
+
+        Persistence.SaveUser(this.User);
+    }
+
+    // Delegate called when a guest departs to update its entry in user notes
+    public void SaveNotes(GuestObject guestObject)
+    {
+        this.User.Notes.UpdateNote(guestObject);
 
         Persistence.SaveUser(this.User);
     }

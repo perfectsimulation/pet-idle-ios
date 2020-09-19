@@ -3,20 +3,33 @@
 public static class DataInitializer
 {
     /* Guests */
-    public static readonly Guest Bear = new Guest("Bear", "Trickster", 0.2f, 2.2f, 3f, 10f, 20, 5, 15, "Images/Hamsters/bear.png");
-    public static readonly Guest Biscuit = new Guest("Biscuit", "Quiet", 1f, 5f, 10f, 30f, 80, 8, 20, "Images/Hamsters/biscuit.png");
-    public static readonly Guest Daisy = new Guest("Daisy", "Luminous", 0.4f, 4f, 4f, 12f, 55, 13, 30, "Images/Hamsters/daisy.png");
-    public static readonly Guest Gizmo = new Guest("Gizmo", "Otherworldly", 5f, 9f, 1f, 20f, 11, 20, 44, "Images/Hamsters/gizmo.png");
-    public static readonly Guest Hamlet = new Guest("Hamlet", "Whimsical", 0.2f, 2.2f, 3f, 10f, 20, 5, 15, "Images/Hamsters/hamlet.png");
-    public static readonly Guest Kujo = new Guest("Kujo", "Legendary", 1f, 5f, 10f, 30f, 80, 8, 20, "Images/Hamsters/kujo.png");
-    public static readonly Guest Muffin = new Guest("Muffin", "Odd", 0.4f, 4f, 4f, 12f, 55, 13, 30, "Images/Hamsters/muffin.png");
-    public static readonly Guest Nugget = new Guest("Nugget", "Elegant", 5f, 9f, 1f, 20f, 11, 20, 44, "Images/Hamsters/nugget.png");
-    public static readonly Guest Sammy = new Guest("Sammy", "Realistic", 5f, 9f, 1f, 20f, 11, 20, 44, "Images/Hamsters/sammy.png");
+    public static readonly Guest Bear = new Guest("Bear", "Trickster", 0.2f, 2.2f, 3f, 10f, 5, 15, 1, 5, "Images/Hamsters/bear.png");
+    public static readonly Guest Biscuit = new Guest("Biscuit", "Quiet", 1f, 5f, 10f, 30f, 8, 20, 1, 4, "Images/Hamsters/biscuit.png");
+    public static readonly Guest Daisy = new Guest("Daisy", "Luminous", 0.4f, 4f, 4f, 12f, 13, 30, 2, 5, "Images/Hamsters/daisy.png");
+    public static readonly Guest Gizmo = new Guest("Gizmo", "Otherworldly", 5f, 9f, 1f, 20f, 20, 44, 1, 6,"Images/Hamsters/gizmo.png");
+    public static readonly Guest Hamlet = new Guest("Hamlet", "Whimsical", 0.2f, 2.2f, 3f, 10f, 5, 15, 1, 6, "Images/Hamsters/hamlet.png");
+    public static readonly Guest Kujo = new Guest("Kujo", "Legendary", 1f, 5f, 10f, 30f, 8, 20, 3, 7, "Images/Hamsters/kujo.png");
+    public static readonly Guest Muffin = new Guest("Muffin", "Odd", 0.4f, 4f, 4f, 12f, 13, 30, 2, 8, "Images/Hamsters/muffin.png");
+    public static readonly Guest Nugget = new Guest("Nugget", "Elegant", 5f, 9f, 1f, 20f, 20, 44, 4, 8, "Images/Hamsters/nugget.png");
+    public static readonly Guest Sammy = new Guest("Sammy", "Realistic", 5f, 9f, 1f, 20f, 20, 44, 3, 9, "Images/Hamsters/sammy.png");
+
+    /* Array of all Guests */
+    public static readonly Guest[] AllGuests = new Guest[]
+    {
+        Bear,
+        Biscuit,
+        Daisy,
+        Gizmo,
+        Hamlet,
+        Kujo,
+        Muffin,
+        Nugget,
+        Sammy
+    };
 
 
 
-
-    /* Guest visit chance dictionaries for Items */
+    /* Guest visit chance dictionaries for Items, manually sorted by rarest guests first */
     private static readonly Dictionary<Guest, float> ItemADictionary = new Dictionary<Guest, float>()
     {
         { Gizmo, 0.5f },

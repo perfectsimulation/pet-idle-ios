@@ -19,14 +19,17 @@ public class Guest
     // Minutes before latest departure relative to arrival in active biome
     public float LatestDepartureInMinutes;
 
-    // Priority for tie-breaking guest selection
-    public int PowerLevel;
-
     // Minimum coins awarded to user upon completion of guest visit
     public int MinimumCoinDrop;
 
     // Maximum coins awarded to user upon completion of guest visit
     public int MaximumCoinDrop;
+
+    // Minimum friendship points awarded to user upon completion of guest visit
+    public int MinimumFriendshipPointReward;
+
+    // Maximum friendship points awarded to user upon completion of guest visit
+    public int MaximumFriendshipPointReward;
 
     // Path to the png to use for the GuestObject that owns this Guest
     public string ImageAssetPath;
@@ -42,9 +45,10 @@ public class Guest
         float latestArrivalInMinutes,
         float earliestDepartureInMinutes,
         float latestDepartureInMinutes,
-        int powerLevel,
         int minimumCoinDrop,
         int maximumCoinDrop,
+        int minimumFriendshipPointReward,
+        int maximumFriendshipPointReward,
         string imageAssetPath)
     {
         this.Name = name;
@@ -53,10 +57,27 @@ public class Guest
         this.LatestArrivalInMinutes = latestArrivalInMinutes;
         this.EarliestDepartureInMinutes = earliestDepartureInMinutes;
         this.LatestDepartureInMinutes = latestDepartureInMinutes;
-        this.PowerLevel = powerLevel;
         this.MinimumCoinDrop = minimumCoinDrop;
         this.MaximumCoinDrop = maximumCoinDrop;
+        this.MinimumFriendshipPointReward = minimumFriendshipPointReward;
+        this.MaximumFriendshipPointReward = maximumFriendshipPointReward;
         this.ImageAssetPath = imageAssetPath;
+    }
+
+    // Two guests are equal if they have the same name
+    public override bool Equals(object obj)
+    {
+        // If the other obj is not a Guest, it is not equal
+        Guest otherGuest = (Guest)obj;
+        if (otherGuest == null) return false;
+
+        // If the other guest has the same name, it is equal
+        return this.Name.Equals(otherGuest.Name);
+    }
+
+    public override int GetHashCode()
+    {
+        return this.Name.GetHashCode();
     }
 
     // This is a valid guest if it has been assigned a non-empty name

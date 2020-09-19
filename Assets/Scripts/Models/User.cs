@@ -5,22 +5,17 @@ public class User
     public int Coins;
     public Inventory Inventory;
     public List<Biome> UnlockedBiomes;
-    public SerializedBiomeObject ActiveBiomeState;
+    public SerializedBiomeObject ActiveBiome;
+    public Notes Notes;
 
     /* Default no-arg constructor */
     public User()
     {
         this.Coins = 300;
-        this.Inventory = new Inventory(new List<Item>()
-        {
-            DataInitializer.ItemE,
-            DataInitializer.ItemF,
-            DataInitializer.ItemG,
-            DataInitializer.ItemH,
-            DataInitializer.ItemI
-        });
+        this.Inventory = new Inventory();
         this.UnlockedBiomes = new List<Biome>() { DataInitializer.Field };
-        this.ActiveBiomeState = new SerializedBiomeObject(DataInitializer.Field);
+        this.ActiveBiome = new SerializedBiomeObject(DataInitializer.Field);
+        this.Notes = new Notes();
     }
 
     /* Deserialize a user */
@@ -39,7 +34,8 @@ public class User
         this.Coins = serializedUser.Coins;
         this.Inventory = new Inventory(deserializedItems);
         this.UnlockedBiomes = Serializer.ArrayToList(serializedUser.UnlockedBiomes);
-        this.ActiveBiomeState = serializedUser.ActiveBiomeState;
+        this.ActiveBiome = serializedUser.ActiveBiome;
+        this.Notes = new Notes(serializedUser.Notes);
     }
 
 }
@@ -50,7 +46,8 @@ public class SerializedUser
     public int Coins;
     public SerializedItem[] Inventory;
     public Biome[] UnlockedBiomes;
-    public SerializedBiomeObject ActiveBiomeState;
+    public SerializedBiomeObject ActiveBiome;
+    public SerializedNotes Notes;
 
     /* Serialize a user */
     public SerializedUser(User user)
@@ -68,7 +65,8 @@ public class SerializedUser
         this.Coins = user.Coins;
         this.Inventory = serializedItems;
         this.UnlockedBiomes = Serializer.ListToArray(user.UnlockedBiomes);
-        this.ActiveBiomeState = user.ActiveBiomeState;
+        this.ActiveBiome = user.ActiveBiome;
+        this.Notes = new SerializedNotes(user.Notes);
     }
 
 }

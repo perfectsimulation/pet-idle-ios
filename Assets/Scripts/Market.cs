@@ -8,16 +8,16 @@ public class Market
     /* Default no-arg constructor */
     public Market() { }
 
-    /* Constructor from list of items */
+    /* Constructor from inventory */
     public Market(Inventory inventory)
     {
-        // Initialize the ordered dictionary of item purchase records
-        this.ItemPurchaseRecord = new OrderedDictionary();
+        // Initialize the dictionary with known capacity of all items
+        int capacity = DataInitializer.AllItems.Length;
+        this.ItemPurchaseRecord = new OrderedDictionary(capacity);
 
         // Loop through all items and check which ones the user already has
-        for (int i = 0; i < DataInitializer.AllItems.Length; i++)
+        foreach(Item item in DataInitializer.AllItems)
         {
-            Item item = DataInitializer.AllItems[i];
             bool isPurchased = inventory.Contains(item);
 
             // Add an entry in the item purchase record for this item

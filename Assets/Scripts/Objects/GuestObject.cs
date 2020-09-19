@@ -7,6 +7,7 @@ public class GuestObject : MonoBehaviour
     public DateTime ArrivalDateTime;
     public DateTime DepartureDateTime;
     public int CoinDrop;
+    public int FriendshipPointReward;
 
     public void SetGuest(Guest guest)
     {
@@ -31,12 +32,20 @@ public class GuestObject : MonoBehaviour
         this.CoinDrop = coinDrop;
     }
 
+    // Set the friendship points from save data or when guest is initially slotted
+    public void SetFriendshipPointReward(int friendshipPoints)
+    {
+        this.FriendshipPointReward = friendshipPoints;
+    }
+
+    // Reset assigned guest properties
     public void RemoveGuest()
     {
         this.Guest = null;
         this.ArrivalDateTime = DateTime.MinValue;
         this.DepartureDateTime = DateTime.MinValue;
         this.CoinDrop = 0;
+        this.FriendshipPointReward = 0;
     }
 
     // Check if the arrival datetime is in the past and departure is in the future
@@ -58,22 +67,6 @@ public class GuestObject : MonoBehaviour
 
         // Return true if the current time is past the departure time
         return (serializedGuestObject.DepartureDateTime < DateTime.UtcNow);
-    }
-
-    // Get the departure coin drop range
-    public static int[] GetCoinDropRange(SerializedGuestObject serializedGuestObject)
-    {
-        // Initialize the coin drop range
-        int[] coinDropRange = new int[] { 0, 0 };
-
-        // Return [0, 0] if there is no guest
-        if (serializedGuestObject.Guest == null) return coinDropRange;
-
-        // Set the coin drop range with the properties of this guest
-        coinDropRange[0] = serializedGuestObject.Guest.MinimumCoinDrop;
-        coinDropRange[1] = serializedGuestObject.Guest.MaximumCoinDrop;
-
-        return coinDropRange;
     }
 
 }
@@ -107,6 +100,7 @@ public class SerializedGuestObject
     public SerializedDateTime ArrivalDateTime;
     public SerializedDateTime DepartureDateTime;
     public int CoinDrop;
+    public int FriendshipPointReward;
 
     /* Serialize a guest object */
     public SerializedGuestObject()
@@ -115,6 +109,7 @@ public class SerializedGuestObject
         this.ArrivalDateTime = DateTime.MinValue;
         this.DepartureDateTime = DateTime.MinValue;
         this.CoinDrop = 0;
+        this.FriendshipPointReward = 0;
     }
 
     public SerializedGuestObject(GuestObject guestObject)
@@ -125,6 +120,7 @@ public class SerializedGuestObject
             this.ArrivalDateTime = guestObject.ArrivalDateTime;
             this.DepartureDateTime = guestObject.DepartureDateTime;
             this.CoinDrop = guestObject.CoinDrop;
+            this.FriendshipPointReward = guestObject.FriendshipPointReward;
         }
         else
         {
@@ -132,6 +128,7 @@ public class SerializedGuestObject
             this.ArrivalDateTime = DateTime.MinValue;
             this.DepartureDateTime = DateTime.MinValue;
             this.CoinDrop = 0;
+            this.FriendshipPointReward = 0;
         }
     }
 

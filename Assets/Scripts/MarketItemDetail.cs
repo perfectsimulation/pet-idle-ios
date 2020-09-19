@@ -15,7 +15,7 @@ public class MarketItemDetail : MonoBehaviour
     // Set when an item button of market content is pressed
     private Item Item;
 
-    // Item purchase modal components
+    // Purchase attempt outcome modals
     private TextMeshProUGUI NeedFundsText;
     private Button NeedFundsButton;
     private TextMeshProUGUI PurchaseSuccessText;
@@ -24,7 +24,7 @@ public class MarketItemDetail : MonoBehaviour
     // Delegate to try an item purchase from the menu manager
     [HideInInspector]
     public delegate void TryPurchaseDelegate(Item item);
-    private TryPurchaseDelegate TryItemPurchaseDelegate;
+    private TryPurchaseDelegate TryPurchaseItemDelegate;
 
     // Delegate to close the detail panel from the menu manager
     [HideInInspector]
@@ -33,7 +33,7 @@ public class MarketItemDetail : MonoBehaviour
 
     void Awake()
     {
-        // Cache item purchase modal components
+        // Cache components of purchase attempt outcome modals
         this.NeedFundsText = this.NeedFundsPanel.GetComponentInChildren<TextMeshProUGUI>();
         this.NeedFundsButton = this.NeedFundsPanel.GetComponentInChildren<Button>();
         this.PurchaseSuccessText = this.PurchaseSuccessPanel.GetComponentInChildren<TextMeshProUGUI>();
@@ -42,7 +42,7 @@ public class MarketItemDetail : MonoBehaviour
 
     void Start()
     {
-        // Hide item purchase modals
+        // Hide purchase attempt outcome modals
         this.NeedFundsPanel.SetActive(false);
         this.PurchaseSuccessPanel.SetActive(false);
     }
@@ -59,7 +59,7 @@ public class MarketItemDetail : MonoBehaviour
         this.Title.SetText(title);
         this.Image.sprite = ImageUtility.CreateSpriteFromPng(imagePath, 128, 128);
 
-        // Set up item purchase modals
+        // Set up purchase attempt outcome modals
         this.HydrateNeedFunds();
         this.HydratePurchaseSuccess();
 
@@ -67,10 +67,10 @@ public class MarketItemDetail : MonoBehaviour
         this.BuyButton.interactable = true;
     }
 
-    // Assign item purchase delegate from menu manager
-    public void SetupTryItemPurchaseDelegate(TryPurchaseDelegate callback)
+    // Assign purchase item delegate from menu manager
+    public void SetupTryPurchaseItemDelegate(TryPurchaseDelegate callback)
     {
-        this.TryItemPurchaseDelegate = callback;
+        this.TryPurchaseItemDelegate = callback;
     }
 
     // Assign on close delegate from menu manager
@@ -88,10 +88,10 @@ public class MarketItemDetail : MonoBehaviour
     // Delegate to attempt an item purchase and update market content
     public void OnBuyButtonPress()
     {
-        this.TryItemPurchaseDelegate(this.Item);
+        this.TryPurchaseItemDelegate(this.Item);
     }
 
-    // Show need funds when user has insufficient funds when trying to purchase
+    // Show failure outcome when user has insufficient funds to purchase the item
     public void OpenNeedFundsPanel()
     {
         this.NeedFundsPanel.SetActive(true);
@@ -103,7 +103,7 @@ public class MarketItemDetail : MonoBehaviour
         this.NeedFundsPanel.SetActive(false);
     }
 
-    // Show success when user has successfully completed an item purchase
+    // Show success outcome when user completed an item purchase
     public void OpenPurchaseSuccessPanel()
     {
         this.PurchaseSuccessPanel.SetActive(true);
