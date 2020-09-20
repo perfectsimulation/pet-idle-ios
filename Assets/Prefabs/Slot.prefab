@@ -63,7 +63,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: dabe3564e7ccf45458e0d433afe79ea4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -241,8 +241,10 @@ MonoBehaviour:
     LatestArrivalInMinutes: 0
     EarliestDepartureInMinutes: 0
     LatestDepartureInMinutes: 0
-    PowerLevel: 0
     MinimumCoinDrop: 0
     MaximumCoinDrop: 0
+    MinimumFriendshipPointReward: 0
+    MaximumFriendshipPointReward: 0
     ImageAssetPath: 
   CoinDrop: 0
+  FriendshipPointReward: 0
