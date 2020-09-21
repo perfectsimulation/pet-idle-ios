@@ -41,6 +41,9 @@ public class Notes
 
     }
 
+    // Get the total number of guests
+    public int Count { get { return this.GuestNotes.Count; } }
+
     // Update the guest notes with the visit details of the guest object
     public void UpdateNote(GuestObject guestObject)
     {

@@ -8,7 +8,7 @@ public class MarketContent : MonoBehaviour
     // The item button prefab
     public GameObject Prefab;
 
-    // The rect transform of this inventory container
+    // The rect transform of this market container
     private RectTransform RectTransform;
 
     // Auto-layout script for the item buttons
@@ -17,13 +17,13 @@ public class MarketContent : MonoBehaviour
     // Keep references of all instantiated item buttons by item name
     private Dictionary<string, GameObject> InstantiatedPrefabs;
 
-    // The user inventory, set from the game manager
+    // The market, set from the game manager
     private Market Market;
 
     // The user coin balance, set from the game manager
     private int UserCoins;
 
-    // The inventory item detail component of the item detail panel
+    // The market item detail component of the item detail panel
     private MarketItemDetail ItemDetail;
 
     // Delegate to open the item detail from menu manager

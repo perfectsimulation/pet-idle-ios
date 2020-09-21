@@ -4,8 +4,8 @@ public class Guest
     // Name of this guest
     public string Name;
 
-    // Personality of this guest
-    public string Personality;
+    // Nature of this guest
+    public string Nature;
 
     // Minutes before earliest arrival to active biome
     public float EarliestArrivalInMinutes;
@@ -40,7 +40,7 @@ public class Guest
     /* Construct a guest */
     public Guest(
         string name,
-        string personality,
+        string nature,
         float earliestArrivalInMinutes,
         float latestArrivalInMinutes,
         float earliestDepartureInMinutes,
@@ -52,7 +52,7 @@ public class Guest
         string imageAssetPath)
     {
         this.Name = name;
-        this.Personality = personality;
+        this.Nature = nature;
         this.EarliestArrivalInMinutes = earliestArrivalInMinutes;
         this.LatestArrivalInMinutes = latestArrivalInMinutes;
         this.EarliestDepartureInMinutes = earliestDepartureInMinutes;

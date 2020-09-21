@@ -15,7 +15,7 @@ public class MarketItemDetail : MonoBehaviour
     // Set when an item button of market content is pressed
     private Item Item;
 
-    // Purchase attempt outcome modals
+    // Purchase attempt outcome modal components
     private TextMeshProUGUI NeedFundsText;
     private Button NeedFundsButton;
     private TextMeshProUGUI PurchaseSuccessText;
@@ -38,13 +38,6 @@ public class MarketItemDetail : MonoBehaviour
         this.NeedFundsButton = this.NeedFundsPanel.GetComponentInChildren<Button>();
         this.PurchaseSuccessText = this.PurchaseSuccessPanel.GetComponentInChildren<TextMeshProUGUI>();
         this.PurchaseSuccessButton = this.PurchaseSuccessPanel.GetComponentInChildren<Button>();
-    }
-
-    void Start()
-    {
-        // Hide purchase attempt outcome modals
-        this.NeedFundsPanel.SetActive(false);
-        this.PurchaseSuccessPanel.SetActive(false);
     }
 
     // Fill in item details from market content

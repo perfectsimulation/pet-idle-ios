@@ -12,10 +12,13 @@ public class MenuManager : MonoBehaviour
     public Button MarketMenuButton;
     public GameObject InventoryMenuPanel;
     public GameObject MarketMenuPanel;
+    public GameObject NotesMenuPanel;
     public InventoryContent InventoryContent;
     public MarketContent MarketContent;
+    public NotesContent NotesContent;
     public InventoryItemDetail InventoryItemDetail;
     public MarketItemDetail MarketItemDetail;
+    public NotesGuestDetail NotesGuestDetail;
 
     // Simulate 'tap out to close' on focused menu element with invisible button
     public Button TapOutToCloseButton;
@@ -57,6 +60,12 @@ public class MenuManager : MonoBehaviour
 
         // Assign on close delegate to market item detail
         this.MarketContent.SetupOnCloseDetailDelegate(this.CloseButton.onClick.Invoke);
+
+        // Assign notes guest detail to notes content
+        this.NotesContent.SetupGuestDetail(this.NotesGuestDetail);
+
+        // Assign open notes guest detail to notes content
+        this.NotesContent.SetupOpenGuestDetailDelegate(this.FocusNotesGuestDetail);
     }
 
     // Assign inventory to inventory content from game manager
@@ -69,6 +78,12 @@ public class MenuManager : MonoBehaviour
     public void SetupMarket(Inventory inventory, int coins)
     {
         this.MarketContent.SetupMarket(new Market(inventory), coins);
+    }
+
+    // Assign notes to notes content from game manager
+    public void SetupNotes(Notes notes)
+    {
+        this.NotesContent.SetupNotes(notes);
     }
 
     // Assign purchase item delegate to market content from game manager
@@ -125,6 +140,12 @@ public class MenuManager : MonoBehaviour
         this.FocusMarketMenu();
     }
 
+    // Display the notes menu panel and hide the main menu panel
+    public void OnNotesMenuButtonPress()
+    {
+        this.FocusNotesMenu();
+    }
+
     // Select an item for slot placement from inventory item button press
     private void PlaceItemInActiveBiome(Item item)
     {
@@ -147,8 +168,10 @@ public class MenuManager : MonoBehaviour
         this.CloseButton.gameObject.SetActive(false);
         this.InventoryMenuPanel.SetActive(false);
         this.MarketMenuPanel.SetActive(false);
+        this.NotesMenuPanel.SetActive(false);
         this.InventoryItemDetail.gameObject.SetActive(false);
         this.MarketItemDetail.gameObject.SetActive(false);
+        this.NotesGuestDetail.gameObject.SetActive(false);
 
         // Disable the tap out to close button when no menus are focused
         this.DisableTapOutToCloseButton();
@@ -157,13 +180,19 @@ public class MenuManager : MonoBehaviour
     // Hide all menus except the main menu
     private void FocusMainMenu()
     {
+        // Reset menu scroll views to start at the top
+        this.ScrollMenusToTop();
+
+        // Enable main menu and close button, disable everything else
         this.MainMenuPanel.SetActive(true);
         this.MainMenuButton.gameObject.SetActive(false);
         this.CloseButton.gameObject.SetActive(true);
         this.InventoryMenuPanel.SetActive(false);
         this.MarketMenuPanel.SetActive(false);
+        this.NotesMenuPanel.SetActive(false);
         this.InventoryItemDetail.gameObject.SetActive(false);
         this.MarketItemDetail.gameObject.SetActive(false);
+        this.NotesGuestDetail.gameObject.SetActive(false);
 
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
@@ -182,9 +211,6 @@ public class MenuManager : MonoBehaviour
         this.InventoryMenuPanel.SetActive(true);
         this.InventoryItemDetail.gameObject.SetActive(false);
 
-        // Start at the top of the scroll view of inventory content
-        this.ScrollToTop(this.InventoryMenuPanel);
-
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
 
@@ -201,8 +227,19 @@ public class MenuManager : MonoBehaviour
         this.MarketItemDetail.CloseNeedFundsPanel();
         this.MarketItemDetail.ClosePurchaseSuccessPanel();
 
-        // Start at the top of the scroll view of market content
-        this.ScrollToTop(this.MarketMenuPanel);
+        // Move tap out to close button behind the main menu
+        this.PrepareTapOutToClose(this.MainMenuPanel);
+
+        // Set listener of close buttons to focus the main menu
+        this.SetCloseButtonListener(this.FocusMainMenu);
+    }
+
+    // Hide all menus except the notes
+    private void FocusNotesMenu()
+    {
+        this.MainMenuPanel.SetActive(false);
+        this.NotesMenuPanel.SetActive(true);
+        this.NotesGuestDetail.gameObject.SetActive(false);
 
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
@@ -240,6 +277,21 @@ public class MenuManager : MonoBehaviour
         this.SetCloseButtonListener(this.FocusMarketMenu);
 
         // Remove the highlighted state on the item button
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    // Show the notes guest detail in the notes menu
+    private void FocusNotesGuestDetail()
+    {
+        this.NotesGuestDetail.gameObject.SetActive(true);
+
+        // Move tap out to close button behind the notes guest detail panel
+        this.PrepareTapOutToClose(this.NotesGuestDetail.gameObject);
+
+        // Set listener of close buttons to focus the notes menu
+        this.SetCloseButtonListener(this.FocusNotesMenu);
+
+        // Remove the highlighted state on the guest button
         EventSystem.current.SetSelectedGameObject(null);
     }
 
@@ -332,6 +384,14 @@ public class MenuManager : MonoBehaviour
         // Set to false both active and enabled for tap out button
         this.TapOutToCloseButton.gameObject.SetActive(false);
         this.TapOutToCloseButton.enabled = false;
+    }
+
+    // Scroll inventory, market, and notes menus to the top
+    private void ScrollMenusToTop()
+    {
+        this.ScrollToTop(this.InventoryMenuPanel);
+        this.ScrollToTop(this.MarketMenuPanel);
+        this.ScrollToTop(this.NotesMenuPanel);
     }
 
     // Find the scroll rect in this gameobject and scroll to the top

@@ -257,10 +257,13 @@ MonoBehaviour:
   MarketMenuButton: {fileID: 1807907577}
   InventoryMenuPanel: {fileID: 1130371657}
   MarketMenuPanel: {fileID: 1402341790}
+  NotesMenuPanel: {fileID: 1296757983}
   InventoryContent: {fileID: 1347589133}
   MarketContent: {fileID: 837715286}
+  NotesContent: {fileID: 503174431}
   InventoryItemDetail: {fileID: 1648496072}
   MarketItemDetail: {fileID: 425970691}
+  NotesGuestDetail: {fileID: 1862059293}
   TapOutToCloseButton: {fileID: 1066929009}
 --- !u!1 &27385424
 GameObject:
@@ -2827,7 +2830,7 @@ GameObject:
   - component: {fileID: 503174432}
   - component: {fileID: 503174431}
   m_Layer: 5
-  m_Name: InventoryContent
+  m_Name: NotesContent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2849,7 +2852,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00017588357}
+  m_AnchoredPosition: {x: 0, y: 0.000036939047}
   m_SizeDelta: {x: 920, y: 1480}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &503174431
@@ -2861,10 +2864,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 503174429}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94668fc3732804843af01c80f2ca588f, type: 3}
+  m_Script: {fileID: 11500000, guid: 86349ea24223b4f7997e35a3ba8fcb07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 6048915606808837761, guid: e679097b5c12d4fc4bbc13895d6ce18a, type: 3}
+  Prefab: {fileID: 8149128581589019825, guid: 291150d7e0a5246b4a836981f11a0215, type: 3}
 --- !u!114 &503174432
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2925,7 +2928,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -4081,7 +4084,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0000048108777}
+  m_AnchoredPosition: {x: 0, y: -0.0000240961}
   m_SizeDelta: {x: 920, y: 1480}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &837715285
@@ -5129,7 +5132,7 @@ MonoBehaviour:
     Name: Default Biome
     AllowedGuests:
     - Name: Beanman
-      Personality: Legendary
+      Nature: 
       EarliestArrivalInMinutes: 1
       LatestArrivalInMinutes: 5
       EarliestDepartureInMinutes: 10
@@ -6482,7 +6485,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0000048108777}
+  m_AnchoredPosition: {x: 0, y: -0.0000240961}
   m_SizeDelta: {x: 920, y: 1480}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1347589133
@@ -7509,7 +7512,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1704703584}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 18852524}
+        m_MethodName: OnNotesMenuButtonPress
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1704703584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7998,7 +8012,7 @@ GameObject:
   - component: {fileID: 1855966068}
   - component: {fileID: 1855966067}
   m_Layer: 5
-  m_Name: AboutText
+  m_Name: NotesText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8269,6 +8283,7 @@ GameObject:
   - component: {fileID: 1862059290}
   - component: {fileID: 1862059292}
   - component: {fileID: 1862059291}
+  - component: {fileID: 1862059293}
   m_Layer: 5
   m_Name: GuestDetail
   m_TagString: Untagged
@@ -8337,6 +8352,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1862059289}
   m_CullTransparentMesh: 0
+--- !u!114 &1862059293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1862059289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6326d49d69c99416aa57d6d84da45697, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: {fileID: 1721766821}
+  GuestImage: {fileID: 430677455}
+  FriendshipImage: {fileID: 173856690}
+  VisitCountText: {fileID: 316881181}
+  NatureText: {fileID: 1375528986}
+  NotesText: {fileID: 1855966067}
 --- !u!1 &1892167644
 GameObject:
   m_ObjectHideFlags: 0

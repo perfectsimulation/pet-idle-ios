@@ -23,6 +23,9 @@ public class GameManager : MonoBehaviour
         // Give the inventory and coin balance to the market content
         this.MenuManager.SetupMarket(this.User.Inventory, this.User.Coins);
 
+        // Give the notes to the notes content
+        this.MenuManager.SetupNotes(this.User.Notes);
+
         // Give the menu manager a callback to save item purchases
         this.MenuManager.SetupPurchaseItemDelegate(this.SaveItemPurchase);
 
