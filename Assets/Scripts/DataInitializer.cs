@@ -27,6 +27,10 @@ public static class DataInitializer
         Sammy
     };
 
+    /* Friendship level thresholds for all Guests */
+    public static int[] FriendshipLevelThresholds = { 50, 100, 200, 300, 400, 500, 700 };
+
+
 
 
     /* Guest visit chance dictionaries for Items, manually sorted by rarest guests first */

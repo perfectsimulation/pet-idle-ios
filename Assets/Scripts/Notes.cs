@@ -62,7 +62,6 @@ public class Notes
         this.GuestNotes[guestObject.Guest] = note;
     }
 
-
 }
 
 public class Note
