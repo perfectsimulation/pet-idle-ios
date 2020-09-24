@@ -222,7 +222,11 @@ public class Slot : MonoBehaviour
         // Check if there is currently a guest in the active biome
         if (GuestObject.IsVisiting(guestObject))
         {
+            // Set item guest interaction image in slot
             this.SetItemGuestPairInteractionImageSprite();
+
+            // Tell the game manager to save the details of the guest visit in notes
+            this.SaveUpdatedNotesDelegate(this.GuestObject);
         }
 
         // Remove the guest if it has departed

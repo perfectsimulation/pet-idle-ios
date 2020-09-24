@@ -54,6 +54,13 @@ public class Notes
         // Do not continue if there was an issue getting the note
         if (note == null) return;
 
+        // Check if guest is currently in the active biome for the first time
+        if (!note.HasBeenSighted && GuestObject.IsVisiting(guestObject))
+        {
+            // Record the first sighting of this guest
+            note.RecordFirstSighting();
+        }
+
         // Increase the friendship points and visit count for this guest
         note.AddFriendshipPointReward(guestObject.FriendshipPointReward);
         note.IncrementVisitCount();
@@ -66,12 +73,14 @@ public class Notes
 
 public class Note
 {
+    public bool HasBeenSighted { get; private set; }
     public int FriendshipPoints { get;  private set; }
     public int VisitCount { get; private set; }
 
     /* Initialize a brand new Note */
     public Note()
     {
+        this.HasBeenSighted = false;
         this.FriendshipPoints = 0;
         this.VisitCount = 0;
     }
@@ -79,8 +88,14 @@ public class Note
     /* Create Note from save data */
     public Note(SerializedNote serializedNote)
     {
+        this.HasBeenSighted = serializedNote.HasBeenSighted;
         this.FriendshipPoints = serializedNote.FriendshipPoints;
         this.VisitCount = serializedNote.VisitCount;
+    }
+
+    public void RecordFirstSighting()
+    {
+        this.HasBeenSighted = true;
     }
 
     // Increase friendship points by the rewarded points when guest departs
@@ -101,6 +116,7 @@ public class Note
 public class SerializedNote
 {
     public Guest Guest;
+    public bool HasBeenSighted;
     public int FriendshipPoints;
     public int VisitCount;
 
@@ -110,6 +126,7 @@ public class SerializedNote
     public SerializedNote(Guest guest, Note note)
     {
         this.Guest = guest;
+        this.HasBeenSighted = note.HasBeenSighted;
         this.FriendshipPoints = note.FriendshipPoints;
         this.VisitCount = note.VisitCount;
     }

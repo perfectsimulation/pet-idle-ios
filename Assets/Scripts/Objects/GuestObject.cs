@@ -49,6 +49,17 @@ public class GuestObject : MonoBehaviour
     }
 
     // Check if the arrival datetime is in the past and departure is in the future
+    public static bool IsVisiting(GuestObject guestObject)
+    {
+        // Return false if there is no guest
+        if (guestObject.Guest == null) return false;
+
+        // Return true if the current time is between the arrival and departure times
+        return (guestObject.ArrivalDateTime < DateTime.UtcNow &&
+            guestObject.DepartureDateTime >= DateTime.UtcNow);
+    }
+
+    // Check if the arrival datetime is in the past and departure is in the future
     public static bool IsVisiting(SerializedGuestObject serializedGuestObject)
     {
         // Return false if there is no guest

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -114,16 +115,38 @@ public class NotesContent : MonoBehaviour
                 // Ignore the image component in the root component
                 if (image.gameObject.GetInstanceID() != prefabObject.GetInstanceID())
                 {
-                    // Create and set guest image sprite on the child of this new guest button
-                    image.sprite = ImageUtility.CreateSpriteFromPng(guest.ImageAssetPath, 128, 128);
+                    // Show unknown placeholder if guest has not yet visited
+                    if (!note.HasBeenSighted)
+                    {
+                        // Show unknown guest image for this new guest button
+                        string unknownGuestImagePath = "Images/Hamsters/unknown.png";
+                        image.sprite = ImageUtility.CreateSpriteFromPng(unknownGuestImagePath, 128, 128);
+                    }
+                    else
+                    {
+                        // Create and set guest image sprite of this new guest button
+                        image.sprite = ImageUtility.CreateSpriteFromPng(guest.ImageAssetPath, 128, 128);
+                    }
                 }
             }
+
+            // Get the text component on the guest button prefab
+            TextMeshProUGUI nameText = prefabObject.GetComponentInChildren<TextMeshProUGUI>();
+
+            // Null check for name text component
+            if (nameText == null) continue;
+
+            // Set guest name to name text component
+            nameText.text = guest.Name;
 
             // Get the button component on the guest button prefab
             Button button = prefabObject.GetComponent<Button>();
 
             // Null check for button component
             if (button == null) continue;
+
+            // Disable button if guest has not yet visited
+            button.interactable = note.HasBeenSighted;
 
             // Set onClick of the new guest button with the delegate passed down from game manager
             button.onClick.AddListener(() => this.OnGuestButtonPress(guest, note));
