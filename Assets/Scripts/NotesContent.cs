@@ -6,28 +6,28 @@ using UnityEngine.UI;
 
 public class NotesContent : MonoBehaviour
 {
-    // The guest button prefab
+    // The note button prefab
     public GameObject Prefab;
 
     // The rect transform of this notes container
     private RectTransform RectTransform;
 
-    // Auto-layout script for the guest buttons
+    // Auto-layout script for the note buttons
     private GridLayoutGroup GridLayoutGroup;
 
-    // Keep references of all instantiated guest buttons by guest name
+    // Keep references of all instantiated note buttons by guest name
     private Dictionary<string, GameObject> InstantiatedPrefabs;
 
     // The user notes, set from the game manager
     private Notes Notes;
 
-    // The guest detail component of the guest detail panel
-    private NotesGuestDetail GuestDetail;
+    // The note detail component of the note detail panel
+    private NoteDetail NoteDetail;
 
-    // Delegate to open the guest detail from menu manager
+    // Delegate to open the note detail from menu manager
     [HideInInspector]
-    public delegate void GuestDetailDelegate();
-    private GuestDetailDelegate OpenGuestDetailDelegate;
+    public delegate void NoteDetailDelegate();
+    private NoteDetailDelegate OpenNoteDetailDelegate;
 
     void Awake()
     {
@@ -36,16 +36,16 @@ public class NotesContent : MonoBehaviour
         this.GridLayoutGroup = this.gameObject.GetComponent<GridLayoutGroup>();
     }
 
-    // Assign notes guest detail component from menu manager
-    public void SetupGuestDetail(NotesGuestDetail guestDetail)
+    // Assign note detail component from menu manager
+    public void SetupNoteDetail(NoteDetail noteDetail)
     {
-        this.GuestDetail = guestDetail;
+        this.NoteDetail = noteDetail;
     }
 
-    // Assign open guest detail delegate from menu manager
-    public void SetupOpenGuestDetailDelegate(GuestDetailDelegate callback)
+    // Assign open note detail delegate from menu manager
+    public void SetupOpenNoteDetailDelegate(NoteDetailDelegate callback)
     {
-        this.OpenGuestDetailDelegate = callback;
+        this.OpenNoteDetailDelegate = callback;
     }
 
     // Assign notes to notes content
@@ -53,24 +53,31 @@ public class NotesContent : MonoBehaviour
     {
         this.Notes = notes;
 
-        // Initialize dictionary of instantiated guest buttons
+        // Initialize dictionary of instantiated note buttons
         this.InstantiatedPrefabs = new Dictionary<string, GameObject>();
 
-        // Calculate the scroll view height based on guests and layout properties
-        // Note: this assumes cells are square
+        // Size the scroll view to accommodate all note buttons
+        this.PrepareScrollViewForLayout();
+
+        // Fill the notes menu with note buttons
+        this.Populate();
+    }
+
+    private void PrepareScrollViewForLayout()
+    {
         float screenWidth = this.RectTransform.sizeDelta.x;
-        float gridCellSize = this.GridLayoutGroup.cellSize.x;
-        float gridCellSpacing = this.GridLayoutGroup.spacing.x;
+        float gridCellSize = this.GridLayoutGroup.cellSize.y;
+        float gridCellSpacing = this.GridLayoutGroup.spacing.y;
         float gridCellTopPadding = this.GridLayoutGroup.padding.top;
         float cellsPerRow = Mathf.Floor(screenWidth / gridCellSize);
 
-        // Start with the guest count
+        // Start with the note count
         float height = (float)this.Notes.Count;
 
         // Divide by the number of guests per row
         height /= cellsPerRow;
 
-        // Round up in case of odd numbered guest count
+        // Round up in case of odd numbered note count
         height = Mathf.Ceil(height);
 
         // Multiply by the sum of cell size and cell spacing
@@ -81,12 +88,9 @@ public class NotesContent : MonoBehaviour
 
         // Set the height of the rect transform for proper scroll behavior
         this.RectTransform.sizeDelta = new Vector2(screenWidth, height);
-
-        // Fill the notes menu with guest buttons
-        this.Populate();
     }
 
-    // Create a guest button prefab for each guest in notes
+    // Create a note button prefab for each note in notes
     private void Populate()
     {
         GameObject prefabObject;
@@ -100,10 +104,10 @@ public class NotesContent : MonoBehaviour
             // Instantiate the prefab clone with this as the parent
             prefabObject = Instantiate(this.Prefab, this.transform);
 
-            // TODO Set custom properties dependent on the guest
+            // TODO Set custom properties dependent on the note
             prefabObject.name = guest.Name;
 
-            // Get all the image components on the guest button prefab
+            // Get all the image components on the note button prefab
             Image[] images = prefabObject.GetComponentsInChildren<Image>();
 
             // Null check for image component array
@@ -130,7 +134,7 @@ public class NotesContent : MonoBehaviour
                 }
             }
 
-            // Get the text component on the guest button prefab
+            // Get the text component on the note button prefab
             TextMeshProUGUI nameText = prefabObject.GetComponentInChildren<TextMeshProUGUI>();
 
             // Null check for name text component
@@ -139,7 +143,7 @@ public class NotesContent : MonoBehaviour
             // Set guest name to name text component
             nameText.text = guest.Name;
 
-            // Get the button component on the guest button prefab
+            // Get the button component on the note button prefab
             Button button = prefabObject.GetComponent<Button>();
 
             // Null check for button component
@@ -148,20 +152,20 @@ public class NotesContent : MonoBehaviour
             // Disable button if guest has not yet visited
             button.interactable = note.HasBeenSighted;
 
-            // Set onClick of the new guest button with the delegate passed down from game manager
-            button.onClick.AddListener(() => this.OnGuestButtonPress(guest, note));
+            // Set onClick of the new note button with the delegate passed down from game manager
+            button.onClick.AddListener(() => this.OnNoteButtonPress(guest, note));
 
-            // Add the new guest button to the dictionary of instantiated prefabs
+            // Add the new note button to the dictionary of instantiated prefabs
             this.InstantiatedPrefabs.Add(guest.Name, prefabObject);
         }
 
     }
 
-    // Open the guest detail panel and hydrate it with the note of the pressed button
-    private void OnGuestButtonPress(Guest guest, Note note)
+    // Open the note detail panel and hydrate it with the note of the pressed button
+    private void OnNoteButtonPress(Guest guest, Note note)
     {
-        this.GuestDetail.Hydrate(guest, note);
-        this.OpenGuestDetailDelegate();
+        this.NoteDetail.Hydrate(guest, note);
+        this.OpenNoteDetailDelegate();
     }
 
 }

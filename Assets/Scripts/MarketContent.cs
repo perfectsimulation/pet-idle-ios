@@ -101,11 +101,19 @@ public class MarketContent : MonoBehaviour
         // Initialize dictionary of instantiated item buttons
         this.InstantiatedPrefabs = new Dictionary<string, GameObject>();
 
-        // Calculate the scroll view height based on item count and layout properties
-        // Note: this assumes cells are square
+        // Size the scroll view to accommodate all item buttons
+        this.PrepareScrollViewForLayout();
+
+        // Fill the market menu with item buttons
+        this.Populate();
+    }
+
+    // Calculate and set the scroll view height based on layout properties
+    private void PrepareScrollViewForLayout()
+    {
         float screenWidth = this.RectTransform.sizeDelta.x;
-        float gridCellSize = this.GridLayoutGroup.cellSize.x;
-        float gridCellSpacing = this.GridLayoutGroup.spacing.x;
+        float gridCellSize = this.GridLayoutGroup.cellSize.y;
+        float gridCellSpacing = this.GridLayoutGroup.spacing.y;
         float gridCellTopPadding = this.GridLayoutGroup.padding.top;
         float cellsPerRow = Mathf.Floor(screenWidth / gridCellSize);
 
@@ -126,9 +134,6 @@ public class MarketContent : MonoBehaviour
 
         // Set the height of the rect transform for proper scroll behavior
         this.RectTransform.sizeDelta = new Vector2(screenWidth, height);
-
-        // Fill the inventory menu with item buttons
-        this.Populate();
     }
 
     // Create an item button prefab for each item in the market

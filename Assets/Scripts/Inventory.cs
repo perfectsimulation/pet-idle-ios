@@ -7,7 +7,7 @@ public class Inventory
     // List of all items in the user inventory
     public List<Item> ItemList;
 
-    /* Initialize a brand new inventory with starter items */
+    /* Initialize a brand new Inventory with starter items */
     public Inventory()
     {
         this.ItemList = new List<Item>()
@@ -20,16 +20,18 @@ public class Inventory
         };
     }
 
-    /* Constructor from list of items */
-    public Inventory(List<Item> itemList)
+    /* Create Inventory from save data */
+    public Inventory(SerializedInventory serializedInventory)
     {
-        this.ItemList = itemList;
-    }
+        List<Item> itemList = new List<Item>();
+        itemList.Capacity = serializedInventory.Length;
 
-    /* Constructor from array of items */
-    public Inventory(Item[] itemList)
-    {
-        this.ItemList = Serializer.ArrayToList(itemList);
+        foreach (SerializedItem serializedItem in serializedInventory.ItemArray)
+        {
+            itemList.Add(new Item(serializedItem));
+        }
+
+        this.ItemList = itemList;
     }
 
     // Get the total number of items in the user inventory
@@ -126,4 +128,27 @@ public class Inventory
         return Serializer.ArrayToList(sortedItems);
     }
 
+}
+
+[Serializable]
+public class SerializedInventory
+{
+    // Array of all items in the user inventory
+    public SerializedItem[] ItemArray;
+
+    /* Create SerializedInventory from Inventory */
+    public SerializedInventory(Inventory inventory)
+    {
+        SerializedItem[] itemArray = new SerializedItem[inventory.Count];
+
+        for (int i = 0; i < inventory.Count; i++)
+        {
+            itemArray[i] = new SerializedItem(inventory[i]);
+        }
+
+        this.ItemArray = itemArray;
+    }
+
+    // Get the total number of serialized items
+    public int Length { get { return this.ItemArray.Length; } }
 }

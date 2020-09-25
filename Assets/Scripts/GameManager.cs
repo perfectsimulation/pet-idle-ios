@@ -26,6 +26,9 @@ public class GameManager : MonoBehaviour
         // Give the notes to the notes content
         this.MenuManager.SetupNotes(this.User.Notes);
 
+        // Give the gifts to the gifts content
+        this.MenuManager.SetupGifts(this.User.Gifts);
+
         // Give the menu manager a callback to save item purchases
         this.MenuManager.SetupPurchaseItemDelegate(this.SaveItemPurchase);
 
@@ -77,7 +80,7 @@ public class GameManager : MonoBehaviour
     // Delegate called when a guest departs to update its entry in user notes
     public void SaveNotes(GuestObject guestObject)
     {
-        this.User.Notes.UpdateNote(guestObject);
+        this.User.Notes.UpdateVisitCount(guestObject);
 
         Persistence.SaveUser(this.User);
     }

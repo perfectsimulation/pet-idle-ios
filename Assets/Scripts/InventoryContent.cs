@@ -59,7 +59,7 @@ public class InventoryContent : MonoBehaviour
         this.ItemDetail.SetupOnCloseDelegate(callback);
     }
 
-    // Prepare the scroll view before populating it with item buttons
+    // Assign inventory to inventory content from game manager
     public void SetupInventory(Inventory inventory)
     {
         this.Inventory = inventory;
@@ -84,19 +84,18 @@ public class InventoryContent : MonoBehaviour
         this.PrepareScrollViewForLayout();
 
         // Instantiate the new item button
-        this.Populate(new Item[] { item });
+        this.Populate(item);
 
         // Reorder instantiated item buttons relative to the inventory
         this.InsertNewItemIntoGridLayout();
     }
 
-    // Calculate and set the scroll view height based on item count and layout properties
+    // Calculate and set the scroll view height based on layout properties
     private void PrepareScrollViewForLayout()
     {
-        // Note: this approach assumes cells are square
         float screenWidth = this.RectTransform.sizeDelta.x;
-        float gridCellSize = this.GridLayoutGroup.cellSize.x;
-        float gridCellSpacing = this.GridLayoutGroup.spacing.x;
+        float gridCellSize = this.GridLayoutGroup.cellSize.y;
+        float gridCellSpacing = this.GridLayoutGroup.spacing.y;
         float gridCellTopPadding = this.GridLayoutGroup.padding.top;
         float cellsPerRow = Mathf.Floor(screenWidth / gridCellSize);
 
@@ -119,7 +118,13 @@ public class InventoryContent : MonoBehaviour
         this.RectTransform.sizeDelta = new Vector2(screenWidth, height);
     }
 
-    // Create an item button prefab for each item in the list
+    // Add the item to the inventory scroll view
+    private void Populate(Item item)
+    {
+        this.Populate(new Item[] { item });
+    }
+
+    // Create an item button prefab for each item in the array
     private void Populate(Item[] items)
     {
         GameObject prefabObject;

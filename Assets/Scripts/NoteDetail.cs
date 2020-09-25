@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class NotesGuestDetail : MonoBehaviour
+public class NoteDetail : MonoBehaviour
 {
     public TextMeshProUGUI Name;
     public Image GuestImage;

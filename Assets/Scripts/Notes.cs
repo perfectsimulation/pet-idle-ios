@@ -44,8 +44,8 @@ public class Notes
     // Get the total number of guests
     public int Count { get { return this.GuestNotes.Count; } }
 
-    // Update the guest notes with the visit details of the guest object
-    public void UpdateNote(GuestObject guestObject)
+    // Update the visit count of this guest
+    public void UpdateVisitCount(GuestObject guestObject)
     {
         // TODO create gift for the guest visit to show updated values visually
         // Get the note for this guest
@@ -61,12 +61,21 @@ public class Notes
             note.RecordFirstSighting();
         }
 
-        // Increase the friendship points and visit count for this guest
-        note.AddFriendshipPointReward(guestObject.FriendshipPointReward);
+        // Increase the visit count for this guest
         note.IncrementVisitCount();
 
         // Reassign the note to the guest notes
         this.GuestNotes[guestObject.Guest] = note;
+    }
+
+    // Update the friendship points of this guest from its departure gift
+    public void AcceptGift(Gift gift)
+    {
+        // Get the note for the guest who gave the gift
+        Note note = (Note)this.GuestNotes[(object)gift.Guest];
+
+        // Increase the friendship points for this guest
+        note.AddFriendshipPointReward(gift.FriendshipPointReward);
     }
 
 }
@@ -93,6 +102,7 @@ public class Note
         this.VisitCount = serializedNote.VisitCount;
     }
 
+    // Set has been sighted to true when guest is first seen in the active biome
     public void RecordFirstSighting()
     {
         this.HasBeenSighted = true;

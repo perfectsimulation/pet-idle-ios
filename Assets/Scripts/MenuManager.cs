@@ -13,12 +13,14 @@ public class MenuManager : MonoBehaviour
     public GameObject InventoryMenuPanel;
     public GameObject MarketMenuPanel;
     public GameObject NotesMenuPanel;
+    public GameObject GiftsMenuPanel;
     public InventoryContent InventoryContent;
     public MarketContent MarketContent;
     public NotesContent NotesContent;
+    public GiftsContent GiftsContent;
     public InventoryItemDetail InventoryItemDetail;
     public MarketItemDetail MarketItemDetail;
-    public NotesGuestDetail NotesGuestDetail;
+    public NoteDetail NoteDetail;
 
     // Simulate 'tap out to close' on focused menu element with invisible button
     public Button TapOutToCloseButton;
@@ -62,10 +64,10 @@ public class MenuManager : MonoBehaviour
         this.MarketContent.SetupOnCloseDetailDelegate(this.CloseButton.onClick.Invoke);
 
         // Assign notes guest detail to notes content
-        this.NotesContent.SetupGuestDetail(this.NotesGuestDetail);
+        this.NotesContent.SetupNoteDetail(this.NoteDetail);
 
         // Assign open notes guest detail to notes content
-        this.NotesContent.SetupOpenGuestDetailDelegate(this.FocusNotesGuestDetail);
+        this.NotesContent.SetupOpenNoteDetailDelegate(this.FocusNoteDetail);
     }
 
     // Assign inventory to inventory content from game manager
@@ -84,6 +86,12 @@ public class MenuManager : MonoBehaviour
     public void SetupNotes(Notes notes)
     {
         this.NotesContent.SetupNotes(notes);
+    }
+
+    // Assign gifts to gifts content from game manager
+    public void SetupGifts(Gifts gifts)
+    {
+        this.GiftsContent.SetupGifts(gifts);
     }
 
     // Assign purchase item delegate to market content from game manager
@@ -146,6 +154,12 @@ public class MenuManager : MonoBehaviour
         this.FocusNotesMenu();
     }
 
+    // Display the gifts menu panel and hide the main menu panel
+    public void OnGiftsMenuButtonPress()
+    {
+        this.FocusGiftsMenu();
+    }
+
     // Select an item for slot placement from inventory item button press
     private void PlaceItemInActiveBiome(Item item)
     {
@@ -169,9 +183,10 @@ public class MenuManager : MonoBehaviour
         this.InventoryMenuPanel.SetActive(false);
         this.MarketMenuPanel.SetActive(false);
         this.NotesMenuPanel.SetActive(false);
+        this.GiftsMenuPanel.SetActive(false);
         this.InventoryItemDetail.gameObject.SetActive(false);
         this.MarketItemDetail.gameObject.SetActive(false);
-        this.NotesGuestDetail.gameObject.SetActive(false);
+        this.NoteDetail.gameObject.SetActive(false);
 
         // Disable the tap out to close button when no menus are focused
         this.DisableTapOutToCloseButton();
@@ -190,9 +205,10 @@ public class MenuManager : MonoBehaviour
         this.InventoryMenuPanel.SetActive(false);
         this.MarketMenuPanel.SetActive(false);
         this.NotesMenuPanel.SetActive(false);
+        this.GiftsMenuPanel.SetActive(false);
         this.InventoryItemDetail.gameObject.SetActive(false);
         this.MarketItemDetail.gameObject.SetActive(false);
-        this.NotesGuestDetail.gameObject.SetActive(false);
+        this.NoteDetail.gameObject.SetActive(false);
 
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
@@ -239,7 +255,20 @@ public class MenuManager : MonoBehaviour
     {
         this.MainMenuPanel.SetActive(false);
         this.NotesMenuPanel.SetActive(true);
-        this.NotesGuestDetail.gameObject.SetActive(false);
+        this.NoteDetail.gameObject.SetActive(false);
+
+        // Move tap out to close button behind the main menu
+        this.PrepareTapOutToClose(this.MainMenuPanel);
+
+        // Set listener of close buttons to focus the main menu
+        this.SetCloseButtonListener(this.FocusMainMenu);
+    }
+
+    // Hide all menus except the gifts
+    private void FocusGiftsMenu()
+    {
+        this.MainMenuPanel.SetActive(false);
+        this.GiftsMenuPanel.SetActive(true);
 
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
@@ -281,12 +310,12 @@ public class MenuManager : MonoBehaviour
     }
 
     // Show the notes guest detail in the notes menu
-    private void FocusNotesGuestDetail()
+    private void FocusNoteDetail()
     {
-        this.NotesGuestDetail.gameObject.SetActive(true);
+        this.NoteDetail.gameObject.SetActive(true);
 
         // Move tap out to close button behind the notes guest detail panel
-        this.PrepareTapOutToClose(this.NotesGuestDetail.gameObject);
+        this.PrepareTapOutToClose(this.NoteDetail.gameObject);
 
         // Set listener of close buttons to focus the notes menu
         this.SetCloseButtonListener(this.FocusNotesMenu);
