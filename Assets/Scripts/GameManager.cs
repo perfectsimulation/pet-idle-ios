@@ -17,17 +17,20 @@ public class GameManager : MonoBehaviour
     // Provide other scripts with user data and initialize their parameters
     void Start()
     {
-        // Give the user inventory data to the inventory content
-        this.MenuManager.SetupInventory(this.User.Inventory);
+        // Give the coin balance to the menu manager
+        this.MenuManager.HydrateCoins(this.User.Coins);
+
+        // Give the inventory to the inventory content
+        this.MenuManager.HydrateInventory(this.User.Inventory);
 
         // Give the inventory and coin balance to the market content
-        this.MenuManager.SetupMarket(this.User.Inventory, this.User.Coins);
+        this.MenuManager.HydrateMarket(this.User.Inventory);
 
         // Give the notes to the notes content
-        this.MenuManager.SetupNotes(this.User.Notes);
+        this.MenuManager.HydrateNotes(this.User.Notes);
 
-        // Give the gifts to the gifts content
-        this.MenuManager.SetupGifts(this.User.Gifts);
+        // Give the gifts and coin balance to the gifts content
+        this.MenuManager.HydrateGifts(this.User.Gifts);
 
         // Give the menu manager a callback to save item purchases
         this.MenuManager.SetupPurchaseItemDelegate(this.SaveItemPurchase);
@@ -38,20 +41,17 @@ public class GameManager : MonoBehaviour
         // Give the active biome slots a callback to save coins
         this.MenuManager.SetupSaveCoinsDelegate(this.SaveCoins);
 
-        // Give the active biome slots a callback to save notes
-        this.MenuManager.SetupSaveNotesDelegate(this.SaveNotes);
+        // Give the active biome slots a callback to save guest visit counts
+        this.MenuManager.SetupSaveVisitDelegate(this.SaveGuestVisit);
 
-        // Set the active biome state from the saved data
+        // Give the menu manager a callback to save claimed coins from gifts
+        this.MenuManager.SetupClaimCoinsDelegate(this.SaveCoins);
+
+        // Give the menu manager a callback to save claimed friendship points
+        this.MenuManager.SetupClaimFriendshipDelegate(this.SaveFriendship);
+
+        // Give the saved active biome state to the active biome
         this.MenuManager.SetupBiome(this.User.ActiveBiome);
-    }
-
-    // Delegate called when a departing guest leaves a coin award for the user
-    public void SaveCoins(int coins)
-    {
-        // Add the coins to user balance
-        this.User.Coins += coins;
-
-        Persistence.SaveUser(this.User);
     }
 
     // Delegate called in market content to update user inventory and coins
@@ -63,7 +63,10 @@ public class GameManager : MonoBehaviour
         // Subtract the newly purchased item price from the user coin balance
         this.User.Coins -= item.Price;
 
-        // Update inventory content with newly purchased item
+        // Give the updated coin balance to the menus using it
+        this.MenuManager.HydrateCoins(this.User.Coins);
+
+        // Give the updated inventory to the inventory content
         this.MenuManager.UpdateInventory(item);
 
         Persistence.SaveUser(this.User);
@@ -77,10 +80,30 @@ public class GameManager : MonoBehaviour
         Persistence.SaveUser(this.User);
     }
 
-    // Delegate called when a guest departs to update its entry in user notes
-    public void SaveNotes(GuestObject guestObject)
+    // Delegate called when a departing guest leaves a coin award for the user
+    public void SaveCoins(int coins)
+    {
+        // Add the coins to user balance
+        this.User.Coins += coins;
+
+        // Give the updated coin balance to the menus using it
+        this.MenuManager.HydrateCoins(this.User.Coins);
+
+        Persistence.SaveUser(this.User);
+    }
+
+    // Delegate called when guests depart to increment visit counts in notes
+    public void SaveGuestVisit(GuestObject guestObject)
     {
         this.User.Notes.UpdateVisitCount(guestObject);
+
+        Persistence.SaveUser(this.User);
+    }
+
+    // Delegate called when a gift is claimed to update guest friendship
+    public void SaveFriendship(Guest guest, int friendshipPoints)
+    {
+        this.User.Notes.UpdateFriendship(guest, friendshipPoints);
 
         Persistence.SaveUser(this.User);
     }

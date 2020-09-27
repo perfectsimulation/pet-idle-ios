@@ -44,10 +44,9 @@ public class Notes
     // Get the total number of guests
     public int Count { get { return this.GuestNotes.Count; } }
 
-    // Update the visit count of this guest
+    // Increment the visit count of this guest
     public void UpdateVisitCount(GuestObject guestObject)
     {
-        // TODO create gift for the guest visit to show updated values visually
         // Get the note for this guest
         Note note = (Note)this.GuestNotes[(object)guestObject.Guest];
 
@@ -63,19 +62,16 @@ public class Notes
 
         // Increase the visit count for this guest
         note.IncrementVisitCount();
-
-        // Reassign the note to the guest notes
-        this.GuestNotes[guestObject.Guest] = note;
     }
 
-    // Update the friendship points of this guest from its departure gift
-    public void AcceptGift(Gift gift)
+    // Update the friendship points of this guest
+    public void UpdateFriendship(Guest guest, int friendshipPoints)
     {
         // Get the note for the guest who gave the gift
-        Note note = (Note)this.GuestNotes[(object)gift.Guest];
+        Note note = (Note)this.GuestNotes[(object)guest];
 
         // Increase the friendship points for this guest
-        note.AddFriendshipPointReward(gift.FriendshipPointReward);
+        note.AddFriendshipPoints(friendshipPoints);
     }
 
 }
@@ -83,41 +79,41 @@ public class Notes
 public class Note
 {
     public bool HasBeenSighted { get; private set; }
-    public int FriendshipPoints { get;  private set; }
     public int VisitCount { get; private set; }
+    public int FriendshipPoints { get; private set; }
 
     /* Initialize a brand new Note */
     public Note()
     {
         this.HasBeenSighted = false;
-        this.FriendshipPoints = 0;
         this.VisitCount = 0;
+        this.FriendshipPoints = 0;
     }
 
     /* Create Note from save data */
     public Note(SerializedNote serializedNote)
     {
         this.HasBeenSighted = serializedNote.HasBeenSighted;
-        this.FriendshipPoints = serializedNote.FriendshipPoints;
         this.VisitCount = serializedNote.VisitCount;
+        this.FriendshipPoints = serializedNote.FriendshipPoints;
     }
 
-    // Set has been sighted to true when guest is first seen in the active biome
+    // Indicate if guest has been seen in the active biome
     public void RecordFirstSighting()
     {
         this.HasBeenSighted = true;
     }
 
-    // Increase friendship points by the rewarded points when guest departs
-    public void AddFriendshipPointReward(int friendshipPointReward)
-    {
-        this.FriendshipPoints += friendshipPointReward;
-    }
-
-    // Increment visit count when guest departs
+    // Increment visit count automatically
     public void IncrementVisitCount()
     {
         this.VisitCount++;
+    }
+
+    // Increase friendship points by the rewarded points when user claims gift
+    public void AddFriendshipPoints(int friendshipPointReward)
+    {
+        this.FriendshipPoints += friendshipPointReward;
     }
 
 }
@@ -127,8 +123,8 @@ public class SerializedNote
 {
     public Guest Guest;
     public bool HasBeenSighted;
-    public int FriendshipPoints;
     public int VisitCount;
+    public int FriendshipPoints;
 
     public SerializedNote() { }
 
@@ -137,8 +133,8 @@ public class SerializedNote
     {
         this.Guest = guest;
         this.HasBeenSighted = note.HasBeenSighted;
-        this.FriendshipPoints = note.FriendshipPoints;
         this.VisitCount = note.VisitCount;
+        this.FriendshipPoints = note.FriendshipPoints;
     }
 
 }

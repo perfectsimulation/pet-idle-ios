@@ -20,8 +20,8 @@ public class Slot : MonoBehaviour
 
     // Delegate to save updated notes upon guest departure
     [HideInInspector]
-    public delegate void SaveNotesDelegate(GuestObject guestObject);
-    private SaveNotesDelegate SaveUpdatedNotesDelegate;
+    public delegate void SaveVisitDelegate(GuestObject guestObject);
+    private SaveVisitDelegate SaveGuestVisitDelegate;
 
     public Slot() { }
 
@@ -57,9 +57,9 @@ public class Slot : MonoBehaviour
     }
 
     // Assign save award delegate from active biome object
-    public void SetupSaveNotesDelegate(SaveNotesDelegate callback)
+    public void SetupSaveVisitDelegate(SaveVisitDelegate callback)
     {
-        this.SaveUpdatedNotesDelegate = callback;
+        this.SaveGuestVisitDelegate = callback;
     }
 
     // Initialize a newly placed item for this slot
@@ -226,7 +226,7 @@ public class Slot : MonoBehaviour
             this.SetItemGuestPairInteractionImageSprite();
 
             // Tell the game manager to save the details of the guest visit in notes
-            this.SaveUpdatedNotesDelegate(this.GuestObject);
+            this.SaveGuestVisitDelegate(this.GuestObject);
         }
 
         // Remove the guest if it has departed
@@ -249,7 +249,7 @@ public class Slot : MonoBehaviour
         this.SaveUpdatedCoinsDelegate(this.GuestObject.CoinDrop);
 
         // Tell the game manager to save the details of the guest visit in notes
-        this.SaveUpdatedNotesDelegate(this.GuestObject);
+        this.SaveGuestVisitDelegate(this.GuestObject);
 
         // Reset the image sprite to show the item alone
         this.SetImageSprite(this.ItemObject.Item.ImageAssetPath, 256, 256);

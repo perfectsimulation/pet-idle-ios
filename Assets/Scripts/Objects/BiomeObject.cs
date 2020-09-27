@@ -37,12 +37,12 @@ public class BiomeObject : MonoBehaviour
 
     }
 
-    // Assign each slot a save notes delegate from game manager
-    public void SetupSaveNotesDelegate(Slot.SaveNotesDelegate callback)
+    // Assign each slot a save visit delegate from game manager
+    public void SetupSaveVisitDelegate(Slot.SaveVisitDelegate callback)
     {
         foreach (Slot slot in this.Slots)
         {
-            slot.SetupSaveNotesDelegate(callback);
+            slot.SetupSaveVisitDelegate(callback);
         }
 
     }
@@ -180,7 +180,6 @@ public class BiomeObject : MonoBehaviour
             {
                 selectedGuest = visitChance.Key;
 
-                // TODO implement power level for priority
                 break;
             }
 

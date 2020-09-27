@@ -70,28 +70,35 @@ public class MenuManager : MonoBehaviour
         this.NotesContent.SetupOpenNoteDetailDelegate(this.FocusNoteDetail);
     }
 
-    // Assign inventory to inventory content from game manager
-    public void SetupInventory(Inventory inventory)
+    // Assign coins to menus that use them
+    public void HydrateCoins(int coins)
     {
-        this.InventoryContent.SetupInventory(inventory);
+        this.MarketContent.HydrateCoins(coins);
+        this.GiftsContent.HydrateCoins(coins);
+    }
+
+    // Assign inventory to inventory content from game manager
+    public void HydrateInventory(Inventory inventory)
+    {
+        this.InventoryContent.HydrateInventory(inventory);
     }
 
     // Assign market to market content from game manager
-    public void SetupMarket(Inventory inventory, int coins)
+    public void HydrateMarket(Inventory inventory)
     {
-        this.MarketContent.SetupMarket(new Market(inventory), coins);
+        this.MarketContent.HydrateMarket(new Market(inventory));
     }
 
     // Assign notes to notes content from game manager
-    public void SetupNotes(Notes notes)
+    public void HydrateNotes(Notes notes)
     {
-        this.NotesContent.SetupNotes(notes);
+        this.NotesContent.HydrateNotes(notes);
     }
 
     // Assign gifts to gifts content from game manager
-    public void SetupGifts(Gifts gifts)
+    public void HydrateGifts(Gifts gifts)
     {
-        this.GiftsContent.SetupGifts(gifts);
+        this.GiftsContent.HydrateGifts(gifts);
     }
 
     // Assign purchase item delegate to market content from game manager
@@ -106,16 +113,28 @@ public class MenuManager : MonoBehaviour
         this.ActiveBiome.SetupSaveBiomeDelegate(callback);
     }
 
-    // Assign save coins delegate from game manager
+    // Assign save coins delegate to active biome from game manager
     public void SetupSaveCoinsDelegate(Slot.SaveCoinsDelegate callback)
     {
         this.ActiveBiome.SetupSaveCoinsDelegate(callback);
     }
 
-    // Assign save notes delegate from game manager
-    public void SetupSaveNotesDelegate(Slot.SaveNotesDelegate callback)
+    // Assign save guest visit delegate to active biome from game manager
+    public void SetupSaveVisitDelegate(Slot.SaveVisitDelegate callback)
     {
-        this.ActiveBiome.SetupSaveNotesDelegate(callback);
+        this.ActiveBiome.SetupSaveVisitDelegate(callback);
+    }
+
+    // Assign claim coins delegate to gifts content from game manager
+    public void SetupClaimCoinsDelegate(GiftsContent.ClaimCoinsDelegate callback)
+    {
+        this.GiftsContent.SetupClaimCoinsDelegate(callback);
+    }
+
+    // Assign claim friendship delegate to gifts content from game manager
+    public void SetupClaimFriendshipDelegate(GiftsContent.ClaimFriendshipDelegate callback)
+    {
+        this.GiftsContent.SetupClaimFriendshipDelegate(callback);
     }
 
     // Assign biome to active biome, called from game manager
@@ -421,6 +440,7 @@ public class MenuManager : MonoBehaviour
         this.ScrollToTop(this.InventoryMenuPanel);
         this.ScrollToTop(this.MarketMenuPanel);
         this.ScrollToTop(this.NotesMenuPanel);
+        this.ScrollToTop(this.GiftsMenuPanel);
     }
 
     // Find the scroll rect in this gameobject and scroll to the top

@@ -49,7 +49,7 @@ public class NotesContent : MonoBehaviour
     }
 
     // Assign notes to notes content
-    public void SetupNotes(Notes notes)
+    public void HydrateNotes(Notes notes)
     {
         this.Notes = notes;
 
@@ -63,6 +63,7 @@ public class NotesContent : MonoBehaviour
         this.Populate();
     }
 
+    // Calculate and set the scroll view height based on layout properties
     private void PrepareScrollViewForLayout()
     {
         float screenWidth = this.RectTransform.sizeDelta.x;

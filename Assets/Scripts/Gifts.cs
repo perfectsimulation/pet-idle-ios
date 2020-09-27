@@ -16,8 +16,10 @@ public class Gifts
         List<Gift> giftList = new List<Gift>();
         giftList.Capacity = serializedGifts.Length;
 
+        // Create a gift for each serialized gift
         foreach (SerializedGift serializedGift in serializedGifts.GiftArray)
         {
+            // Add the new gift to the gift list
             giftList.Add(new Gift(serializedGift));
         }
 
@@ -48,22 +50,42 @@ public class Gifts
         this.GiftList.Add(gift);
     }
 
+    // Empty the gift list
+    public void Clear()
+    {
+        this.GiftList.Clear();
+    }
+
+    // Return the total coin amount from all gifts
+    public int GetTotalCoins()
+    {
+        int coins = 0;
+
+        // Add coins from each gift
+        foreach (Gift gift in this.GiftList)
+        {
+            coins += gift.Coins;
+        }
+
+        return coins;
+    }
+
 }
 
 public class Gift
 {
     public Guest Guest;
     public Item Item;
-    public int FriendshipPointReward;
-    public int CoinDrop;
+    public int FriendshipPoints;
+    public int Coins;
 
     /* Create a new Gift */
-    public Gift(Guest guest, Item item, int friendshipReward, int coinDrop)
+    public Gift(Guest guest, Item item, int friendshipReward, int coins)
     {
         this.Guest = guest;
         this.Item = item;
-        this.FriendshipPointReward = friendshipReward;
-        this.CoinDrop = coinDrop;
+        this.FriendshipPoints = friendshipReward;
+        this.Coins = coins;
     }
 
     /* Create Gift from save data */
@@ -71,8 +93,8 @@ public class Gift
     {
         this.Guest = serializedGift.Guest;
         this.Item = new Item(serializedGift.Item);
-        this.FriendshipPointReward = serializedGift.FriendshipPointReward;
-        this.CoinDrop = serializedGift.CoinDrop;
+        this.FriendshipPoints = serializedGift.FriendshipPoints;
+        this.Coins = serializedGift.Coins;
     }
 
 }
@@ -82,16 +104,16 @@ public class SerializedGift
 {
     public Guest Guest;
     public SerializedItem Item;
-    public int FriendshipPointReward;
-    public int CoinDrop;
+    public int FriendshipPoints;
+    public int Coins;
 
     /* Create SerializedGift from Gift */
     public SerializedGift(Gift gift)
     {
         this.Guest = gift.Guest;
         this.Item = new SerializedItem(gift.Item);
-        this.FriendshipPointReward = gift.FriendshipPointReward;
-        this.CoinDrop = gift.CoinDrop;
+        this.FriendshipPoints = gift.FriendshipPoints;
+        this.Coins = gift.Coins;
     }
 
 }
@@ -106,8 +128,10 @@ public class SerializedGifts
     {
         SerializedGift[] giftArray = new SerializedGift[gifts.Count];
 
+        // Create a serialized gift for each gift
         for (int i = 0; i < gifts.Count; i++)
         {
+            // Add the new serialized gift to the gift array
             giftArray[i] = new SerializedGift(gifts[i]);
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,9 @@ public class MarketContent : MonoBehaviour
 {
     // The item button prefab
     public GameObject Prefab;
+
+    // Coin text of the market menu panel
+    public TextMeshProUGUI CoinText;
 
     // The rect transform of this market container
     private RectTransform RectTransform;
@@ -89,11 +93,19 @@ public class MarketContent : MonoBehaviour
         this.ItemDetail.SetupOnCloseDelegate(callback);
     }
 
+    // Assign coins to user coins
+    public void HydrateCoins(int coins)
+    {
+        this.UserCoins = coins;
+
+        // Update coin text with user coins
+        this.UpdateCoinText();
+    }
+
     // Assign market to market content
-    public void SetupMarket(Market market, int coins)
+    public void HydrateMarket(Market market)
     {
         this.Market = market;
-        this.UserCoins = coins;
 
         // Setup the market item detail with purchase delegate from game manager
         this.ItemDetail.SetupTryPurchaseItemDelegate(this.TryPurchaseItem);
@@ -205,17 +217,20 @@ public class MarketContent : MonoBehaviour
         // Allow purchase if the user has more coins than the price of the item
         if (this.UserCoins > item.Price)
         {
-            // Subtract the item price from the user coins
-            this.UserCoins -= item.Price;
-
             // Update market and market content to reflect new item purchase
             this.PurchaseSelectedItemDelegate(item);
 
             // Open the purchase success panel in the item detail
             this.OpenPurchaseSuccessDelegate();
 
-            // Indicate the new item purchase in the market content
-            this.UpdateMarket(item);
+            // Set isPurchased to true for this item
+            this.Market.RecordItemPurchase(item);
+
+            // Prevent user from attempting a duplicate purchase
+            this.DisableItemButton(item);
+
+            // Show purchase overlay for the newly purchased overlay
+            this.ShowPurchaseOverlay();
         }
         else
         {
@@ -225,13 +240,10 @@ public class MarketContent : MonoBehaviour
 
     }
 
-    // Update market and show purchased overlay for this item
-    private void UpdateMarket(Item item)
+    // Disable item button for this item
+    private void DisableItemButton(Item item)
     {
-        // Set isPurchased to true for this item
-        this.Market.RecordItemPurchase(item);
-
-        // Get the item button object for this item and its button component
+        // Get the item button object and button component for this item
         GameObject itemButton = this.InstantiatedPrefabs[item.Name];
         Button itemButtonComponent = itemButton.GetComponent<Button>();
 
@@ -240,8 +252,18 @@ public class MarketContent : MonoBehaviour
 
         // Disable interaction on this item button
         itemButtonComponent.interactable = false;
+    }
 
-        // TODO set active the purchase overlay image
+    // Show purchase overlay on item button
+    private void ShowPurchaseOverlay()
+    {
+        // TODO
+    }
+
+    // Update coin text with current user coin amount
+    private void UpdateCoinText()
+    {
+        this.CoinText.text = this.UserCoins.ToString();
     }
 
 }

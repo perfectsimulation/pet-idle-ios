@@ -60,7 +60,7 @@ public class InventoryContent : MonoBehaviour
     }
 
     // Assign inventory to inventory content from game manager
-    public void SetupInventory(Inventory inventory)
+    public void HydrateInventory(Inventory inventory)
     {
         this.Inventory = inventory;
 
