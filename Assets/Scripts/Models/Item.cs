@@ -9,7 +9,7 @@ public class Item
     // Price to buy this item in the shop
     public int Price;
 
-    // Path to the png to use for the ItemObject that owns this Item
+    // Path to the png to use for the SlotItem that owns this Item
     public string ImageAssetPath;
 
     // Dictionary with guest keys and visit chance values

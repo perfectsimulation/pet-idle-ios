@@ -75,7 +75,7 @@ public class InventoryContent : MonoBehaviour
     }
 
     // Called from game manager when user purchases an item
-    public void UpdateInventory(Item item)
+    public void AddItem(Item item)
     {
         // Add the item to the inventory
         this.Inventory.Add(item);

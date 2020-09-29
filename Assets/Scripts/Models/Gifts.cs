@@ -79,13 +79,22 @@ public class Gift
     public int FriendshipPoints;
     public int Coins;
 
-    /* Create a new Gift */
+    /* Create a Gift with explicit properties */
     public Gift(Guest guest, Item item, int friendshipReward, int coins)
     {
         this.Guest = guest;
         this.Item = item;
         this.FriendshipPoints = friendshipReward;
         this.Coins = coins;
+    }
+
+    /* Create Gift from guest departure */
+    public Gift(SlotGuest slotGuest, Item item)
+    {
+        this.Guest = slotGuest.Guest;
+        this.Item = item;
+        this.FriendshipPoints = slotGuest.FriendshipPointReward;
+        this.Coins = slotGuest.CoinDrop;
     }
 
     /* Create Gift from save data */

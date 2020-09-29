@@ -44,21 +44,32 @@ public class Notes
     // Get the total number of guests
     public int Count { get { return this.GuestNotes.Count; } }
 
-    // Increment the visit count of this guest
-    public void UpdateVisitCount(GuestObject guestObject)
+    // Custom indexing
+    public Note this[Guest guest]
+    {
+        get
+        {
+            return (Note)this.GuestNotes[(object)guest];
+        }
+    }
+
+    // Increment the visit count of this guest when it departs
+    public void UpdateVisitCount(SlotGuest slotGuest)
     {
         // Get the note for this guest
-        Note note = (Note)this.GuestNotes[(object)guestObject.Guest];
+        Note note = (Note)this.GuestNotes[(object)slotGuest.Guest];
 
         // Do not continue if there was an issue getting the note
         if (note == null) return;
 
-        // Check if guest is currently in the active biome for the first time
-        if (!note.HasBeenSighted && GuestObject.IsVisiting(guestObject))
+        // If this was the first visit, change the image asset for this note
+        if (note.VisitCount == 0)
         {
-            // Record the first sighting of this guest
-            note.RecordFirstSighting();
+            note.SetImagePath("Images/Hamsters/unknown.png");
         }
+
+        // Check if this is the first sighting for this guest
+        this.CheckForFirstSighting(note, slotGuest);
 
         // Increase the visit count for this guest
         note.IncrementVisitCount();
@@ -74,10 +85,23 @@ public class Notes
         note.AddFriendshipPoints(friendshipPoints);
     }
 
+    // Record the sighting of the guest if it is visiting for first time
+    private void CheckForFirstSighting(Note note, SlotGuest slotGuest)
+    {
+        // Check if guest is currently in the active biome for the first time
+        if (!note.HasBeenSighted && slotGuest.IsVisiting())
+        {
+            // Record the first sighting of this guest
+            note.RecordFirstSighting();
+            note.SetImagePath(slotGuest.Guest.ImageAssetPath);
+        }
+    }
+
 }
 
 public class Note
 {
+    public string ImagePath { get; private set; }
     public bool HasBeenSighted { get; private set; }
     public int VisitCount { get; private set; }
     public int FriendshipPoints { get; private set; }
@@ -85,6 +109,7 @@ public class Note
     /* Initialize a brand new Note */
     public Note()
     {
+        this.ImagePath = "";
         this.HasBeenSighted = false;
         this.VisitCount = 0;
         this.FriendshipPoints = 0;
@@ -93,9 +118,16 @@ public class Note
     /* Create Note from save data */
     public Note(SerializedNote serializedNote)
     {
+        this.ImagePath = serializedNote.ImagePath;
         this.HasBeenSighted = serializedNote.HasBeenSighted;
         this.VisitCount = serializedNote.VisitCount;
         this.FriendshipPoints = serializedNote.FriendshipPoints;
+    }
+
+    // Change the image asset used for this note in notes content
+    public void SetImagePath(string imagePath)
+    {
+        this.ImagePath = imagePath;
     }
 
     // Indicate if guest has been seen in the active biome
@@ -122,6 +154,7 @@ public class Note
 public class SerializedNote
 {
     public Guest Guest;
+    public string ImagePath;
     public bool HasBeenSighted;
     public int VisitCount;
     public int FriendshipPoints;
@@ -132,6 +165,7 @@ public class SerializedNote
     public SerializedNote(Guest guest, Note note)
     {
         this.Guest = guest;
+        this.ImagePath = note.ImagePath;
         this.HasBeenSighted = note.HasBeenSighted;
         this.VisitCount = note.VisitCount;
         this.FriendshipPoints = note.FriendshipPoints;

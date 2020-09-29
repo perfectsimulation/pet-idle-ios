@@ -27,22 +27,22 @@ public class BiomeObject : MonoBehaviour
         this.SaveUpdatedActiveBiomeDelegate = callback;
     }
 
-    // Assign each slot a save coins delegate from game manager
-    public void SetupSaveCoinsDelegate(Slot.SaveCoinsDelegate callback)
-    {
-        foreach (Slot slot in this.Slots)
-        {
-            slot.SetupSaveCoinsDelegate(callback);
-        }
-
-    }
-
     // Assign each slot a save visit delegate from game manager
     public void SetupSaveVisitDelegate(Slot.SaveVisitDelegate callback)
     {
         foreach (Slot slot in this.Slots)
         {
             slot.SetupSaveVisitDelegate(callback);
+        }
+
+    }
+
+    // Assign each slot a save gift delegate from game manager
+    public void SetupSaveGiftDelegate(Slot.SaveGiftDelegate callback)
+    {
+        foreach (Slot slot in this.Slots)
+        {
+            slot.SetupSaveGiftDelegate(callback);
         }
 
     }
@@ -151,12 +151,12 @@ public class BiomeObject : MonoBehaviour
             }
 
             // If the serialized slot has a guest, assign it to the corresponding slot
-            if (serializedSlots[i].GuestObject != null &&
-                serializedSlots[i].GuestObject.Guest != null &&
-                Guest.IsValid(serializedSlots[i].GuestObject.Guest))
+            if (serializedSlots[i].SlotGuest != null &&
+                serializedSlots[i].SlotGuest.Guest != null &&
+                Guest.IsValid(serializedSlots[i].SlotGuest.Guest))
             {
                 // Assign the guest to the slot and show it if it is currently visiting
-                this.Slots[i].SetGuestFromSaveData(serializedSlots[i].GuestObject);
+                this.Slots[i].SetGuestFromSaveData(serializedSlots[i].SlotGuest);
             }
 
         }
@@ -197,10 +197,10 @@ public class BiomeObject : MonoBehaviour
         for (int i = 0; i < this.Slots.Length; i++)
         {
             // If there is no item in the slot, skip to the next one
-            if (this.Slots[i].ItemObject.Item == null) continue;
+            if (this.Slots[i].SlotItem.Item == null) continue;
 
             // If the item matches the slot item, return the index of that slot
-            if (this.Slots[i].ItemObject.Item.Equals(item)) return i;
+            if (this.Slots[i].SlotItem.Item.Equals(item)) return i;
         }
 
         // No match in the slots, so item is not currently placed

@@ -63,6 +63,21 @@ public class NotesContent : MonoBehaviour
         this.Populate();
     }
 
+    // Update notes for this guest
+    public void UpdateNotes(Guest guest, Notes notes)
+    {
+        this.Notes = notes;
+
+        // Get the note button of the updated guest
+        GameObject noteButton = this.InstantiatedPrefabs[guest.Name];
+
+        // Do not continue if the note button was not retrieved
+        if (noteButton == null) return;
+
+        // Update the note button for this guest
+        this.UpdateNoteButton(guest, noteButton);
+    }
+
     // Calculate and set the scroll view height based on layout properties
     private void PrepareScrollViewForLayout()
     {
@@ -117,21 +132,12 @@ public class NotesContent : MonoBehaviour
             // Select the image component in the child
             foreach (Image image in images)
             {
+                // TODO add third case for positive visit count with no sighting
                 // Ignore the image component in the root component
                 if (image.gameObject.GetInstanceID() != prefabObject.GetInstanceID())
                 {
-                    // Show unknown placeholder if guest has not yet visited
-                    if (!note.HasBeenSighted)
-                    {
-                        // Show unknown guest image for this new guest button
-                        string unknownGuestImagePath = "Images/Hamsters/unknown.png";
-                        image.sprite = ImageUtility.CreateSpriteFromPng(unknownGuestImagePath, 128, 128);
-                    }
-                    else
-                    {
-                        // Create and set guest image sprite of this new guest button
-                        image.sprite = ImageUtility.CreateSpriteFromPng(guest.ImageAssetPath, 128, 128);
-                    }
+                    // Create and set guest image sprite of this new guest button
+                    image.sprite = ImageUtility.CreateSpriteFromPng(note.ImagePath, 128, 128);
                 }
             }
 
@@ -151,7 +157,7 @@ public class NotesContent : MonoBehaviour
             if (button == null) continue;
 
             // Disable button if guest has not yet visited
-            button.interactable = note.HasBeenSighted;
+            button.interactable = note.VisitCount > 0;
 
             // Set onClick of the new note button with the delegate passed down from game manager
             button.onClick.AddListener(() => this.OnNoteButtonPress(guest, note));
@@ -160,6 +166,39 @@ public class NotesContent : MonoBehaviour
             this.InstantiatedPrefabs.Add(guest.Name, prefabObject);
         }
 
+    }
+
+    // Update note button
+    private void UpdateNoteButton(Guest guest, GameObject noteButton)
+    {
+        // Get the note associated with this note button
+        Note note = this.Notes[guest];
+
+        // Get all the image components on the note button prefab
+        Image[] images = noteButton.GetComponentsInChildren<Image>();
+
+        // Null check for image component array
+        if (images == null) return;
+
+        // Select the image component in the child
+        foreach (Image image in images)
+        {
+            // Ignore the image component in the root component
+            if (image.gameObject.GetInstanceID() != noteButton.GetInstanceID())
+            {
+                // Create and set guest image sprite of this new guest button
+                image.sprite = ImageUtility.CreateSpriteFromPng(note.ImagePath, 128, 128);
+            }
+        }
+
+        // Get the button component on the note button prefab
+        Button button = noteButton.GetComponent<Button>();
+
+        // Null check for button component
+        if (button == null) return;
+
+        // Disable button if guest has not yet visited
+        button.interactable = note.VisitCount > 0;
     }
 
     // Open the note detail panel and hydrate it with the note of the pressed button

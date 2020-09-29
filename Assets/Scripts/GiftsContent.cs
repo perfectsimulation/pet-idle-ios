@@ -101,6 +101,9 @@ public class GiftsContent : MonoBehaviour
     // Claim all gifts at once
     public void OnCollectButtonPress()
     {
+        // Do not continue if there are no gifts to collect
+        if (this.Gifts.Count == 0) return;
+
         // Call delegate to save coins to user
         this.SaveCoinsDelegate(this.UnclaimedCoinCredit);
 

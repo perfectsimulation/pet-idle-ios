@@ -31,7 +31,7 @@ public class Guest
     // Maximum friendship points awarded to user upon completion of guest visit
     public int MaximumFriendshipPointReward;
 
-    // Path to the png to use for the GuestObject that owns this Guest
+    // Path to the png to use for the SlotGuest that owns this Guest
     public string ImageAssetPath;
 
     /* Default no-arg constructor */

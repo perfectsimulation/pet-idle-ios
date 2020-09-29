@@ -38,11 +38,11 @@ public class GameManager : MonoBehaviour
         // Give the active biome a callback to save updates to active biome
         this.MenuManager.SetupSaveBiomeDelegate(this.SaveActiveBiome);
 
-        // Give the active biome slots a callback to save coins
-        this.MenuManager.SetupSaveCoinsDelegate(this.SaveCoins);
-
-        // Give the active biome slots a callback to save guest visit counts
+        // Give the active biome slots a callback to save gifts
         this.MenuManager.SetupSaveVisitDelegate(this.SaveGuestVisit);
+
+        // Give the active biome slots a callback to save gifts
+        this.MenuManager.SetupSaveGiftDelegate(this.SaveGift);
 
         // Give the menu manager a callback to save claimed coins from gifts
         this.MenuManager.SetupClaimCoinsDelegate(this.SaveCoins);
@@ -63,11 +63,11 @@ public class GameManager : MonoBehaviour
         // Subtract the newly purchased item price from the user coin balance
         this.User.Coins -= item.Price;
 
-        // Give the updated coin balance to the menus using it
+        // Give the updated coin balance to the menus that use it
         this.MenuManager.HydrateCoins(this.User.Coins);
 
-        // Give the updated inventory to the inventory content
-        this.MenuManager.UpdateInventory(item);
+        // Give the new inventory item to the inventory content
+        this.MenuManager.AddInventoryItem(item);
 
         Persistence.SaveUser(this.User);
     }
@@ -92,10 +92,29 @@ public class GameManager : MonoBehaviour
         Persistence.SaveUser(this.User);
     }
 
-    // Delegate called when guests depart to increment visit counts in notes
-    public void SaveGuestVisit(GuestObject guestObject)
+    // Delegate called when guest visits the active biome
+    public void SaveGuestVisit(SlotGuest slotGuest)
     {
-        this.User.Notes.UpdateVisitCount(guestObject);
+        // Automatically update visit count when guest departs
+        this.User.Notes.UpdateVisitCount(slotGuest);
+
+        // Update notes in notes content
+        this.MenuManager.UpdateNotes(slotGuest.Guest, this.User.Notes);
+
+        Persistence.SaveUser(this.User);
+    }
+
+    // Delegate called when guest departs to update notes and save the new gift
+    public void SaveGift(Gift gift)
+    {
+        // Add the new gift to the user gifts
+        this.User.Gifts.Add(gift);
+
+        // Give the new gift to the gifts content
+        this.MenuManager.AddGift(gift);
+
+        // Update notes in notes content
+        this.MenuManager.UpdateNotes(gift.Guest, this.User.Notes);
 
         Persistence.SaveUser(this.User);
     }

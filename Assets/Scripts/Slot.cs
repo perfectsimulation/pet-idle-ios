@@ -3,8 +3,8 @@ using UnityEngine.UI;
 
 public class Slot : MonoBehaviour
 {
-    public ItemObject ItemObject;
-    public GuestObject GuestObject;
+    public SlotItem SlotItem;
+    public SlotGuest SlotGuest;
     public Image Image;
     public GameObject ItemPlacementIndicator;
 
@@ -13,17 +13,21 @@ public class Slot : MonoBehaviour
     public delegate Guest SelectGuestDelegate(Item item);
     private SelectGuestDelegate SelectNewGuestDelegate;
 
-    // Delegate to save awarded coins upon guest departure
+    // Delegate to save a guest visit
     [HideInInspector]
-    public delegate void SaveCoinsDelegate(int coins);
-    private SaveCoinsDelegate SaveUpdatedCoinsDelegate;
-
-    // Delegate to save updated notes upon guest departure
-    [HideInInspector]
-    public delegate void SaveVisitDelegate(GuestObject guestObject);
+    public delegate void SaveVisitDelegate(SlotGuest slotGuest);
     private SaveVisitDelegate SaveGuestVisitDelegate;
 
-    public Slot() { }
+    // Delegate to save the new gift created upon guest departure
+    [HideInInspector]
+    public delegate void SaveGiftDelegate(Gift gift);
+    private SaveGiftDelegate SaveGuestGiftDelegate;
+
+    void Awake()
+    {
+        this.SlotItem = new SlotItem();
+        this.SlotGuest = new SlotGuest();
+    }
 
     public void HideSlot()
     {
@@ -44,54 +48,45 @@ public class Slot : MonoBehaviour
         this.ItemPlacementIndicator.SetActive(false);
     }
 
+    // Assign save visit delegate from active biome object
+    public void SetupSaveVisitDelegate(SaveVisitDelegate callback)
+    {
+        this.SaveGuestVisitDelegate = callback;
+    }
+
+    // Assign save gift delegate from active biome object
+    public void SetupSaveGiftDelegate(SaveGiftDelegate callback)
+    {
+        this.SaveGuestGiftDelegate = callback;
+    }
+
     // Assign select guest delegate from active biome object
     public void SetupSelectGuestDelegate(SelectGuestDelegate callback)
     {
         this.SelectNewGuestDelegate = callback;
     }
 
-    // Assign save award delegate from active biome object
-    public void SetupSaveCoinsDelegate(SaveCoinsDelegate callback)
-    {
-        this.SaveUpdatedCoinsDelegate = callback;
-    }
-
-    // Assign save award delegate from active biome object
-    public void SetupSaveVisitDelegate(SaveVisitDelegate callback)
-    {
-        this.SaveGuestVisitDelegate = callback;
-    }
-
     // Initialize a newly placed item for this slot
     public void InitializeItem(Item item)
     {
-        this.ItemObject.SetItem(item);
-
-        // Sprite properties for item image TODO make these matter
-        int width = 256;
-        int height = 256;
+        this.SlotItem = new SlotItem(item);
 
         // Set image sprite of item with the png designated by its image asset pathname
-        this.SetImageSprite(item.ImageAssetPath, width, height);
+        this.SetImageSprite(item.ImageAssetPath, 256, 256);
 
         // Select and initialize a guest to visit the newly placed item
         Guest guest = this.SelectNewGuestDelegate(item);
         this.InitializeGuest(guest);
     }
 
-    // Assign an item to the item object of this slot
+    // Assign an item to the slot item of this slot
     public void SetItemFromSaveData(SerializedItem serializedItem)
     {
-        // Create an item from the serialized item and set it to this item object
-        Item item = new Item(serializedItem);
-        this.ItemObject.SetItem(item);
-
-        // Sprite properties for item image TODO make these matter
-        int width = 256;
-        int height = 256;
+        // Create an item from the serialized item
+        this.SlotItem = new SlotItem(serializedItem);
 
         // Set image sprite of item with the png designated by its image asset pathname
-        this.SetImageSprite(item.ImageAssetPath, width, height);
+        this.SetImageSprite(serializedItem.ImageAssetPath, 256, 256);
     }
 
     // Remove the item from this slot along with its guest
@@ -103,159 +98,77 @@ public class Slot : MonoBehaviour
         // Reset the image sprite
         this.RemoveImageSprite();
 
-        // Remove the item in the item object
-        this.ItemObject.RemoveItem();
+        // Remove the slot item
+        this.SlotItem.RemoveItem();
     }
 
     // Initialize a newly selected guest for this slot
     public void InitializeGuest(Guest guest)
     {
-        this.GuestObject.SetGuest(guest);
-        this.InitializeGuestArrivalDateTime();
-        this.InitializeGuestDepartureDateTime();
-        this.InitializeGuestCoinDrop();
-        this.InitializeGuestFriendshipPointReward();
+        this.SlotGuest = new SlotGuest(guest);
     }
 
     // Only called on app start to restore saved guest data for this session
-    public void SetGuestFromSaveData(SerializedGuestObject serializedGuestObject)
+    public void SetGuestFromSaveData(SerializedSlotGuest serializedSlotGuest)
     {
-        this.GuestObject.SetGuest(serializedGuestObject.Guest);
-        this.SetGuestArrivalDateTime(serializedGuestObject.ArrivalDateTime);
-        this.SetGuestDepartureDateTime(serializedGuestObject.DepartureDateTime);
-        this.SetGuestCoinDrop(serializedGuestObject.CoinDrop);
-        this.SetGuestFriendshipPointReward(serializedGuestObject.FriendshipPointReward);
-        this.CheckGuestVisit(serializedGuestObject);
-    }
-
-    // Create a new arrival datetime when a guest is newly set for this slot
-    private void InitializeGuestArrivalDateTime()
-    {
-        // Randomly select an arrival delay within the range allowed by the guest
-        // TODO multiply arrivals by 60 to get minutes
-        float earliestArrival = this.GuestObject.Guest.EarliestArrivalInMinutes;
-        float latestArrival = this.GuestObject.Guest.LatestArrivalInMinutes;
-        float arrivalDelay = Random.Range(earliestArrival, latestArrival);
-
-        // Create a new datetime with the arrival delay
-        // TODO change this to AddMinutes
-        System.DateTime arrival = System.DateTime.UtcNow.AddSeconds(arrivalDelay);
-
-        // Set the newly created arrival datetime in the guest object
-        this.SetGuestArrivalDateTime(arrival);
-    }
-
-    // Create a new departure datetime when a guest is newly set for this slot
-    private void InitializeGuestDepartureDateTime()
-    {
-        // Randomly select a departure delay within the range allowed by the guest
-        float earliestDeparture = this.GuestObject.Guest.EarliestDepartureInMinutes;
-        float latestDeparture = this.GuestObject.Guest.LatestDepartureInMinutes;
-        float departureDelay = Random.Range(earliestDeparture, latestDeparture);
-
-        // Create a new datetime relative to the arrival datetime plus the departure delay
-        // TODO change this to AddMinutes
-        System.DateTime departure = this.GuestObject.ArrivalDateTime.AddSeconds(departureDelay * 10f);
-
-        // Set the newly created arrival datetime in the guest object
-        this.SetGuestDepartureDateTime(departure);
-    }
-
-    // Create a new coin drop when a guest is newly set for this slot
-    private void InitializeGuestCoinDrop()
-    {
-        // Randomly select a coin drop within the range allowed by the guest
-        int minCoinDrop = this.GuestObject.Guest.MinimumCoinDrop;
-        int maxCoinDrop = this.GuestObject.Guest.MaximumCoinDrop;
-
-        // Add one to the max since Random.Range has an exclusive max argument
-        int coinDrop = Random.Range(minCoinDrop, maxCoinDrop + 1);
-
-        // Set the newly created coin drop in the guest object
-        this.SetGuestCoinDrop(coinDrop);
-    }
-
-    // Create a new friendship point reward when a guest is newly set for this slot
-    private void InitializeGuestFriendshipPointReward()
-    {
-        // Randomly select a coin drop within the range allowed by the guest
-        int minFriendshipPoint = this.GuestObject.Guest.MinimumFriendshipPointReward;
-        int maxFriendshipPoint = this.GuestObject.Guest.MaximumFriendshipPointReward;
-
-        // Add one to the max since Random.Range has an exclusive max argument
-        int friendshipPoints = Random.Range(minFriendshipPoint, maxFriendshipPoint + 1);
-
-        // Set the newly created coin drop in the guest object
-        this.SetGuestFriendshipPointReward(friendshipPoints);
-    }
-
-    // Assign an arrival date time for the guest object of this slot
-    private void SetGuestArrivalDateTime(System.DateTime arrivalDateTime)
-    {
-        this.GuestObject.SetArrivalDateTime(arrivalDateTime);
-    }
-
-    // Assign a departure date time for the guest object of this slot
-    private void SetGuestDepartureDateTime(System.DateTime departureDateTime)
-    {
-        this.GuestObject.SetDepartureDateTime(departureDateTime);
-    }
-
-    // Assign a coin drop for the guest object of this slot
-    private void SetGuestCoinDrop(int coinDrop)
-    {
-        this.GuestObject.SetCoinDrop(coinDrop);
-    }
-
-    // Assign a friendship point reward for the guest object of this slot
-    private void SetGuestFriendshipPointReward(int friendshipPoints)
-    {
-        this.GuestObject.SetFriendshipPointReward(friendshipPoints);
+        this.SlotGuest = new SlotGuest(serializedSlotGuest);
+        this.CheckGuestVisit();
     }
 
     // Only called on app start to add newly arrived guests and remove departed guests
-    private void CheckGuestVisit(SerializedGuestObject guestObject)
+    private void CheckGuestVisit()
     {
         // Do not continue if there is no guest
-        if (guestObject.Guest == null) return;
+        if (this.SlotGuest.Guest == null) return;
+
+        // Save the visit if the guest has already arrived
+        if (this.SlotGuest.IsArrived())
+        {
+            // Tell the game manager to save the guest visit
+            this.SaveGuestVisitDelegate(this.SlotGuest);
+        }
 
         // Check if there is currently a guest in the active biome
-        if (GuestObject.IsVisiting(guestObject))
+        if (this.SlotGuest.IsVisiting())
         {
             // Set item guest interaction image in slot
             this.SetItemGuestPairInteractionImageSprite();
-
-            // Tell the game manager to save the details of the guest visit in notes
-            this.SaveGuestVisitDelegate(this.GuestObject);
         }
 
         // Remove the guest if it has departed
-        else if (GuestObject.IsDeparted(guestObject))
+        else if (this.SlotGuest.IsDeparted())
         {
+            // Create a gift from the departed guest
+            this.CreateGift();
+
             // Remove the departed guest
             this.RemoveGuest();
 
             // Select a new guest and trigger the next visit
-            Guest nextGuest = this.SelectNewGuestDelegate(this.ItemObject.Item);
+            Guest nextGuest = this.SelectNewGuestDelegate(this.SlotItem.Item);
             this.InitializeGuest(nextGuest);
         }
 
     }
 
-    // Remove the guest from this slot and call the save delegate in game manager
+    // Remove the guest from this slot and save its gift in the game manager
     private void RemoveGuest()
     {
-        // Tell the game manager to save the coin drop for this guest departure
-        this.SaveUpdatedCoinsDelegate(this.GuestObject.CoinDrop);
-
-        // Tell the game manager to save the details of the guest visit in notes
-        this.SaveGuestVisitDelegate(this.GuestObject);
-
         // Reset the image sprite to show the item alone
-        this.SetImageSprite(this.ItemObject.Item.ImageAssetPath, 256, 256);
+        this.SetImageSprite(this.SlotItem.Item.ImageAssetPath, 256, 256);
 
-        // Remove the item in the item object
-        this.GuestObject.RemoveGuest();
+        // Remove the slot guest
+        this.SlotGuest.RemoveGuest();
+    }
+
+    // Create a gift from a departing guest
+    private void CreateGift()
+    {
+        // Make a new gift from this guest
+        Gift gift = new Gift(this.SlotGuest, this.SlotItem.Item);
+
+        // Tell the game manager to save the gift
+        this.SaveGuestGiftDelegate(gift);
     }
 
     // Set the image sprite to an item-guest pair interaction asset
@@ -264,8 +177,8 @@ public class Slot : MonoBehaviour
         // Construct the name of the asset from item-guest pair
         string interactionAssetName = string.Format(
             "Images/Interactions/{0}-{1}.png",
-            this.GuestObject.Guest.Name.ToLower(),
-            this.ItemObject.Item.Name.ToLower());
+            this.SlotGuest.Guest.Name.ToLower(),
+            this.SlotItem.Item.Name.ToLower());
 
         // Get the absolute path to the asset
         string interactionAssetPath = Persistence.GetAbsoluteAssetPath(interactionAssetName);
@@ -294,19 +207,19 @@ public class Slot : MonoBehaviour
 public class SerializedSlot
 {
     public SerializedItem Item;
-    public SerializedGuestObject GuestObject;
+    public SerializedSlotGuest SlotGuest;
 
     public SerializedSlot() { }
 
     /* Serialize a slot */
     public SerializedSlot(Slot slot)
     {
-        if (slot.ItemObject.Item != null)
+        if (slot.SlotItem.Item != null)
         {
-            this.Item = new SerializedItem(slot.ItemObject.Item);
+            this.Item = new SerializedItem(slot.SlotItem.Item);
         }
 
-        this.GuestObject = new SerializedGuestObject(slot.GuestObject);
+        this.SlotGuest = new SerializedSlotGuest(slot.SlotGuest);
     }
 
 }

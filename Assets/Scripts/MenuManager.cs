@@ -113,16 +113,16 @@ public class MenuManager : MonoBehaviour
         this.ActiveBiome.SetupSaveBiomeDelegate(callback);
     }
 
-    // Assign save coins delegate to active biome from game manager
-    public void SetupSaveCoinsDelegate(Slot.SaveCoinsDelegate callback)
-    {
-        this.ActiveBiome.SetupSaveCoinsDelegate(callback);
-    }
-
     // Assign save guest visit delegate to active biome from game manager
     public void SetupSaveVisitDelegate(Slot.SaveVisitDelegate callback)
     {
         this.ActiveBiome.SetupSaveVisitDelegate(callback);
+    }
+
+    // Assign save gift delegate to active biome from game manager
+    public void SetupSaveGiftDelegate(Slot.SaveGiftDelegate callback)
+    {
+        this.ActiveBiome.SetupSaveGiftDelegate(callback);
     }
 
     // Assign claim coins delegate to gifts content from game manager
@@ -144,9 +144,21 @@ public class MenuManager : MonoBehaviour
     }
 
     // Add a newly purchased item to inventory content
-    public void UpdateInventory(Item item)
+    public void AddInventoryItem(Item item)
     {
-        this.InventoryContent.UpdateInventory(item);
+        this.InventoryContent.AddItem(item);
+    }
+
+    // Add a newly purchased item to inventory content
+    public void AddGift(Gift gift)
+    {
+        this.GiftsContent.AddGift(gift);
+    }
+
+    // Update the notes in notes content
+    public void UpdateNotes(Guest guest, Notes notes)
+    {
+        this.NotesContent.UpdateNotes(guest, notes);
     }
 
     // Display the main menu panel and close button
