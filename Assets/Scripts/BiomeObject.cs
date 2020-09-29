@@ -140,6 +140,24 @@ public class BiomeObject : MonoBehaviour
 
                 // Assign the item to the slot
                 this.Slots[i].SetItemFromSaveData(serializedSlots[i].Item);
+
+                // If the serialized slot has a guest, assign it to the corresponding slot
+                if (serializedSlots[i].SlotGuest != null &&
+                    serializedSlots[i].SlotGuest.Guest != null &&
+                    Guest.IsValid(serializedSlots[i].SlotGuest.Guest))
+                {
+                    // Assign the guest to the slot
+                    this.Slots[i].SetGuestFromSaveData(serializedSlots[i].SlotGuest);
+                }
+
+                // There is an item, but no guest in the slot
+                else
+                {
+                    // Initialize a new guest for this slot
+                    Item item = new Item(serializedSlots[i].Item);
+                    Guest guest = this.SelectGuestToVisit(item);
+                    this.Slots[i].InitializeGuest(guest, item);
+                }
             }
 
             // There is no item, so make the slot transparent
@@ -148,15 +166,6 @@ public class BiomeObject : MonoBehaviour
                 this.Slots[i].HideSlot();
                 // Can skip to next slot if there is no item
                 continue;
-            }
-
-            // If the serialized slot has a guest, assign it to the corresponding slot
-            if (serializedSlots[i].SlotGuest != null &&
-                serializedSlots[i].SlotGuest.Guest != null &&
-                Guest.IsValid(serializedSlots[i].SlotGuest.Guest))
-            {
-                // Assign the guest to the slot and show it if it is currently visiting
-                this.Slots[i].SetGuestFromSaveData(serializedSlots[i].SlotGuest);
             }
 
         }

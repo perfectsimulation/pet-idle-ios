@@ -86,8 +86,6 @@ public class GiftsContent : MonoBehaviour
     // Called when a guest departs to add its gift to the gift content
     public void AddGift(Gift gift)
     {
-        this.Gifts.Add(gift);
-
         // Reset unclaimed coin credit
         this.UnclaimedCoinCredit = this.Gifts.GetTotalCoins();
 
@@ -107,14 +105,14 @@ public class GiftsContent : MonoBehaviour
         // Call delegate to save coins to user
         this.SaveCoinsDelegate(this.UnclaimedCoinCredit);
 
+        // Reset unclaimed coin credit
+        this.UnclaimedCoinCredit = 0;
+
         // Call delegate to save friendship rewards
         this.UpdateFriendships();
 
         // Clear all claimed gifts
         this.Gifts.Clear();
-
-        // Reset unclaimed coin credit
-        this.UnclaimedCoinCredit = 0;
 
         // Remove the gift buttons now that the gifts are all claimed
         this.DestroyGiftButtons();
@@ -209,6 +207,8 @@ public class GiftsContent : MonoBehaviour
         {
             Destroy(giftButton);
         }
+
+        this.InstantiatedPrefabs.Clear();
 
     }
 

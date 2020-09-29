@@ -76,7 +76,7 @@ public class Slot : MonoBehaviour
 
         // Select and initialize a guest to visit the newly placed item
         Guest guest = this.SelectNewGuestDelegate(item);
-        this.InitializeGuest(guest);
+        this.InitializeGuest(guest, item);
     }
 
     // Assign an item to the slot item of this slot
@@ -103,9 +103,9 @@ public class Slot : MonoBehaviour
     }
 
     // Initialize a newly selected guest for this slot
-    public void InitializeGuest(Guest guest)
+    public void InitializeGuest(Guest guest, Item item)
     {
-        this.SlotGuest = new SlotGuest(guest);
+        this.SlotGuest = new SlotGuest(guest, item);
     }
 
     // Only called on app start to restore saved guest data for this session
@@ -138,15 +138,15 @@ public class Slot : MonoBehaviour
         // Remove the guest if it has departed
         else if (this.SlotGuest.IsDeparted())
         {
-            // Create a gift from the departed guest
-            this.CreateGift();
+            // Save the gift from the departed guest
+            this.SaveGuestGiftDelegate(this.SlotGuest.Gift);
 
             // Remove the departed guest
             this.RemoveGuest();
 
             // Select a new guest and trigger the next visit
             Guest nextGuest = this.SelectNewGuestDelegate(this.SlotItem.Item);
-            this.InitializeGuest(nextGuest);
+            this.InitializeGuest(nextGuest, this.SlotItem.Item);
         }
 
     }
@@ -159,16 +159,6 @@ public class Slot : MonoBehaviour
 
         // Remove the slot guest
         this.SlotGuest.RemoveGuest();
-    }
-
-    // Create a gift from a departing guest
-    private void CreateGift()
-    {
-        // Make a new gift from this guest
-        Gift gift = new Gift(this.SlotGuest, this.SlotItem.Item);
-
-        // Tell the game manager to save the gift
-        this.SaveGuestGiftDelegate(gift);
     }
 
     // Set the image sprite to an item-guest pair interaction asset

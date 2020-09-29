@@ -124,6 +124,9 @@ public class GameManager : MonoBehaviour
     {
         this.User.Notes.UpdateFriendship(guest, friendshipPoints);
 
+        // Update notes in notes content
+        this.MenuManager.UpdateNotes(guest, this.User.Notes);
+
         Persistence.SaveUser(this.User);
     }
 

@@ -7,17 +7,19 @@ public class SlotGuest
     public DateTime DepartureDateTime;
     public int CoinDrop;
     public int FriendshipPointReward;
+    public Gift Gift;
 
     public SlotGuest() { }
 
     /* Initialize a brand new SlotGuest */
-    public SlotGuest(Guest guest)
+    public SlotGuest(Guest guest, Item item)
     {
         this.Guest = guest;
         this.ArrivalDateTime = this.SelectGuestArrivalDateTime();
         this.DepartureDateTime = this.SelectGuestDepartureDateTime();
         this.CoinDrop = this.SelectGuestCoinDrop();
         this.FriendshipPointReward = this.SelectGuestFriendshipPointReward();
+        this.Gift = this.CreateGift(item);
     }
 
     /* Create SlotGuest from save data */
@@ -28,6 +30,7 @@ public class SlotGuest
         this.DepartureDateTime = serializedSlotGuest.DepartureDateTime;
         this.CoinDrop = serializedSlotGuest.CoinDrop;
         this.FriendshipPointReward = serializedSlotGuest.FriendshipPointReward;
+        this.Gift = new Gift(serializedSlotGuest.Gift);
     }
 
     // Reset assigned guest properties
@@ -64,8 +67,8 @@ public class SlotGuest
     // Check if the departure datetime is in the past
     public bool IsDeparted()
     {
-        // Return true if there is no guest
-        if (this.Guest == null) return true;
+        // Return false if there is no guest
+        if (this.Guest == null) return false;
 
         // Return true if the current time is past the departure time
         return (this.DepartureDateTime < DateTime.UtcNow);
@@ -121,6 +124,13 @@ public class SlotGuest
         return friendshipPoints;
     }
 
+    // Create the departure gift for this guest
+    private Gift CreateGift(Item item)
+    {
+        Gift gift = new Gift(this, item);
+        return gift;
+    }
+
 }
 
 [Serializable]
@@ -153,6 +163,7 @@ public class SerializedSlotGuest
     public SerializedDateTime DepartureDateTime;
     public int CoinDrop;
     public int FriendshipPointReward;
+    public SerializedGift Gift;
 
     /* Create SerializedSlotGuest from SlotGuest */
     public SerializedSlotGuest(SlotGuest slotGuest)
@@ -164,6 +175,7 @@ public class SerializedSlotGuest
             this.DepartureDateTime = slotGuest.DepartureDateTime;
             this.CoinDrop = slotGuest.CoinDrop;
             this.FriendshipPointReward = slotGuest.FriendshipPointReward;
+            this.Gift = new SerializedGift(slotGuest.Gift);
         }
         else
         {
@@ -172,6 +184,7 @@ public class SerializedSlotGuest
             this.DepartureDateTime = DateTime.MinValue;
             this.CoinDrop = 0;
             this.FriendshipPointReward = 0;
+            this.Gift = null;
         }
     }
 
