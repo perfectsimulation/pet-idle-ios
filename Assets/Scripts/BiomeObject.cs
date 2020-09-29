@@ -11,6 +11,9 @@ public class BiomeObject : MonoBehaviour
     // Item selected from inventory awaiting slot placement
     private Item ItemToPlaceInActiveBiome;
 
+    // Keep track of guests currently visiting in the active biome
+    private List<Guest> VisitingGuestList;
+
     // Delegate to save user data with an updated active biome state
     [HideInInspector]
     public delegate void SaveBiomeDelegate(SerializedBiomeObject updatedBiome);
@@ -51,6 +54,11 @@ public class BiomeObject : MonoBehaviour
     public void SetupBiome(Biome biome, SerializedSlot[] serializedSlots)
     {
         this.Biome = biome;
+
+        // Initialize the list of visiting guests
+        this.VisitingGuestList = new List<Guest>();
+
+        // Layout items and guests into slots using save data
         this.LayoutSavedSlots(serializedSlots);
     }
 
@@ -138,6 +146,9 @@ public class BiomeObject : MonoBehaviour
                 // Pass the slot a delegate to retrigger new guests
                 this.Slots[i].SetupSelectGuestDelegate(this.SelectGuestToVisit);
 
+                // Pass the slot a delegate to remove departing guests
+                this.Slots[i].SetupRemoveGuestDelegate(this.RemoveGuest);
+
                 // Assign the item to the slot
                 this.Slots[i].SetItemFromSaveData(serializedSlots[i].Item);
 
@@ -187,6 +198,14 @@ public class BiomeObject : MonoBehaviour
             // If the random number is lower than the visit chance, select that Guest
             if (guestChance < visitChance.Value)
             {
+                // Check if the guest is already currently visiting the active biome
+                if (this.VisitingGuestList.Contains(visitChance.Key))
+                {
+                    // Skip this guest if it is already visiting a different slot
+                    continue;
+                }
+
+                // Select this guest to visit this slot
                 selectedGuest = visitChance.Key;
 
                 break;
@@ -197,6 +216,12 @@ public class BiomeObject : MonoBehaviour
         // Call delegate from game manager to save user with updated slot data
         this.SaveUpdatedActiveBiomeDelegate(new SerializedBiomeObject(this));
         return selectedGuest;
+    }
+
+    // Remove the departing guest from the list of visiting guests
+    private void RemoveGuest(Guest guest)
+    {
+        this.VisitingGuestList.Remove(guest);
     }
 
     // Get the index of the slot that contains the item, or -1 if item is not found

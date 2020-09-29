@@ -41,6 +41,7 @@ public class SlotGuest
         this.DepartureDateTime = DateTime.MinValue;
         this.CoinDrop = 0;
         this.FriendshipPointReward = 0;
+        this.Gift = null;
     }
 
     // Check if the arrival datetime is in the future

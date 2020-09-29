@@ -23,6 +23,11 @@ public class Slot : MonoBehaviour
     public delegate void SaveGiftDelegate(Gift gift);
     private SaveGiftDelegate SaveGuestGiftDelegate;
 
+    // Delegate to remove a departing guest from the active biome guest list
+    [HideInInspector]
+    public delegate void RemoveGuestDelegate(Guest guest);
+    private RemoveGuestDelegate RemoveDepartingGuestDelegate;
+
     void Awake()
     {
         this.SlotItem = new SlotItem();
@@ -48,22 +53,28 @@ public class Slot : MonoBehaviour
         this.ItemPlacementIndicator.SetActive(false);
     }
 
-    // Assign save visit delegate from active biome object
+    // Assign save visit delegate from active biome
     public void SetupSaveVisitDelegate(SaveVisitDelegate callback)
     {
         this.SaveGuestVisitDelegate = callback;
     }
 
-    // Assign save gift delegate from active biome object
+    // Assign save gift delegate from active biome
     public void SetupSaveGiftDelegate(SaveGiftDelegate callback)
     {
         this.SaveGuestGiftDelegate = callback;
     }
 
-    // Assign select guest delegate from active biome object
+    // Assign select guest delegate from active biome
     public void SetupSelectGuestDelegate(SelectGuestDelegate callback)
     {
         this.SelectNewGuestDelegate = callback;
+    }
+
+    // Assign remove guest delegate from active biome
+    public void SetupRemoveGuestDelegate(RemoveGuestDelegate callback)
+    {
+        this.RemoveDepartingGuestDelegate = callback;
     }
 
     // Initialize a newly placed item for this slot
@@ -156,6 +167,9 @@ public class Slot : MonoBehaviour
     {
         // Reset the image sprite to show the item alone
         this.SetImageSprite(this.SlotItem.Item.ImageAssetPath, 256, 256);
+
+        // Tell active biome to remove the departing guest from the guest list
+        this.RemoveDepartingGuestDelegate(this.SlotGuest.Guest);
 
         // Remove the slot guest
         this.SlotGuest.RemoveGuest();
