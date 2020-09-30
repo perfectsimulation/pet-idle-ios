@@ -20,9 +20,14 @@ public class GiftsContent : MonoBehaviour
     // Keep references of all instantiated gift buttons
     private List<GameObject> InstantiatedPrefabs;
 
+    // The user coins, set from the game manager
+    private int UserCoins;
+
+    // List of guests that have been seen in the active biome
+    private List<Guest> SightedGuests;
+
     // The user gifts, set from the game manager
     private Gifts Gifts;
-    private int UserCoins;
 
     // Value of coins from all outstanding gifts combined
     private int UnclaimedCoinCredit;
@@ -39,9 +44,12 @@ public class GiftsContent : MonoBehaviour
 
     void Awake()
     {
-        // Cache components to layout prefabs after receiving data from game manager
+        // Cache components to layout prefabs with incoming user data from game manager
         this.RectTransform = this.gameObject.GetComponent<RectTransform>();
         this.GridLayoutGroup = this.gameObject.GetComponent<GridLayoutGroup>();
+
+        // Initialize list of instantiated gift buttons
+        this.InstantiatedPrefabs = new List<GameObject>();
     }
 
     // Assign claim coins delegate from game manager
@@ -65,13 +73,20 @@ public class GiftsContent : MonoBehaviour
         this.UpdateCoinText();
     }
 
+    // Assign notes to gifts content from the game manager
+    public void HydrateSightedGuests(List<Guest> sightedGuests)
+    {
+        // Used to determine which guest image to use in gift detail
+        this.SightedGuests = sightedGuests;
+
+        // Update guest images for existing gifts
+        this.UpdateGuestImages();
+    }
+
     // Assign gifts to gifts content from game manager
     public void HydrateGifts(Gifts gifts)
     {
         this.Gifts = gifts;
-
-        // Initialize list of instantiated gift buttons
-        this.InstantiatedPrefabs = new List<GameObject>();
 
         // Reset unclaimed coin credit
         this.UnclaimedCoinCredit = this.Gifts.GetTotalCoins();
@@ -83,7 +98,7 @@ public class GiftsContent : MonoBehaviour
         this.Populate(this.Gifts.ToArray());
     }
 
-    // Called when a guest departs to add its gift to the gift content
+    // Called when a guest departs to add its gift to the gifts content
     public void AddGift(Gift gift)
     {
         // Reset unclaimed coin credit
@@ -167,22 +182,19 @@ public class GiftsContent : MonoBehaviour
             // Instantiate the prefab clone with this as the parent
             prefabObject = Instantiate(this.Prefab, this.transform);
 
-            // Cache gift properties
-            string guestName = gift.Guest.Name;
-            Sprite guestImage = ImageUtility.CreateSpriteFromPng(gift.Guest.ImageAssetPath, 128, 128);
-            Sprite itemImage = ImageUtility.CreateSpriteFromPng(gift.Item.ImageAssetPath, 128, 128);
-            int coins = gift.Coins;
-            int friendshipPoints = gift.FriendshipPoints;
+            // Name the new gift button using the name of the guest
+            prefabObject.name = string.Format("{0}Gift", gift.Guest.Name);
 
             // Get the GiftButton component of the prefab
             GiftButton giftButton = prefabObject.GetComponent<GiftButton>();
 
             // Set GiftButton properties using gift
-            giftButton.SetGuestName(guestName);
-            giftButton.SetGuestImage(guestImage);
-            giftButton.SetItemImage(itemImage);
-            giftButton.SetCoinText(coins);
-            giftButton.SetFriendshipText(friendshipPoints);
+            giftButton.SetGuest(gift.Guest);
+            giftButton.SetGuestName(gift.Guest.Name);
+            giftButton.SetGuestImage(this.GetGiftButtonGuestSprite(gift.Guest));
+            giftButton.SetItemImage(ImageUtility.CreateSpriteFromPng(gift.Item.ImageAssetPath, 128, 128));
+            giftButton.SetCoinText(gift.Coins);
+            giftButton.SetFriendshipText(gift.FriendshipPoints);
 
             // TODO claim individual gift?
             Button button = prefabObject.GetComponent<Button>();
@@ -190,9 +202,6 @@ public class GiftsContent : MonoBehaviour
             // Null check for button component
             if (button == null) continue;
             button.interactable = false;
-
-            // Name the new gift button using the name of the guest
-            prefabObject.name = string.Format("{0}Gift", guestName);
 
             // Add the new gift button to the list of instantiated prefabs
             this.InstantiatedPrefabs.Add(prefabObject);
@@ -210,6 +219,44 @@ public class GiftsContent : MonoBehaviour
 
         this.InstantiatedPrefabs.Clear();
 
+    }
+
+    // Update guest images in gift buttons when sighted guest list is updated
+    private void UpdateGuestImages()
+    {
+        foreach (GameObject prefabObject in this.InstantiatedPrefabs)
+        {
+            // Get the GiftButton component of the prefab
+            GiftButton giftButton = prefabObject.GetComponent<GiftButton>();
+
+            // Do not continue if the GiftButton component was not found
+            if (giftButton == null) continue;
+
+            // Get the guest of this gift button
+            Guest guest = giftButton.Guest;
+
+            // Set the guest image sprite
+            giftButton.SetGuestImage(this.GetGiftButtonGuestSprite(guest));
+        }
+
+    }
+
+    // Get the sprite to use for the gift button with this guest
+    private Sprite GetGiftButtonGuestSprite(Guest guest)
+    {
+        Sprite guestSprite;
+        if (this.SightedGuests.Contains(guest))
+        {
+            // The guest has been seen, so create sprite using guest image
+            guestSprite = ImageUtility.CreateSpriteFromPng(guest.ImageAssetPath, 128, 128);
+        }
+        else
+        {
+            // The guest has not been seen, so create using generic unknown guest image
+            guestSprite = ImageUtility.CreateSpriteFromPng(DataInitializer.UnsightedGuestImageAsset, 128, 128);
+        }
+
+        return guestSprite;
     }
 
     // Save friendship reward for each guest

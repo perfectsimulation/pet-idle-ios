@@ -13,12 +13,9 @@ public class NoteDetail : MonoBehaviour
 
     public void Hydrate(Guest guest, Note note)
     {
-        // TODO implement third scenario - visited but not seen
-        bool hasVisited = note.VisitCount > 0;
-
-        // If the guest has not yet visited, show unknown entry
-        if (hasVisited) this.HydrateKnownGuest(guest, note);
-        else this.HydrateUnknownGuest(guest);
+        // Hide some fields if the guest has not been seen in the active biome
+        if (note.HasBeenSighted) this.HydrateKnownGuest(guest, note);
+        else this.HydrateUnknownGuest(guest, note);
     }
 
     // Fill in details from guest note
@@ -37,14 +34,14 @@ public class NoteDetail : MonoBehaviour
         this.NatureText.SetText(natureText);
     }
 
-    // Show unknown placeholder if guest has not visited
-    private void HydrateUnknownGuest(Guest guest)
+    // Show unknowns if guest has not been seen in active biome
+    private void HydrateUnknownGuest(Guest guest, Note note)
     {
         string name = guest.Name;
-        string guestImagePath = "Images/Hamsters/unknown.png";
-        string heartImagePath = this.GetFriendshipImage(0);
-        string visitText = "Visits: " + 0;
-        string natureText = "Nature: ?";
+        string guestImagePath = DataInitializer.UnsightedGuestImageAsset;
+        string heartImagePath = this.GetFriendshipImage(note.FriendshipPoints);
+        string visitText = "Visits: " + note.VisitCount;
+        string natureText = "Nature: " + guest.Nature;
 
         this.Name.SetText(name);
         this.GuestImage.sprite = ImageUtility.CreateSpriteFromPng(guestImagePath, 128, 128);

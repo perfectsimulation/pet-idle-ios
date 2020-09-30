@@ -4,11 +4,17 @@ using UnityEngine.UI;
 
 public class GiftButton : MonoBehaviour
 {
+    public Guest Guest;
     public TextMeshProUGUI GuestName;
     public Image GuestImage;
     public Image ItemImage;
     public TextMeshProUGUI CoinText;
     public TextMeshProUGUI FriendshipText;
+
+    public void SetGuest(Guest guest)
+    {
+        this.Guest = guest;
+    }
 
     public void SetGuestName(string name)
     {

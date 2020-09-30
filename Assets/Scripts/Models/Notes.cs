@@ -65,7 +65,7 @@ public class Notes
         // If this was the first visit, change the image asset for this note
         if (note.VisitCount == 0)
         {
-            note.SetImagePath("Images/Hamsters/unknown.png");
+            note.SetImagePath(DataInitializer.UnsightedGuestImageAsset);
         }
 
         // Check if this is the first sighting for this guest
@@ -78,11 +78,38 @@ public class Notes
     // Update the friendship points of this guest
     public void UpdateFriendship(Guest guest, int friendshipPoints)
     {
-        // Get the note for the guest who gave the gift
+        // Get the note for the guest
         Note note = (Note)this.GuestNotes[(object)guest];
 
         // Increase the friendship points for this guest
         note.AddFriendshipPoints(friendshipPoints);
+    }
+
+    // Get a list of all guests that have been seen in the active biome
+    public List<Guest> GetSightedGuests()
+    {
+        // Initialize the list of guests
+        List<Guest> sightedGuests = new List<Guest>();
+
+        // Get arrays of the keys and values of guest notes
+        ICollection keys = this.GuestNotes.Keys;
+        ICollection values = this.GuestNotes.Values;
+        Guest[] guests = new Guest[this.GuestNotes.Count];
+        Note[] notes = new Note[this.GuestNotes.Count];
+        keys.CopyTo(guests, 0);
+        values.CopyTo(notes, 0);
+
+        for (int i = 0; i < this.GuestNotes.Count; i++)
+        {
+            // Check the note to see if the guest has been seen
+            if (notes[i].HasBeenSighted)
+            {
+                // Add the seen guest to the list
+                sightedGuests.Add(guests[i]);
+            }
+        }
+
+        return sightedGuests;
     }
 
     // Record the sighting of the guest if it is visiting for first time

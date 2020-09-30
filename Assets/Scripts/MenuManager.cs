@@ -93,6 +93,7 @@ public class MenuManager : MonoBehaviour
     public void HydrateNotes(Notes notes)
     {
         this.NotesContent.HydrateNotes(notes);
+        this.GiftsContent.HydrateSightedGuests(notes.GetSightedGuests());
     }
 
     // Assign gifts to gifts content from game manager
@@ -159,6 +160,7 @@ public class MenuManager : MonoBehaviour
     public void UpdateNotes(Guest guest, Notes notes)
     {
         this.NotesContent.UpdateNotes(guest, notes);
+        this.GiftsContent.HydrateSightedGuests(notes.GetSightedGuests());
     }
 
     // Display the main menu panel and close button

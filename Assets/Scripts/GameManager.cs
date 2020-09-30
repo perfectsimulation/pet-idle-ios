@@ -23,13 +23,13 @@ public class GameManager : MonoBehaviour
         // Give the inventory to the inventory content
         this.MenuManager.HydrateInventory(this.User.Inventory);
 
-        // Give the inventory and coin balance to the market content
+        // Give the inventory to the market content
         this.MenuManager.HydrateMarket(this.User.Inventory);
 
         // Give the notes to the notes content
         this.MenuManager.HydrateNotes(this.User.Notes);
 
-        // Give the gifts and coin balance to the gifts content
+        // Give the gifts to the gifts content
         this.MenuManager.HydrateGifts(this.User.Gifts);
 
         // Give the menu manager a callback to save item purchases
