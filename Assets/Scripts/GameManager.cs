@@ -136,10 +136,4 @@ public class GameManager : MonoBehaviour
         Persistence.SaveUser(this.User);
     }
 
-    // Save the current user data if the application is suspended
-    void OnApplicationPause(bool isPaused)
-    {
-        Persistence.SaveUser(this.User);
-    }
-
 }

@@ -44,25 +44,14 @@ public class SlotGuest
         this.Gift = null;
     }
 
-    // Check if the arrival datetime is in the future
+    // Check if the arrival datetime is in the past relative to game start time
     public bool IsArrived()
     {
         // Return false if there is no guest
         if (this.Guest == null) return false;
 
-        // Return true if the current time is before the arrival time
-        return (this.ArrivalDateTime < DateTime.UtcNow);
-    }
-
-    // Check if the arrival datetime is in the past and departure is in the future
-    public bool IsVisiting()
-    {
-        // Return false if there is no guest
-        if (this.Guest == null) return false;
-
-        // Return true if the current time is between the arrival and departure times
-        return (this.ArrivalDateTime < DateTime.UtcNow &&
-            this.DepartureDateTime >= DateTime.UtcNow);
+        // Return true if the game start time is past the arrival time
+        return (this.ArrivalDateTime <= this.GetGameStartTime());
     }
 
     // Check if the departure datetime is in the past
@@ -71,8 +60,18 @@ public class SlotGuest
         // Return false if there is no guest
         if (this.Guest == null) return false;
 
-        // Return true if the current time is past the departure time
-        return (this.DepartureDateTime < DateTime.UtcNow);
+        // Return true if the game start time is past the departure time
+        return (this.DepartureDateTime <= this.GetGameStartTime());
+    }
+
+    // Check if guest has arrived and has not departed relative to game start time
+    public bool IsVisiting()
+    {
+        // Return false if there is no guest
+        if (this.Guest == null) return false;
+
+        // Return true if the game start time is between the arrival and departure
+        return (this.IsArrived() && !this.IsDeparted());
     }
 
     // Select an arrival datetime for a new guest
@@ -130,6 +129,17 @@ public class SlotGuest
     {
         Gift gift = new Gift(this, item);
         return gift;
+    }
+
+    // Get the datetime of the moment the game started
+    private DateTime GetGameStartTime()
+    {
+        // Get elapsed seconds since game started
+        double elapsedSeconds = UnityEngine.Time.realtimeSinceStartup;
+
+        // Subtract elapsed seconds from now to get the datetime of game start
+        DateTime gameStartTime = DateTime.UtcNow.AddSeconds(-1 * elapsedSeconds);
+        return gameStartTime;
     }
 
 }

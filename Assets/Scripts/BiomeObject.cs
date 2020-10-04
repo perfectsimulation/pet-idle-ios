@@ -24,6 +24,11 @@ public class BiomeObject : MonoBehaviour
     public delegate void FocusBiomeDelegate();
     private FocusBiomeDelegate FocusActiveBiomeDelegate;
 
+    // Delegate to send the guest of a captured photo to the photo detail
+    [HideInInspector]
+    public delegate void SetPhotoGuestDelegate(Guest guest);
+    private SetPhotoGuestDelegate SelectPhotoGuestDelegate;
+
     // Assign save active biome state delegate from game manager
     public void SetupSaveBiomeDelegate(SaveBiomeDelegate callback)
     {
@@ -68,21 +73,64 @@ public class BiomeObject : MonoBehaviour
         this.FocusActiveBiomeDelegate = callback;
     }
 
+    // Assign set photo guest delegate from menu manager for photo capture
+    public void SetupSetPhotoGuestDelegate(SetPhotoGuestDelegate callback)
+    {
+        this.SelectPhotoGuestDelegate = callback;
+    }
+
     // Show slot locations when an item is selected from inventory content for placement
-    public void SelectItemForSlotPlacement(Item item)
+    public void PrepareItemPlacement(Item item)
     {
         this.ItemToPlaceInActiveBiome = item;
 
         // Show item placement indicator images for all the slots
         foreach (Slot slot in this.Slots)
         {
-            slot.ShowSlotLocation();
+            slot.SetupPlaceItemDelegate(this.PlaceItemInSlot);
+            slot.ValidateItemPlacementEligibility();
+        }
+
+    }
+
+    // Clear selected item cache if item placement is canceled
+    public void CancelItemPlacement()
+    {
+        this.ItemToPlaceInActiveBiome = null;
+
+        // Hide valid slot indicator and slot button listeners for each slot
+        foreach (Slot slot in this.Slots)
+        {
+            slot.EndSlotSelection();
+        }
+
+    }
+
+    // Indicate the slots that are capable of photo capture
+    public void PreparePhotoCapture()
+    {
+        // Validate eligibility for photo capture in each slot
+        foreach (Slot slot in this.Slots)
+        {
+            slot.SetupCapturePhotoDelegate(this.CapturePhoto);
+            slot.ValidatePhotoCaptureEligibility();
+        }
+
+    }
+
+    // Clear photo capture listeners in each slot button
+    public void CancelPhotoCapture()
+    {
+        // Hide valid slot indicator and slot button listeners for each slot
+        foreach (Slot slot in this.Slots)
+        {
+            slot.EndSlotSelection();
         }
 
     }
 
     // Delegate called from onClick of item buttons in inventory content to slot an item
-    public void PlaceItemInSlot(int slotIndex)
+    private void PlaceItemInSlot(Slot selectedSlot)
     {
         // Do not continue if no item is awaiting slot placement
         if (this.ItemToPlaceInActiveBiome == null) return;
@@ -93,19 +141,18 @@ public class BiomeObject : MonoBehaviour
         // If the item is already placed, oldSlotIndex will be non-negative
         if (oldSlotIndex >= 0)
         {
-            // Remove the item from the previous slot before placing it in a new one
+            // Remove the item from its current slot before placing it in a new one
             this.Slots[oldSlotIndex].RemoveItem();
-            this.Slots[oldSlotIndex].HideSlot();
         }
 
         // Initialize the item in the newly selected slot
-        this.Slots[slotIndex].SetupSelectGuestDelegate(this.SelectGuestToVisit);
-        this.Slots[slotIndex].InitializeItem(this.ItemToPlaceInActiveBiome);
+        selectedSlot.SetupSelectGuestDelegate(this.SelectGuestToVisit);
+        selectedSlot.InitializeItem(this.ItemToPlaceInActiveBiome);
 
-        // Hide item placement indicator images for all the slots
+        // End item placement flow for each slot
         foreach (Slot slot in this.Slots)
         {
-            slot.HideSlotLocation();
+            slot.EndSlotSelection();
         }
 
         // Clear selected item cache to ensure only one slot placement per item
@@ -118,16 +165,11 @@ public class BiomeObject : MonoBehaviour
         this.SaveUpdatedActiveBiomeDelegate(new SerializedBiomeObject(this));
     }
 
-    // Clear selected item cache if item placement is canceled
-    public void CancelItemPlacement()
+    // Delegate called from slot button to capture photo of this guest
+    private void CapturePhoto(Guest guest)
     {
-        this.ItemToPlaceInActiveBiome = null;
-
-        // Hide item placement indicator images for all the slots
-        foreach (Slot slot in this.Slots)
-        {
-            slot.HideSlotLocation();
-        }
+        // Send selected guest to menu manager to open the photo detail
+        this.SelectPhotoGuestDelegate(guest);
     }
 
     // Restore slots of active biome state from saved slot data
@@ -174,7 +216,7 @@ public class BiomeObject : MonoBehaviour
             // There is no item, so make the slot transparent
             else
             {
-                this.Slots[i].HideSlot();
+                this.Slots[i].Hide();
                 // Can skip to next slot if there is no item
                 continue;
             }

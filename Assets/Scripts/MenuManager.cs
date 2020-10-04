@@ -14,6 +14,7 @@ public class MenuManager : MonoBehaviour
     public GameObject MarketMenuPanel;
     public GameObject NotesMenuPanel;
     public GameObject GiftsMenuPanel;
+    public PhotoCapture PhotoCapture;
     public InventoryContent InventoryContent;
     public MarketContent MarketContent;
     public NotesContent NotesContent;
@@ -21,6 +22,7 @@ public class MenuManager : MonoBehaviour
     public InventoryItemDetail InventoryItemDetail;
     public MarketItemDetail MarketItemDetail;
     public NoteDetail NoteDetail;
+    public PhotoDetail PhotoDetail;
 
     // Simulate 'tap out to close' on focused menu element with invisible button
     public Button TapOutToCloseButton;
@@ -43,7 +45,7 @@ public class MenuManager : MonoBehaviour
         this.InventoryContent.SetupOpenItemDetailDelegate(this.FocusInventoryItemDetail);
 
         // Assign item placement delegate to inventory content
-        this.InventoryContent.SetupItemPlacementDelegate(this.PlaceItemInActiveBiome);
+        this.InventoryContent.SetupItemPlacementDelegate(this.BeginItemPlacementFlow);
 
         // Assign on close delegate to inventory item detail
         this.InventoryContent.SetupOnCloseDetailDelegate(this.CloseButton.onClick.Invoke);
@@ -68,6 +70,15 @@ public class MenuManager : MonoBehaviour
 
         // Assign open notes guest detail to notes content
         this.NotesContent.SetupOpenNoteDetailDelegate(this.FocusNoteDetail);
+
+        // Assign open photo detail to photo capture
+        this.ActiveBiome.SetupSetPhotoGuestDelegate(this.FocusPhotoCapture);
+
+        // Assign photo detail to photo capture
+        this.PhotoCapture.SetupPhotoDetail(this.PhotoDetail);
+
+        // Assign open photo detail to photo capture
+        this.PhotoCapture.SetupOpenPhotoDetailDelegate(this.FocusPhotoDetail);
     }
 
     // Assign coins to menus that use them
@@ -193,18 +204,11 @@ public class MenuManager : MonoBehaviour
         this.FocusGiftsMenu();
     }
 
-    // Select an item for slot placement from inventory item button press
-    private void PlaceItemInActiveBiome(Item item)
+    // Begin photo capture flow starting from active biome slot selection
+    public void OnCameraMenuButtonPress()
     {
-        // Close all menus and show the active biome
-        this.FocusActiveBiome();
-
-        // Set listener of close button to focus the inventory menu
-        this.CloseButton.gameObject.SetActive(true);
-        this.SetCloseButtonListener(this.CancelItemPlacementInActiveBiome);
-
-        // Give the selected item to the active biome for slot placement
-        this.ActiveBiome.SelectItemForSlotPlacement(item);
+        // Begin photo capture process
+        this.BeginPhotoCaptureFlow();
     }
 
     // Hide all menu elements except the main menu button
@@ -217,9 +221,11 @@ public class MenuManager : MonoBehaviour
         this.MarketMenuPanel.SetActive(false);
         this.NotesMenuPanel.SetActive(false);
         this.GiftsMenuPanel.SetActive(false);
+        this.PhotoCapture.gameObject.SetActive(false);
         this.InventoryItemDetail.gameObject.SetActive(false);
         this.MarketItemDetail.gameObject.SetActive(false);
         this.NoteDetail.gameObject.SetActive(false);
+        this.PhotoDetail.gameObject.SetActive(false);
 
         // Disable the tap out to close button when no menus are focused
         this.DisableTapOutToCloseButton();
@@ -239,9 +245,11 @@ public class MenuManager : MonoBehaviour
         this.MarketMenuPanel.SetActive(false);
         this.NotesMenuPanel.SetActive(false);
         this.GiftsMenuPanel.SetActive(false);
+        this.PhotoCapture.gameObject.SetActive(false);
         this.InventoryItemDetail.gameObject.SetActive(false);
         this.MarketItemDetail.gameObject.SetActive(false);
         this.NoteDetail.gameObject.SetActive(false);
+        this.PhotoDetail.gameObject.SetActive(false);
 
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
@@ -387,7 +395,50 @@ public class MenuManager : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(null);
     }
 
-    // Cancel item placement into active biome
+    // Show photo capture after guest is set from a slot in active biome
+    private void FocusPhotoCapture(Guest guest)
+    {
+        // Give the guest to photo detail
+        this.PhotoCapture.SetGuest(guest);
+
+        // Enable the photo capture button component
+        this.PhotoCapture.Enable();
+
+        // Set listener of close buttons to restart photo capture process
+        this.SetCloseButtonListener(this.BeginPhotoCaptureFlow);
+
+        // Disable tap out to close photo detail
+        this.DisableTapOutToCloseButton();
+
+        // Remove the highlighted state on the photo capture button
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    // Show photo detail in the photo capture container
+    private void FocusPhotoDetail()
+    {
+        // Set active the photo detail
+        this.PhotoDetail.Show();
+
+        // Prevent interaction with everything behind the photo detail\
+        this.PreventBackgroundInteraction(this.PhotoDetail.gameObject);
+    }
+
+    // Select an item for slot placement from inventory item button press
+    private void BeginItemPlacementFlow(Item item)
+    {
+        // Close all menus and show the active biome
+        this.FocusActiveBiome();
+
+        // Set listener of close button to focus the inventory menu
+        this.CloseButton.gameObject.SetActive(true);
+        this.SetCloseButtonListener(this.CancelItemPlacementInActiveBiome);
+
+        // Give the selected item to the active biome for slot placement
+        this.ActiveBiome.PrepareItemPlacement(item);
+    }
+
+    // End item placement flow in active biome
     private void CancelItemPlacementInActiveBiome()
     {
         // Clear cache of item pending slot placement in active biome
@@ -397,7 +448,47 @@ public class MenuManager : MonoBehaviour
         this.FocusInventoryMenu();
     }
 
-    // Change behavior of close buttons
+    // Hide all menus and begin photo capture flow
+    private void BeginPhotoCaptureFlow()
+    {
+        // Close all menus and show the active biome and close button
+        this.FocusActiveBiome();
+        this.MainMenuButton.gameObject.SetActive(false);
+        this.CloseButton.gameObject.SetActive(true);
+
+        // Enable the photo capture container object
+        this.PhotoCapture.gameObject.SetActive(true);
+
+        // Hide photo detail for now
+        this.PhotoDetail.Hide();
+
+        // Remove guest of last photo capture
+        this.PhotoCapture.RemoveGuest();
+
+        // Disable photo capture button until guest is set from slot
+        this.PhotoCapture.Disable();
+
+        // Select a slot guest that will own captured photo
+        this.ActiveBiome.PreparePhotoCapture();
+
+        // Set listener of close buttons to focus the main menu
+        this.SetCloseButtonListener(this.CancelPhotoCaptureInActiveBiome);
+
+        // Disable tap out to close
+        this.DisableTapOutToCloseButton();
+    }
+
+    // End photo capture flow in active biome
+    private void CancelPhotoCaptureInActiveBiome()
+    {
+        // Tell slots in active biome to stop listening for photo capture
+        this.ActiveBiome.CancelPhotoCapture();
+
+        // Focus the active biome
+        this.FocusActiveBiome();
+    }
+
+    // Change onClick behavior of close buttons
     private void SetCloseButtonListener(CloseButtonListener listener)
     {
         // Change behavior of visible close button in corner
@@ -448,7 +539,17 @@ public class MenuManager : MonoBehaviour
         this.TapOutToCloseButton.enabled = false;
     }
 
-    // Scroll inventory, market, and notes menus to the top
+    // Prevent interaction with anything behind the focused element
+    private void PreventBackgroundInteraction(GameObject focusedElement)
+    {
+        // Reparent the tap out to close button behind the focused element
+        this.PrepareTapOutToClose(focusedElement);
+
+        // Remove listener of tap out to close button so it acts like background mask
+        this.TapOutToCloseButton.onClick.RemoveAllListeners();
+    }
+
+    // Scroll inventory, market, notes, and gifts menus to the top
     private void ScrollMenusToTop()
     {
         this.ScrollToTop(this.InventoryMenuPanel);

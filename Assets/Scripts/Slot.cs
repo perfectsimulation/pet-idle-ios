@@ -6,7 +6,10 @@ public class Slot : MonoBehaviour
     public SlotItem SlotItem;
     public SlotGuest SlotGuest;
     public Image Image;
-    public GameObject ItemPlacementIndicator;
+    public GameObject ValidSelectionIndicator;
+
+    // The slot button component
+    private Button SlotButton;
 
     // Delegate to trigger a new guest upon guest departure
     [HideInInspector]
@@ -28,29 +31,25 @@ public class Slot : MonoBehaviour
     public delegate void RemoveGuestDelegate(Guest guest);
     private RemoveGuestDelegate RemoveDepartingGuestDelegate;
 
+    // Delegate for onClick of slot button to place an item in this slot
+    [HideInInspector]
+    public delegate void PlaceItemDelegate(Slot slot);
+
+    // Delegate for onClick of slot button to capture a photo of this slot
+    [HideInInspector]
+    public delegate void CapturePhotoDelegate(Guest guest);
+
     void Awake()
     {
         this.SlotItem = new SlotItem();
         this.SlotGuest = new SlotGuest();
+        this.SlotButton = this.gameObject.GetComponent<Button>();
     }
 
-    public void HideSlot()
+    // Remove the sprite of this slot
+    public void Hide()
     {
         this.RemoveImageSprite();
-    }
-
-    // Indicate the position of this slot when the user wants to place an item
-    public void ShowSlotLocation()
-    {
-        // Set active the item placement indicator
-        this.ItemPlacementIndicator.SetActive(true);
-    }
-
-    // Hide the slot location indicator when the user is not placing an item
-    public void HideSlotLocation()
-    {
-        // Set active the item placement indicator
-        this.ItemPlacementIndicator.SetActive(false);
     }
 
     // Assign save visit delegate from active biome
@@ -77,6 +76,31 @@ public class Slot : MonoBehaviour
         this.RemoveDepartingGuestDelegate = callback;
     }
 
+    // Assign place item delegate to slot button from active biome
+    public void SetupPlaceItemDelegate(PlaceItemDelegate callback)
+    {
+        this.SlotButton.onClick.RemoveAllListeners();
+        this.SlotButton.onClick.AddListener(delegate { callback(this); });
+    }
+
+    // Assign capture photo delegate to slot button from active biome
+    public void SetupCapturePhotoDelegate(CapturePhotoDelegate callback)
+    {
+        this.SlotButton.onClick.RemoveAllListeners();
+        this.SlotButton.onClick.AddListener(delegate { callback(this.SlotGuest.Guest); });
+    }
+
+    // Call from active biome to cancel item placement or photo capture
+    public void EndSlotSelection()
+    {
+        // Hide eligible slot indicator
+        this.HideValidSelection();
+
+        // Reset slot button onClick listener TODO show guest summary
+        this.SlotButton.onClick.RemoveAllListeners();
+        this.SlotButton.interactable = true;
+    }
+
     // Initialize a newly placed item for this slot
     public void InitializeItem(Item item)
     {
@@ -88,6 +112,9 @@ public class Slot : MonoBehaviour
         // Select and initialize a guest to visit the newly placed item
         Guest guest = this.SelectNewGuestDelegate(item);
         this.InitializeGuest(guest, item);
+
+        // Remove place item delegate from the onClick of slot button
+        this.SlotButton.onClick.RemoveAllListeners();
     }
 
     // Assign an item to the slot item of this slot
@@ -111,6 +138,9 @@ public class Slot : MonoBehaviour
 
         // Remove the slot item
         this.SlotItem.RemoveItem();
+
+        // Hide the now empty slot
+        this.Hide();
     }
 
     // Initialize a newly selected guest for this slot
@@ -124,6 +154,53 @@ public class Slot : MonoBehaviour
     {
         this.SlotGuest = new SlotGuest(serializedSlotGuest);
         this.CheckGuestVisit();
+    }
+
+    // Show indicator for item placement
+    public void ValidateItemPlacementEligibility()
+    {
+        // All slots are eligible for item placement
+        // TODO maybe implement multi-slot items?
+        this.SlotButton.interactable = true;
+        this.ShowValidSelection();
+    }
+
+    // Show indicator for photo capture if guest is currently visiting
+    public void ValidatePhotoCaptureEligibility()
+    {
+        // Disable the slot button before eligibility is validated
+        this.SlotButton.interactable = false;
+
+        // Do not continue if there is no guest assigned to the slot
+        if (this.SlotGuest.Guest == null) return;
+
+        // Do not continue if the guest is not currently visible
+        if (!this.SlotGuest.IsArrived()) return;
+
+        // Make sure the eligible slot is interactable
+        this.SlotButton.interactable = true;
+
+        // Show slot since the guest is currently visiting
+        this.ShowValidSelection();
+    }
+
+    // Indicate eligible slot during item placement or photo capture
+    private void ShowValidSelection()
+    {
+        // Set active the valid selection indicator
+        this.ValidSelectionIndicator.SetActive(true);
+    }
+
+    // Hide the slot location indicator
+    private void HideValidSelection()
+    {
+        // Set active the item placement indicator
+        this.ValidSelectionIndicator.SetActive(false);
+
+        // Remove onClick delegate from slot button
+        this.SlotButton.onClick.RemoveAllListeners();
+
+        // TODO add onClick listener to open guest summary if it is visiting
     }
 
     // Only called on app start to add newly arrived guests and remove departed guests
@@ -143,7 +220,7 @@ public class Slot : MonoBehaviour
         if (this.SlotGuest.IsVisiting())
         {
             // Set item guest interaction image in slot
-            this.SetItemGuestPairInteractionImageSprite();
+            this.SetInteractionImageSprite();
         }
 
         // Remove the guest if it has departed
@@ -176,7 +253,7 @@ public class Slot : MonoBehaviour
     }
 
     // Set the image sprite to an item-guest pair interaction asset
-    private void SetItemGuestPairInteractionImageSprite()
+    private void SetInteractionImageSprite()
     {
         // Construct the name of the asset from item-guest pair
         string interactionAssetName = string.Format(

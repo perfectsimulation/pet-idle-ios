@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,27 +7,56 @@ public class PhotoCapture : MonoBehaviour
     // Button to trigger a photo capture
     public Button CaptureButton;
 
-    // Modal to display captured photo and keep/retake buttons
-    public GameObject PhotoDetail;
-
-    // Text asking to save/discard captured photo to guest note
-    public TextMeshProUGUI SaveText;
-
-    // Image of captured photo in modal
-    public Image PhotoImage;
-
-    // Button to save the photo to the guest note
-    public Button KeepButton;
-
-    // Button to discard the current captured photo and retake another
-    public Button RetakeButton;
+    // The photo detail component of the photo capture object
+    private PhotoDetail PhotoDetail;
 
     // Yield to capture photo at the right time
     private WaitForEndOfFrame FrameEnd;
 
+    // Delegate to open photo detail from menu manager
+    [HideInInspector]
+    public delegate void OpenPhotoDetailDelegate();
+    private OpenPhotoDetailDelegate ShowPhotoDetailDelegate;
+
     void Start()
     {
         this.FrameEnd = new WaitForEndOfFrame();
+    }
+
+    // Set active the capture button and await photo capture
+    public void Enable()
+    {
+        this.CaptureButton.gameObject.SetActive(true);
+    }
+
+    // Deactivate the capture button
+    public void Disable()
+    {
+        this.CaptureButton.gameObject.SetActive(false);
+    }
+
+    // Assign photo detail component from menu manager
+    public void SetupPhotoDetail(PhotoDetail photoDetail)
+    {
+        this.PhotoDetail = photoDetail;
+    }
+
+    // Assign open photo detail delegate from menu manager
+    public void SetupOpenPhotoDetailDelegate(OpenPhotoDetailDelegate callback)
+    {
+        this.ShowPhotoDetailDelegate = callback;
+    }
+
+    // Remove guest from photo detail
+    public void RemoveGuest()
+    {
+        this.PhotoDetail.RemoveGuest();
+    }
+
+    // Give photo detail the data to display
+    public void SetGuest(Guest guest)
+    {
+        this.PhotoDetail.SetGuest(guest);
     }
 
     // Trigger a photo capture during the next frame update
@@ -37,10 +65,10 @@ public class PhotoCapture : MonoBehaviour
         StartCoroutine(this.CapturePhoto());
     }
 
-    // Create a texture within the capture button
+    // Capture photo and open the photo detail to preview it
     private IEnumerator CapturePhoto()
     {
-        // Yield until the end of frame
+        // Have to yield until end of current frame before reading pixels
         yield return this.FrameEnd;
 
         // Create a texture with the photo content
@@ -54,7 +82,18 @@ public class PhotoCapture : MonoBehaviour
         Vector2 pivot = new Vector2(0.5f, 0.5f);
         float pixelsPerUnit = 100f;
         Sprite sprite = Sprite.Create(photoTexture, rect, pivot, pixelsPerUnit);
-        this.PhotoImage.sprite = sprite;
+
+        // Create and set the photo image sprite for photo detail
+        this.PhotoDetail.CreatePhotoImage(sprite);
+
+        // Open photo detail with newly captured photo
+        this.OpenPhotoDetail();
+    }
+
+    // Open photo detail after sprite is created from onClick of capture button
+    private void OpenPhotoDetail()
+    {
+        this.ShowPhotoDetailDelegate();
     }
 
 }
