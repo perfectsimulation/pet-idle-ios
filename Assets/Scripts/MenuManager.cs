@@ -71,8 +71,8 @@ public class MenuManager : MonoBehaviour
         // Assign open notes guest detail to notes content
         this.NotesContent.SetupOpenNoteDetailDelegate(this.FocusNoteDetail);
 
-        // Assign open photo detail to photo capture
-        this.ActiveBiome.SetupSetPhotoGuestDelegate(this.FocusPhotoCapture);
+        // Assign set photo slot delegate to active biome
+        this.ActiveBiome.SetupSetPhotoSlotDelegate(this.FocusPhotoCapture);
 
         // Assign photo detail to photo capture
         this.PhotoCapture.SetupPhotoDetail(this.PhotoDetail);
@@ -395,13 +395,19 @@ public class MenuManager : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(null);
     }
 
-    // Show photo capture after guest is set from a slot in active biome
-    private void FocusPhotoCapture(Guest guest)
+    // Show photo capture after slot is selected from active biome
+    private void FocusPhotoCapture(Slot slot)
     {
-        // Give the guest to photo detail
-        this.PhotoCapture.SetGuest(guest);
+        // End slot selection in active biome
+        this.ActiveBiome.EndSlotSelection();
 
-        // Enable the photo capture button component
+        // Give the guest to photo detail
+        this.PhotoCapture.SetGuest(slot.SlotGuest.Guest);
+
+        // Align the photo capture frame with the selected slot
+        this.PhotoCapture.Align(slot.transform);
+
+        // Enable the photo capture button
         this.PhotoCapture.Enable();
 
         // Set listener of close buttons to restart photo capture process

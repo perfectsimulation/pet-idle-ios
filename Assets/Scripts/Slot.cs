@@ -35,9 +35,9 @@ public class Slot : MonoBehaviour
     [HideInInspector]
     public delegate void PlaceItemDelegate(Slot slot);
 
-    // Delegate for onClick of slot button to capture a photo of this slot
+    // Delegate for onClick of slot button to select this slot for photo capture
     [HideInInspector]
-    public delegate void CapturePhotoDelegate(Guest guest);
+    public delegate void CapturePhotoDelegate(Slot slot);
 
     void Awake()
     {
@@ -87,7 +87,7 @@ public class Slot : MonoBehaviour
     public void SetupCapturePhotoDelegate(CapturePhotoDelegate callback)
     {
         this.SlotButton.onClick.RemoveAllListeners();
-        this.SlotButton.onClick.AddListener(delegate { callback(this.SlotGuest.Guest); });
+        this.SlotButton.onClick.AddListener(delegate { callback(this); });
     }
 
     // Call from active biome to cancel item placement or photo capture
@@ -184,25 +184,6 @@ public class Slot : MonoBehaviour
         this.ShowValidSelection();
     }
 
-    // Indicate eligible slot during item placement or photo capture
-    private void ShowValidSelection()
-    {
-        // Set active the valid selection indicator
-        this.ValidSelectionIndicator.SetActive(true);
-    }
-
-    // Hide the slot location indicator
-    private void HideValidSelection()
-    {
-        // Set active the item placement indicator
-        this.ValidSelectionIndicator.SetActive(false);
-
-        // Remove onClick delegate from slot button
-        this.SlotButton.onClick.RemoveAllListeners();
-
-        // TODO add onClick listener to open guest summary if it is visiting
-    }
-
     // Only called on app start to add newly arrived guests and remove departed guests
     private void CheckGuestVisit()
     {
@@ -250,6 +231,25 @@ public class Slot : MonoBehaviour
 
         // Remove the slot guest
         this.SlotGuest.RemoveGuest();
+    }
+
+    // Indicate eligible slot during item placement or photo capture
+    private void ShowValidSelection()
+    {
+        // Set active the valid selection indicator
+        this.ValidSelectionIndicator.SetActive(true);
+    }
+
+    // Hide the slot location indicator
+    private void HideValidSelection()
+    {
+        // Set active the item placement indicator
+        this.ValidSelectionIndicator.SetActive(false);
+
+        // Remove onClick delegate from slot button
+        this.SlotButton.onClick.RemoveAllListeners();
+
+        // TODO add onClick listener to open guest summary if it is visiting
     }
 
     // Set the image sprite to an item-guest pair interaction asset
