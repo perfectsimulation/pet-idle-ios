@@ -112,6 +112,16 @@ public class Notes
         return sightedGuests;
     }
 
+    // Add a photo to the note of this guest
+    public void AddPhoto(Guest guest, Photo photo)
+    {
+        // Get the note for the guest
+        Note note = (Note)this.GuestNotes[(object)guest];
+
+        // Add the new photo to the photos of this guest note
+        note.AddPhoto(photo);
+    }
+
     // Record the sighting of the guest if it is visiting for first time
     private void CheckForFirstSighting(Note note, SlotGuest slotGuest)
     {
@@ -132,6 +142,7 @@ public class Note
     public bool HasBeenSighted { get; private set; }
     public int VisitCount { get; private set; }
     public int FriendshipPoints { get; private set; }
+    public Photos Photos { get; private set; }
 
     /* Initialize a brand new Note */
     public Note()
@@ -140,6 +151,7 @@ public class Note
         this.HasBeenSighted = false;
         this.VisitCount = 0;
         this.FriendshipPoints = 0;
+        this.Photos = new Photos();
     }
 
     /* Create Note from save data */
@@ -149,6 +161,7 @@ public class Note
         this.HasBeenSighted = serializedNote.HasBeenSighted;
         this.VisitCount = serializedNote.VisitCount;
         this.FriendshipPoints = serializedNote.FriendshipPoints;
+        this.Photos = new Photos(serializedNote.SerializedPhotos);
     }
 
     // Change the image asset used for this note in notes content
@@ -175,6 +188,12 @@ public class Note
         this.FriendshipPoints += friendshipPointReward;
     }
 
+    // Add a photo to photos
+    public void AddPhoto(Photo photo)
+    {
+        this.Photos.Add(photo);
+    }
+
 }
 
 [System.Serializable]
@@ -185,6 +204,7 @@ public class SerializedNote
     public bool HasBeenSighted;
     public int VisitCount;
     public int FriendshipPoints;
+    public SerializedPhotos SerializedPhotos;
 
     public SerializedNote() { }
 
@@ -196,6 +216,7 @@ public class SerializedNote
         this.HasBeenSighted = note.HasBeenSighted;
         this.VisitCount = note.VisitCount;
         this.FriendshipPoints = note.FriendshipPoints;
+        this.SerializedPhotos = new SerializedPhotos(note.Photos);
     }
 
 }

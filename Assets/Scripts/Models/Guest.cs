@@ -31,7 +31,7 @@ public class Guest
     // Maximum friendship points awarded to user upon completion of guest visit
     public int MaximumFriendshipPointReward;
 
-    // Path to the png to use for the SlotGuest that owns this Guest
+    // Persistence path of guest png asset
     public string ImageAssetPath;
 
     /* Default no-arg constructor */

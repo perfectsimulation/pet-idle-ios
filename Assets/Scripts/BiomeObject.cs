@@ -171,7 +171,7 @@ public class BiomeObject : MonoBehaviour
     // Delegate called from slot button to capture photo of this guest
     private void CapturePhoto(Slot slot)
     {
-        // Send selected guest to menu manager to open the photo detail
+        // Send selected guest to menu manager to open the photo preview
         this.SelectPhotoSlotDelegate(slot);
     }
 

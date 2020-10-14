@@ -14,15 +14,18 @@ public class MenuManager : MonoBehaviour
     public GameObject MarketMenuPanel;
     public GameObject NotesMenuPanel;
     public GameObject GiftsMenuPanel;
+    public GameObject PhotosMenuPanel;
     public PhotoCapture PhotoCapture;
     public InventoryContent InventoryContent;
     public MarketContent MarketContent;
     public NotesContent NotesContent;
     public GiftsContent GiftsContent;
+    public PhotosContent PhotosContent;
     public InventoryItemDetail InventoryItemDetail;
     public MarketItemDetail MarketItemDetail;
     public NoteDetail NoteDetail;
     public PhotoDetail PhotoDetail;
+    public PhotoPreview PhotoPreview;
 
     // Simulate 'tap out to close' on focused menu element with invisible button
     public Button TapOutToCloseButton;
@@ -65,20 +68,26 @@ public class MenuManager : MonoBehaviour
         // Assign on close delegate to market item detail
         this.MarketContent.SetupOnCloseDetailDelegate(this.CloseButton.onClick.Invoke);
 
-        // Assign notes guest detail to notes content
+        // Assign note detail to notes content
         this.NotesContent.SetupNoteDetail(this.NoteDetail);
 
-        // Assign open notes guest detail to notes content
+        // Assign open note detail to notes content
         this.NotesContent.SetupOpenNoteDetailDelegate(this.FocusNoteDetail);
+
+        // Assign photo detail to photos content
+        this.PhotosContent.SetupPhotoDetail(this.PhotoDetail);
+
+        // Assign open photo detail to photos content
+        this.PhotosContent.SetupOpenPhotoDetailDelegate(this.FocusPhotoDetail);
 
         // Assign set photo slot delegate to active biome
         this.ActiveBiome.SetupSetPhotoSlotDelegate(this.FocusPhotoCapture);
 
-        // Assign photo detail to photo capture
-        this.PhotoCapture.SetupPhotoDetail(this.PhotoDetail);
+        // Assign photo preview to photo capture
+        this.PhotoCapture.SetupPhotoPreview(this.PhotoPreview);
 
-        // Assign open photo detail to photo capture
-        this.PhotoCapture.SetupOpenPhotoDetailDelegate(this.FocusPhotoDetail);
+        // Assign open photo preview to photo capture
+        this.PhotoCapture.SetupOpenPhotoPreviewDelegate(this.FocusPhotoPreview);
     }
 
     // Assign coins to menus that use them
@@ -147,6 +156,12 @@ public class MenuManager : MonoBehaviour
     public void SetupClaimFriendshipDelegate(GiftsContent.ClaimFriendshipDelegate callback)
     {
         this.GiftsContent.SetupClaimFriendshipDelegate(callback);
+    }
+
+    // Assign save photo delegate to photos content from game manager
+    public void SetupSavePhotoDelegate(PhotoPreview.SavePhotoDelegate callback)
+    {
+        this.PhotoCapture.SetupSavePhotoDelegate(callback);
     }
 
     // Assign biome to active biome, called from game manager
@@ -221,11 +236,13 @@ public class MenuManager : MonoBehaviour
         this.MarketMenuPanel.SetActive(false);
         this.NotesMenuPanel.SetActive(false);
         this.GiftsMenuPanel.SetActive(false);
+        this.PhotosMenuPanel.SetActive(false);
         this.PhotoCapture.gameObject.SetActive(false);
         this.InventoryItemDetail.gameObject.SetActive(false);
         this.MarketItemDetail.gameObject.SetActive(false);
         this.NoteDetail.gameObject.SetActive(false);
         this.PhotoDetail.gameObject.SetActive(false);
+        this.PhotoPreview.gameObject.SetActive(false);
 
         // Disable the tap out to close button when no menus are focused
         this.DisableTapOutToCloseButton();
@@ -245,11 +262,13 @@ public class MenuManager : MonoBehaviour
         this.MarketMenuPanel.SetActive(false);
         this.NotesMenuPanel.SetActive(false);
         this.GiftsMenuPanel.SetActive(false);
+        this.PhotosMenuPanel.SetActive(false);
         this.PhotoCapture.gameObject.SetActive(false);
         this.InventoryItemDetail.gameObject.SetActive(false);
         this.MarketItemDetail.gameObject.SetActive(false);
         this.NoteDetail.gameObject.SetActive(false);
         this.PhotoDetail.gameObject.SetActive(false);
+        this.PhotoPreview.gameObject.SetActive(false);
 
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
@@ -296,7 +315,9 @@ public class MenuManager : MonoBehaviour
     {
         this.MainMenuPanel.SetActive(false);
         this.NotesMenuPanel.SetActive(true);
+        this.PhotosMenuPanel.SetActive(false);
         this.NoteDetail.gameObject.SetActive(false);
+        this.PhotoDetail.gameObject.SetActive(false);
 
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
@@ -316,6 +337,19 @@ public class MenuManager : MonoBehaviour
 
         // Set listener of close buttons to focus the main menu
         this.SetCloseButtonListener(this.FocusMainMenu);
+    }
+
+    // Show photos menu from the note detail in notes menu
+    private void FocusPhotosMenu()
+    {
+        this.PhotosMenuPanel.SetActive(true);
+        this.PhotoDetail.gameObject.SetActive(false);
+
+        // Move tap out to close button behind the main menu
+        this.PrepareTapOutToClose(this.MainMenuPanel);
+
+        // Set listener of close buttons to refocus the note detail
+        this.SetCloseButtonListener(this.FocusNoteDetail);
     }
 
     // Display the inventory item detail panel
@@ -350,18 +384,35 @@ public class MenuManager : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(null);
     }
 
-    // Show the notes guest detail in the notes menu
+    // Show the note detail in the notes menu
     private void FocusNoteDetail()
     {
+        this.PhotosMenuPanel.SetActive(false);
         this.NoteDetail.gameObject.SetActive(true);
+        this.PhotoDetail.gameObject.SetActive(false);
 
-        // Move tap out to close button behind the notes guest detail panel
+        // Move tap out to close button behind the note detail panel
         this.PrepareTapOutToClose(this.NoteDetail.gameObject);
 
         // Set listener of close buttons to focus the notes menu
         this.SetCloseButtonListener(this.FocusNotesMenu);
 
         // Remove the highlighted state on the guest button
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    // Show the photo detail in the photos menu
+    private void FocusPhotoDetail()
+    {
+        this.PhotoDetail.gameObject.SetActive(true);
+
+        // Move tap out to close button behind the photo detail panel
+        this.PrepareTapOutToClose(this.PhotoDetail.gameObject);
+
+        // Set listener of close buttons to focus the photos menu
+        this.SetCloseButtonListener(this.FocusPhotosMenu);
+
+        // Remove the highlighted state on the photo button
         EventSystem.current.SetSelectedGameObject(null);
     }
 
@@ -401,7 +452,7 @@ public class MenuManager : MonoBehaviour
         // End slot selection in active biome
         this.ActiveBiome.EndSlotSelection();
 
-        // Give the guest to photo detail
+        // Give the guest to photo preview
         this.PhotoCapture.SetGuest(slot.SlotGuest.Guest);
 
         // Align the photo capture frame with the selected slot
@@ -413,21 +464,21 @@ public class MenuManager : MonoBehaviour
         // Set listener of close buttons to restart photo capture process
         this.SetCloseButtonListener(this.BeginPhotoCaptureFlow);
 
-        // Disable tap out to close photo detail
+        // Disable tap out to close photo preview
         this.DisableTapOutToCloseButton();
 
         // Remove the highlighted state on the photo capture button
         EventSystem.current.SetSelectedGameObject(null);
     }
 
-    // Show photo detail in the photo capture container
-    private void FocusPhotoDetail()
+    // Show photo preview in the photo capture container
+    private void FocusPhotoPreview()
     {
-        // Set active the photo detail
-        this.PhotoDetail.Show();
+        // Set active the photo preview
+        this.PhotoPreview.Show();
 
-        // Prevent interaction with everything behind the photo detail\
-        this.PreventBackgroundInteraction(this.PhotoDetail.gameObject);
+        // Prevent interaction with everything behind the photo preview\
+        this.PreventBackgroundInteraction(this.PhotoPreview.gameObject);
     }
 
     // Select an item for slot placement from inventory item button press
@@ -465,8 +516,8 @@ public class MenuManager : MonoBehaviour
         // Enable the photo capture container object
         this.PhotoCapture.gameObject.SetActive(true);
 
-        // Hide photo detail for now
-        this.PhotoDetail.Hide();
+        // Hide photo preview for now
+        this.PhotoPreview.Hide();
 
         // Remove guest of last photo capture
         this.PhotoCapture.RemoveGuest();

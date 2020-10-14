@@ -13,16 +13,16 @@ public class PhotoCapture : MonoBehaviour
     // Rect transform of the capture button
     private RectTransform CaptureRect;
 
-    // The photo detail component of the photo capture object
-    private PhotoDetail PhotoDetail;
+    // The photo preview child component of the photo capture object
+    private PhotoPreview PhotoPreview;
 
     // Yield to capture photo at the right time
     private WaitForEndOfFrame FrameEnd;
 
-    // Delegate to open photo detail from menu manager
+    // Delegate to open photo preview from menu manager
     [HideInInspector]
-    public delegate void OpenPhotoDetailDelegate();
-    private OpenPhotoDetailDelegate ShowPhotoDetailDelegate;
+    public delegate void OpenPhotoPreviewDelegate();
+    private OpenPhotoPreviewDelegate ShowPhotoPreviewDelegate;
 
     void Awake()
     {
@@ -54,28 +54,40 @@ public class PhotoCapture : MonoBehaviour
         this.Frame.position = transform.position;
     }
 
-    // Assign photo detail component from menu manager
-    public void SetupPhotoDetail(PhotoDetail photoDetail)
+    // Assign photo preview component from menu manager
+    public void SetupPhotoPreview(PhotoPreview photoPreview)
     {
-        this.PhotoDetail = photoDetail;
+        this.PhotoPreview = photoPreview;
     }
 
-    // Assign open photo detail delegate from menu manager
-    public void SetupOpenPhotoDetailDelegate(OpenPhotoDetailDelegate callback)
+    // Assign open photo preview delegate from menu manager
+    public void SetupOpenPhotoPreviewDelegate(OpenPhotoPreviewDelegate callback)
     {
-        this.ShowPhotoDetailDelegate = callback;
+        this.ShowPhotoPreviewDelegate = callback;
     }
 
-    // Give photo detail the guest data to display
+    // Give photo preview the guest data to display
     public void SetGuest(Guest guest)
     {
-        this.PhotoDetail.SetGuest(guest);
+        this.PhotoPreview.SetGuest(guest);
     }
 
-    // Remove guest from photo detail
+    // Remove guest from photo preview
     public void RemoveGuest()
     {
-        this.PhotoDetail.RemoveGuest();
+        this.PhotoPreview.RemoveGuest();
+    }
+
+    // Assign save photo delegate to photo preview from menu manager
+    public void SetupSavePhotoDelegate(PhotoPreview.SavePhotoDelegate callback)
+    {
+        this.PhotoPreview.SetupSavePhotoDelegate(callback);
+    }
+
+    // Assign retake photo delegate to photo preview from menu manager
+    public void SetupRetakePhotoDelegate(PhotoPreview.RetakePhotoDelegate callback)
+    {
+        this.PhotoPreview.SetupRetakePhotoDelegate(callback);
     }
 
     // Trigger a photo capture during the next frame update
@@ -84,7 +96,7 @@ public class PhotoCapture : MonoBehaviour
         StartCoroutine(this.CapturePhoto());
     }
 
-    // Capture photo by creating a sprite, then open a prevew with photo detail
+    // Capture photo by creating a sprite and view it with photo preview
     private IEnumerator CapturePhoto()
     {
         // Need to yield until end of current frame before reading pixels
@@ -120,35 +132,17 @@ public class PhotoCapture : MonoBehaviour
         photoTexture.ReadPixels(photoArea, 0, 0);
         photoTexture.Apply();
 
-        // Create a rect to use for the area of the new sprite
-        Rect spriteArea = new Rect(0, 0, width, height);
+        // Show the captured image in the photo preview
+        this.PhotoPreview.CreatePhoto(photoTexture);
 
-        // Set pivot of sprite
-        Vector2 pivot = this.CaptureRect.pivot;
-
-        // Set resolution of sprite
-        float pixelsPerUnit = 100f;
-
-        // Create the sprite using the newly captured texture
-        Sprite sprite = Sprite.Create(
-            photoTexture,
-            spriteArea,
-            pivot,
-            pixelsPerUnit);
-
-        // TODO Make sure the new sprite is fully opaque
-
-        // Set the new photo image sprite of the photo detail modal
-        this.PhotoDetail.CreatePhotoImage(sprite);
-
-        // Open photo detail to preview the photo
-        this.OpenPhotoDetail();
+        // Open photo preview to view the captured image
+        this.OpenPhotoPreview();
     }
 
-    // Open photo detail after sprite creation from onClick of capture button
-    private void OpenPhotoDetail()
+    // Open photo preview after photo creation from onClick of capture button
+    private void OpenPhotoPreview()
     {
-        this.ShowPhotoDetailDelegate();
+        this.ShowPhotoPreviewDelegate();
     }
 
     // Set parent and onClick to the draggable component of the capture button
