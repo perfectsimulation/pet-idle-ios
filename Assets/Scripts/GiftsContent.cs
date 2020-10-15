@@ -23,8 +23,8 @@ public class GiftsContent : MonoBehaviour
     // The user coins, set from the game manager
     private int UserCoins;
 
-    // List of guests that have been seen in the active biome
-    private List<Guest> SightedGuests;
+    // List of names of guests that have been seen in the active biome
+    private List<string> SightedGuestNames;
 
     // The user gifts, set from the game manager
     private Gifts Gifts;
@@ -73,11 +73,11 @@ public class GiftsContent : MonoBehaviour
         this.UpdateCoinText();
     }
 
-    // Assign notes to gifts content from the game manager
-    public void HydrateSightedGuests(List<Guest> sightedGuests)
+    // Assign list of sighted guest names from menu manager
+    public void HydrateSightedGuests(List<string> sightedGuestNames)
     {
         // Used to determine which guest image to use in gift detail
-        this.SightedGuests = sightedGuests;
+        this.SightedGuestNames = sightedGuestNames;
 
         // Update guest images for existing gifts
         this.UpdateGuestImages();
@@ -241,22 +241,17 @@ public class GiftsContent : MonoBehaviour
 
     }
 
-    // Get the sprite to use for the gift button with this guest
+    // Get the guest sprite to use in the gift button
     private Sprite GetGiftButtonGuestSprite(Guest guest)
     {
-        Sprite guestSprite;
-        if (this.SightedGuests.Contains(guest))
+        // Use guest image asset if guest has been seen at least once
+        if (this.SightedGuestNames.Contains(guest.Name))
         {
-            // The guest has been seen, so create sprite using guest image
-            guestSprite = ImageUtility.CreateSpriteFromPng(guest.ImageAssetPath, 128, 128);
-        }
-        else
-        {
-            // The guest has not been seen, so create using generic unknown guest image
-            guestSprite = ImageUtility.CreateSpriteFromPng(DataInitializer.UnsightedGuestImageAsset, 128, 128);
+            return ImageUtility.CreateSpriteFromPng(guest.ImageAssetPath, 128, 128);
         }
 
-        return guestSprite;
+        // Use unsighted guest image asset if guest has never before been seen
+        return ImageUtility.CreateSpriteFromPng(DataInitializer.UnsightedGuestImageAsset, 128, 128);
     }
 
     // Save friendship reward for each guest

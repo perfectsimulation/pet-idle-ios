@@ -114,8 +114,8 @@ public class NotesContent : MonoBehaviour
         // Position is set by the grid layout script attached to this gameobject
         foreach (DictionaryEntry guestNote in this.Notes.GuestNotes)
         {
-            Guest guest = (Guest)guestNote.Key;
             Note note = (Note)guestNote.Value;
+            Guest guest = note.Guest;
 
             // Instantiate the prefab clone with this as the parent
             prefabObject = Instantiate(this.Prefab, this.transform);

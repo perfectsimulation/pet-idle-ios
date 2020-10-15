@@ -62,11 +62,14 @@ public class Photos
 public class Photo
 {
     public Texture2D Texture;
+    public string ID;
+    public string GuestName;
 
     /* Create Photo from texture */
     public Photo(Texture2D texture)
     {
         this.Texture = texture;
+        this.ID = this.GenerateID();
     }
 
     /* Create Photo from save data */
@@ -74,9 +77,17 @@ public class Photo
     {
         // Initialize a new texture
         this.Texture = new Texture2D(2, 2);
+        this.ID = serializedPhoto.ID;
 
         // Replace texture contents with serialized image byte data
         ImageConversion.LoadImage(this.Texture, serializedPhoto.Bytes);
+    }
+
+    // Generate an ID to use for a filename when persisting this photo
+    private string GenerateID()
+    {
+        // Return string value of the current datetime
+        return System.DateTime.Now.ToString("ddMMyyyyHHmmss");
     }
 
 }
@@ -85,12 +96,14 @@ public class Photo
 public class SerializedPhoto
 {
     public byte[] Bytes;
+    public string ID;
 
     /* Create SerializedPhoto from Photo */
     public SerializedPhoto(Photo photo)
     {
         // Encode the photo texture into a PNG byte array
         this.Bytes = photo.Texture.EncodeToPNG();
+        this.ID = photo.ID;
     }
 
 }

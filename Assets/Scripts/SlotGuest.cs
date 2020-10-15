@@ -1,4 +1,5 @@
 ﻿using System;
+using TimeUtility;
 
 public class SlotGuest
 {
@@ -140,28 +141,6 @@ public class SlotGuest
         // Subtract elapsed seconds from now to get the datetime of game start
         DateTime gameStartTime = DateTime.UtcNow.AddSeconds(-1 * elapsedSeconds);
         return gameStartTime;
-    }
-
-}
-
-[Serializable]
-public struct SerializedDateTime
-{
-    // String representation of a datetime so it can be written to json
-    public string stringValue;
-
-    public static implicit operator DateTime(SerializedDateTime serializedDateTime)
-    {
-        return Convert.ToDateTime(serializedDateTime.stringValue);
-    }
-
-    public static implicit operator SerializedDateTime(DateTime dateTime)
-    {
-        SerializedDateTime serializedDateTime = new SerializedDateTime
-        {
-            stringValue = dateTime.ToString()
-        };
-        return serializedDateTime;
     }
 
 }

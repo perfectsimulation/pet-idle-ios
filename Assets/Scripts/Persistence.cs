@@ -3,7 +3,14 @@ using UnityEngine;
 
 public static class Persistence
 {
-    /* Save file location */
+    //   _   _
+    //  | | | |
+    //  | | | |___  ___ _ __
+    //  | | | / __|/ _ \ '__|
+    //  | |_| \__ \  __/ |
+    //   \___/|___/\___|_|
+
+    /* User data file location */
     private static string UserDataPath
     {
         get
@@ -13,11 +20,12 @@ public static class Persistence
                 return Application.persistentDataPath + "/UserData.json";
             }
 
+            // Debug purposes
             return "UserData.json";
         }
     }
 
-    /* Serialize the user and save data to local directory */
+    /* Serialize the user and save data locally */
     public static void SaveUser(User user)
     {
         // Serialize the user
@@ -28,43 +36,130 @@ public static class Persistence
         Debug.Log("Saved user");
     }
 
-    /* Get the user by deserializing local save data */
+    /* Get deserialized user from local save data or create a new user */
     public static User LoadUser()
     {
-        // If there is local save data, load and deserialize the existing user
-        if (DoesFileExistAtPath(UserDataPath))
+        // Initialize a new user when no local save data exists
+        if (!DoesFileExistAtPath(UserDataPath))
         {
-            // Read from local file
-            string userDataJson = File.ReadAllText(UserDataPath);
-            Debug.Log("Loaded user");
-
-            // Get a serialized user from the contents of the local save file
-            SerializedUser userData = StringUtility.FromJson<SerializedUser>(userDataJson);
-
-            // Get a user from the serialized user
-            User user = new User(userData);
-            return user;
+            Debug.Log("No local user data. Created new user");
+            return CreateUser();
         }
 
-        // Create a new user if no local save data is found
-        Debug.Log("No local user data. Created new user");
+        Debug.Log("Loaded user");
+
+        // Read contents of existing local user data json
+        string userDataJson = File.ReadAllText(UserDataPath);
+
+        // Get a serialized user from the user data json
+        SerializedUser userData =
+            StringUtility.FromJson<SerializedUser>(userDataJson);
+
+        // Get a user from the serialized user
+        User user = new User(userData);
+        return user;
+    }
+
+    /* Create a new user when no local save data is found */
+    private static User CreateUser()
+    {
+        // Create local save directories
+        InitializePhotoDirectories();
+
+        // Create a new user
         User newUser = new User();
 
-        // Create local save file with new user
+        // Create new local save file for user data
         SaveUser(newUser);
         return newUser;
     }
 
-    /* Construct the full path to the asset */
-    public static string GetAbsoluteAssetPath(string assetPath)
+    //  ______ _           _
+    //  | ___ \ |         | |
+    //  | |_/ / |__   ___ | |_ ___  ___
+    //  |  __/| '_ \ / _ \| __/ _ \/ __|
+    //  | |   | | | | (_) | || (_) \__ \
+    //  \_|   |_| |_|\___/ \__\___/|___/
+
+    /* Photos root file directory */
+    private static string PhotosRootPath
     {
-        return Path.Combine(Application.streamingAssetsPath, assetPath);
+        get
+        {
+            if (Application.isMobilePlatform)
+            {
+                return Application.persistentDataPath + "/Photos";
+            }
+
+            // Debug purposes
+            return "Persistence/Photos";
+        }
     }
+
+    /* Serialize the photo and save data locally */
+    public static void SavePhoto(Guest guest, Photo photo)
+    {
+        // Get the pathname for the local photo file
+        string photoPath = GetGuestPhotoFilePath(guest, photo);
+
+        // Do not continue if the photo has already been saved
+        if (DoesFileExistAtPath(photoPath)) return;
+
+        // Encode the photo as a PNG byte array
+        SerializedPhoto serializedPhoto = new SerializedPhoto(photo);
+
+        // Write to local file
+        File.WriteAllBytes(photoPath, serializedPhoto.Bytes);
+    }
+
+    /* Create a photo directory for each guest */
+    private static void InitializePhotoDirectories()
+    {
+        // Create a directory for each guest in which its photos are saved
+        foreach (Guest guest in DataInitializer.AllGuests)
+        {
+            // Get the path to use for the new directory
+            string path = GetGuestPhotoDirectory(guest);
+
+            // Get the directory info for this path
+            DirectoryInfo directory = new DirectoryInfo(path);
+
+            // Create the new directory
+            directory.Create();
+        }
+
+    }
+
+    //   _   _ _   _ _ _ _   _
+    //  | | | | | (_) (_) | (_)
+    //  | | | | |_ _| |_| |_ _  ___  ___
+    //  | | | | __| | | | __| |/ _ \/ __|
+    //  | |_| | |_| | | | |_| |  __/\__ \
+    //   \___/ \__|_|_|_|\__|_|\___||___/
 
     /* Check if a local file exists at the provided path */
     public static bool DoesFileExistAtPath(string path)
     {
         return File.Exists(path);
+    }
+
+    /* Get the full path to the streaming asset */
+    public static string GetAbsoluteAssetPath(string assetPath)
+    {
+        return Path.Combine(Application.streamingAssetsPath, assetPath);
+    }
+
+    /* Get the path to the directory containing all photos of this guest */
+    private static string GetGuestPhotoDirectory(Guest guest)
+    {
+        return Path.Combine(PhotosRootPath, guest.Name);
+    }
+
+    /* Get the full path to the guest photo */
+    private static string GetGuestPhotoFilePath(Guest guest, Photo photo)
+    {
+        string fileName = photo.ID + ".png";
+        return Path.Combine(PhotosRootPath, guest.Name, fileName);
     }
 
 }

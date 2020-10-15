@@ -85,7 +85,7 @@ public class PhotoPreview : MonoBehaviour
     // Reject the captured photo and restart photo capture flow
     public void OnRetakeButtonPress()
     {
-        this.RetakeCapturedPhotoDelegate();
+        //TODOthis.RetakeCapturedPhotoDelegate();
     }
 
     // Set the text of the confirmation message of this preview modal

@@ -142,6 +142,7 @@ public class GameManager : MonoBehaviour
         this.MenuManager.UpdateNotes(guest, this.User.Notes);
 
         Persistence.SaveUser(this.User);
+        Persistence.SavePhoto(guest, photo);
     }
 
     // Save the current user data before closing the application
