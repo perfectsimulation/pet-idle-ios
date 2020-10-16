@@ -17,6 +17,7 @@ public class Notes
         // Construct the dictionary with guests as keys and new notes as values
         foreach (Guest guest in DataInitializer.AllGuests)
         {
+            // Add a dictionary entry with a new note for this guest
             this.GuestNotes.Add(guest.Name, new Note(guest));
         }
 
@@ -53,6 +54,21 @@ public class Notes
         }
     }
 
+    // Assign photos after loading them in game manager
+    public void HydratePhotos(Photos[] photosArray)
+    {
+        // Assign each Photos to the guest it belongs to
+        foreach (Photos photos in photosArray)
+        {
+            // Get the note for this guest
+            Note note = (Note)this.GuestNotes[(object)photos.GuestName];
+
+            // Set the Photos of the note
+            note.SetPhotos(photos);
+        }
+
+    }
+
     // Increment the visit count of this guest when it departs
     public void UpdateVisitCount(SlotGuest slotGuest)
     {
@@ -61,12 +77,6 @@ public class Notes
 
         // Do not continue if there was an issue getting the note
         if (note == null) return;
-
-        // If this was the first visit, change the image asset for this note
-        if (note.VisitCount == 0)
-        {
-            note.SetImagePath(DataInitializer.UnsightedGuestImageAsset);
-        }
 
         // Check if this is the first sighting of this guest
         this.CheckForFirstSighting(note, slotGuest);
@@ -149,11 +159,11 @@ public class Note
     public Note(Guest guest)
     {
         this.Guest = guest;
-        this.ImagePath = "";
+        this.ImagePath = DataInitializer.UnsightedGuestImageAsset;
         this.HasBeenSighted = false;
         this.VisitCount = 0;
         this.FriendshipPoints = 0;
-        this.Photos = new Photos();
+        this.Photos = new Photos(guest.Name);
     }
 
     /* Create Note from save data */
@@ -164,11 +174,22 @@ public class Note
         this.HasBeenSighted = serializedNote.HasBeenSighted;
         this.VisitCount = serializedNote.VisitCount;
         this.FriendshipPoints = serializedNote.FriendshipPoints;
-        //TODO load photos from local save data
-        this.Photos = new Photos();
+        this.Photos = new Photos(serializedNote.Guest.Name);
     }
 
-    // Change the image asset used for this note in notes content
+    // Set the Photos for this note
+    public void SetPhotos(Photos photos)
+    {
+        this.Photos = photos;
+    }
+
+    // Add a photo to Photos
+    public void AddPhoto(Photo photo)
+    {
+        this.Photos.Add(photo);
+    }
+
+    // Set the image asset path used for this note
     public void SetImagePath(string imagePath)
     {
         this.ImagePath = imagePath;
@@ -190,12 +211,6 @@ public class Note
     public void AddFriendshipPoints(int friendshipPointReward)
     {
         this.FriendshipPoints += friendshipPointReward;
-    }
-
-    // Add a photo to photos
-    public void AddPhoto(Photo photo)
-    {
-        this.Photos.Add(photo);
     }
 
 }

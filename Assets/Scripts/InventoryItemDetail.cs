@@ -32,7 +32,7 @@ public class InventoryItemDetail : MonoBehaviour
         // TODO add description field to item
 
         this.Title.SetText(title);
-        this.Image.sprite = ImageUtility.CreateSpriteFromPng(imagePath, 128, 128);
+        this.Image.sprite = ImageUtility.CreateSprite(imagePath);
     }
 
     // Assign item placement delegate from menu manager

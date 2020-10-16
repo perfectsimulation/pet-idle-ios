@@ -28,8 +28,8 @@ public class NoteDetail : MonoBehaviour
         string natureText = "Nature: " + guest.Nature;
 
         this.Name.SetText(name);
-        this.GuestImage.sprite = ImageUtility.CreateSpriteFromPng(guestImagePath, 128, 128);
-        this.FriendshipImage.sprite = ImageUtility.CreateSpriteFromPng(heartImagePath, 128, 128);
+        this.GuestImage.sprite = ImageUtility.CreateSprite(guestImagePath);
+        this.FriendshipImage.sprite = ImageUtility.CreateSprite(heartImagePath);
         this.VisitCountText.SetText(visitText);
         this.NatureText.SetText(natureText);
     }
@@ -44,8 +44,8 @@ public class NoteDetail : MonoBehaviour
         string natureText = "Nature: " + guest.Nature;
 
         this.Name.SetText(name);
-        this.GuestImage.sprite = ImageUtility.CreateSpriteFromPng(guestImagePath, 128, 128);
-        this.FriendshipImage.sprite = ImageUtility.CreateSpriteFromPng(heartImagePath, 128, 128);
+        this.GuestImage.sprite = ImageUtility.CreateSprite(guestImagePath);
+        this.FriendshipImage.sprite = ImageUtility.CreateSprite(heartImagePath);
         this.VisitCountText.SetText(visitText);
         this.NatureText.SetText(natureText);
     }

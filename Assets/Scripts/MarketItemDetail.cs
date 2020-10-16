@@ -50,7 +50,7 @@ public class MarketItemDetail : MonoBehaviour
         // TODO add description field to item
 
         this.Title.SetText(title);
-        this.Image.sprite = ImageUtility.CreateSpriteFromPng(imagePath, 128, 128);
+        this.Image.sprite = ImageUtility.CreateSprite(imagePath);
 
         // Set up purchase attempt outcome modals
         this.HydrateNeedFunds();

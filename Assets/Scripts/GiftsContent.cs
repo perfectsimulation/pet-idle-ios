@@ -192,7 +192,7 @@ public class GiftsContent : MonoBehaviour
             giftButton.SetGuest(gift.Guest);
             giftButton.SetGuestName(gift.Guest.Name);
             giftButton.SetGuestImage(this.GetGiftButtonGuestSprite(gift.Guest));
-            giftButton.SetItemImage(ImageUtility.CreateSpriteFromPng(gift.Item.ImageAssetPath, 128, 128));
+            giftButton.SetItemImage(ImageUtility.CreateSprite(gift.Item.ImageAssetPath));
             giftButton.SetCoinText(gift.Coins);
             giftButton.SetFriendshipText(gift.FriendshipPoints);
 
@@ -247,11 +247,11 @@ public class GiftsContent : MonoBehaviour
         // Use guest image asset if guest has been seen at least once
         if (this.SightedGuestNames.Contains(guest.Name))
         {
-            return ImageUtility.CreateSpriteFromPng(guest.ImageAssetPath, 128, 128);
+            return ImageUtility.CreateSprite(guest.ImageAssetPath);
         }
 
         // Use unsighted guest image asset if guest has never before been seen
-        return ImageUtility.CreateSpriteFromPng(DataInitializer.UnsightedGuestImageAsset, 128, 128);
+        return ImageUtility.CreateSprite(DataInitializer.UnsightedGuestImageAsset);
     }
 
     // Save friendship reward for each guest

@@ -177,7 +177,7 @@ public class MarketContent : MonoBehaviour
                 if (image.gameObject.GetInstanceID() != prefabObject.GetInstanceID())
                 {
                     // Create and set item image sprite on the child of this new item button
-                    image.sprite = ImageUtility.CreateSpriteFromPng(item.ImageAssetPath, 128, 128);
+                    image.sprite = ImageUtility.CreateSprite(item.ImageAssetPath);
                 }
             }
 

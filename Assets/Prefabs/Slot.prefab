@@ -204,5 +204,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e09f1f44172843ae97dbf2db0786da2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Image: {fileID: 8925424965260359812}
+  SlotImage: {fileID: 8925424965260359812}
   ValidSelectionIndicator: {fileID: 2991896364459639709}

@@ -1,42 +1,55 @@
-﻿using System.IO;
+﻿using IOUtility;
 using UnityEngine;
 
 public static class ImageUtility
 {
-    // Create a Texture2D from the png found with the image asset pathname
-    public static Texture2D CreateTexture2DFromPng(
-        string imageAssetPath,
-        int width,
-        int height)
+    // Create a Texture2D from the image file at this streaming asset path
+    public static Texture2D CreateTexture(string streamingAssetPath)
     {
-        Texture2D texture2d = new Texture2D(width, height, TextureFormat.RGBA32, false);
-        string fullAssetPath = Persistence.GetAbsoluteAssetPath(imageAssetPath);
+        // Initialize a new texture
+        Texture2D texture = new Texture2D(2, 2);
 
-        if (Persistence.DoesFileExistAtPath(fullAssetPath))
-        {
-            byte[] imageFileData = File.ReadAllBytes(fullAssetPath);
-            texture2d.LoadImage(imageFileData);
-        }
+        // Get the path to the streaming asset for this image
+        string path = Paths.StreamingAssetFile(streamingAssetPath);
 
-        return texture2d;
+        // Load the encoded image
+        byte[] bytes = Load.AsBytes(path);
+
+        // Replace texture contents with encoded image byte data
+        ImageConversion.LoadImage(texture, bytes);
+
+        return texture;
     }
 
-    // Create a sprite from the png found with the image asset pathname
-    public static Sprite CreateSpriteFromPng(
-        string imageAssetPath,
-        int width,
-        int height)
+    // Create a Sprite from the image file at this streaming asset path
+    public static Sprite CreateSprite(string streamingAssetPath)
     {
-        // Create a Texture2D from the png designated by the asset path
-        Texture2D texture2d = CreateTexture2DFromPng(imageAssetPath, width, height);
+        // Create a Texture2D from the image file at this streaming asset path
+        Texture2D texture = CreateTexture(streamingAssetPath);
 
-        // Use the following default properties
-        Rect rect = new Rect(0.0f, 0.0f, texture2d.width, texture2d.height);
-        Vector2 pivot = new Vector2(0.5f, 0.5f);
-        float pixelsPerUnit = 100f;
+        // Create a rect to use for the area of the new sprite
+        Rect spriteArea = new Rect(0, 0, texture.width, texture.height);
 
-        // Create a sprite
-        Sprite sprite = Sprite.Create(texture2d, rect, pivot, pixelsPerUnit);
+        // Use center alignment for the pivot of the new sprite
+        Vector2 pivot = Vector2.one / 2f;
+
+        // Create the sprite using the newly generated texture
+        Sprite sprite = Sprite.Create(texture, spriteArea, pivot);
+
+        return sprite;
+    }
+
+    // Create a Sprite from this texture
+    public static Sprite CreateSprite(Texture2D texture)
+    {
+        // Create a rect to use for the area of the new sprite
+        Rect spriteArea = new Rect(0, 0, texture.width, texture.height);
+
+        // Use center alignment for the pivot of the new sprite
+        Vector2 pivot = Vector2.one / 2f;
+
+        // Create the sprite using the newly generated texture
+        Sprite sprite = Sprite.Create(texture, spriteArea, pivot);
 
         return sprite;
     }

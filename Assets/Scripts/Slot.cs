@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using IOUtility;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class Slot : MonoBehaviour
 {
     public SlotItem SlotItem;
     public SlotGuest SlotGuest;
-    public Image Image;
+    public Image SlotImage;
     public GameObject ValidSelectionIndicator;
 
     // The slot button component
@@ -49,7 +50,7 @@ public class Slot : MonoBehaviour
     // Remove the sprite of this slot
     public void Hide()
     {
-        this.RemoveImageSprite();
+        this.RemoveSlotSprite();
     }
 
     // Assign save visit delegate from active biome
@@ -106,8 +107,8 @@ public class Slot : MonoBehaviour
     {
         this.SlotItem = new SlotItem(item);
 
-        // Set image sprite of item with the png designated by its image asset pathname
-        this.SetImageSprite(item.ImageAssetPath, 256, 256);
+        // Set sprite using the image at the streaming asset path of the item
+        this.SetSlotSprite(item.ImageAssetPath);
 
         // Select and initialize a guest to visit the newly placed item
         Guest guest = this.SelectNewGuestDelegate(item);
@@ -123,8 +124,8 @@ public class Slot : MonoBehaviour
         // Create an item from the serialized item
         this.SlotItem = new SlotItem(serializedItem);
 
-        // Set image sprite of item with the png designated by its image asset pathname
-        this.SetImageSprite(serializedItem.ImageAssetPath, 256, 256);
+        // Set sprite using the image at the streaming asset path of the item
+        this.SetSlotSprite(serializedItem.ImageAssetPath);
     }
 
     // Remove the item from this slot along with its guest
@@ -134,7 +135,7 @@ public class Slot : MonoBehaviour
         this.RemoveGuest();
 
         // Reset the image sprite
-        this.RemoveImageSprite();
+        this.RemoveSlotSprite();
 
         // Remove the slot item
         this.SlotItem.RemoveItem();
@@ -159,7 +160,7 @@ public class Slot : MonoBehaviour
     // Show indicator for item placement
     public void ValidateItemPlacementEligibility()
     {
-        // All slots are eligible for item placement
+        // All slots are eligible for item placement by default
         // TODO maybe implement multi-slot items?
         this.SlotButton.interactable = true;
         this.ShowValidSelection();
@@ -200,8 +201,8 @@ public class Slot : MonoBehaviour
         // Check if there is currently a guest in the active biome
         if (this.SlotGuest.IsVisiting())
         {
-            // Set item guest interaction image in slot
-            this.SetInteractionImageSprite();
+            // Show item-guest interaction
+            this.SetInteractionSprite();
         }
 
         // Remove the guest if it has departed
@@ -223,8 +224,11 @@ public class Slot : MonoBehaviour
     // Remove the guest from this slot and save its gift in the game manager
     private void RemoveGuest()
     {
-        // Reset the image sprite to show the item alone
-        this.SetImageSprite(this.SlotItem.Item.ImageAssetPath, 256, 256);
+        // Do not continue if there is already no guest in this slot
+        if (this.SlotGuest.Guest == null) return;
+
+        // Reset the slot image to show the item alone
+        this.SetSlotSprite(this.SlotItem.Item.ImageAssetPath);
 
         // Tell active biome to remove the departing guest from the guest list
         this.RemoveDepartingGuestDelegate(this.SlotGuest.Guest);
@@ -252,34 +256,35 @@ public class Slot : MonoBehaviour
         // TODO add onClick listener to open guest summary if it is visiting
     }
 
-    // Set the image sprite to an item-guest pair interaction asset
-    private void SetInteractionImageSprite()
+    // Set the sprite of the slot image to show the item-guest pair interaction
+    private void SetInteractionSprite()
     {
-        // Construct the name of the asset from item-guest pair
-        string interactionAssetName = string.Format(
+        // Construct the name of the image file to locate in streaming assets
+        string interactionFileName = string.Format(
             "Images/Interactions/{0}-{1}.png",
             this.SlotGuest.Guest.Name.ToLower(),
             this.SlotItem.Item.Name.ToLower());
 
-        // Get the absolute path to the asset
-        string interactionAssetPath = Persistence.GetAbsoluteAssetPath(interactionAssetName);
+        // Get the path to the streaming asset for this interaction image
+        string interactionFilePath = Paths.StreamingAssetFile(interactionFileName);
 
-        // Set the image sprite to use this interaction asset
-        this.SetImageSprite(interactionAssetPath, 256, 256);
+        // Set the sprite of the slot to show the image at this path
+        this.SetSlotSprite(interactionFilePath);
     }
 
-    // Set the sprite and make the image fully opaque
-    private void SetImageSprite(string imageAssetPath, int width, int height)
+    // Set the sprite of the slot image to show the image at this path
+    private void SetSlotSprite(string imageAssetPath)
     {
-        this.Image.color = Color.white;
-        this.Image.sprite = ImageUtility.CreateSpriteFromPng(imageAssetPath, width, height);
+        // Make sure the slot image is fully opaque
+        this.SlotImage.color = Color.white;
+        this.SlotImage.sprite = ImageUtility.CreateSprite(imageAssetPath);
     }
 
-    // Remove the sprite and make image fully transparent
-    private void RemoveImageSprite()
+    // Remove the sprite of the slot image and make it fully transparent
+    private void RemoveSlotSprite()
     {
-        this.Image.color = Color.clear;
-        this.Image.sprite = null;
+        this.SlotImage.color = Color.clear;
+        this.SlotImage.sprite = null;
     }
 
 }

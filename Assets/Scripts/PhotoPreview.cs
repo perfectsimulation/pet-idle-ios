@@ -68,8 +68,8 @@ public class PhotoPreview : MonoBehaviour
     // Create the photo image sprite from the newly generated texture
     public void CreatePhoto(Texture2D texture)
     {
-        // Create a sprite to show in the photo image component
-        this.CreateSprite(texture);
+        // Show photo as a sprite in the photo image component
+        this.SetPreviewSprite(texture);
 
         // Create a photo with the newly generated texture
         this.Photo = new Photo(texture);
@@ -95,28 +95,14 @@ public class PhotoPreview : MonoBehaviour
         this.SaveText.text = text;
     }
 
-    // Use the newly created sprite in this photo image component
-    private void SetPreviewSprite(Sprite sprite)
+    // Create and set a sprite in the photo image component using this texture
+    private void SetPreviewSprite(Texture2D texture)
     {
+        // Create the sprite using this texture
+        Sprite sprite = ImageUtility.CreateSprite(texture);
+
+        // Set the sprite of the photo image component
         this.PhotoImage.sprite = sprite;
-    }
-
-    private void CreateSprite(Texture2D texture)
-    {
-        // Create a rect to use for the area of the new sprite
-        Rect spriteArea = new Rect(0, 0, texture.width, texture.height);
-
-        // Use center alignment for the pivot of the new sprite
-        Vector2 pivot = Vector2.one / 2f;
-
-        // Set pixels per unit of the new sprite
-        float pixelDensity = 100f;
-
-        // Create the sprite using the newly generated texture
-        Sprite sprite = Sprite.Create(texture, spriteArea, pivot, pixelDensity);
-
-        // Use the new sprite in the photo image component
-        this.SetPreviewSprite(sprite);
     }
 
 }

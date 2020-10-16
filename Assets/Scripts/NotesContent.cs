@@ -137,7 +137,7 @@ public class NotesContent : MonoBehaviour
                 if (image.gameObject.GetInstanceID() != prefabObject.GetInstanceID())
                 {
                     // Create and set guest image sprite of this new guest button
-                    image.sprite = ImageUtility.CreateSpriteFromPng(note.ImagePath, 128, 128);
+                    image.sprite = ImageUtility.CreateSprite(note.ImagePath);
                 }
             }
 
@@ -187,7 +187,7 @@ public class NotesContent : MonoBehaviour
             if (image.gameObject.GetInstanceID() != noteButton.GetInstanceID())
             {
                 // Create and set guest image sprite of this new guest button
-                image.sprite = ImageUtility.CreateSpriteFromPng(note.ImagePath, 128, 128);
+                image.sprite = ImageUtility.CreateSprite(note.ImagePath);
             }
         }
 

@@ -1,5 +1,5 @@
-﻿using System.IO;
-using UnityEngine;
+﻿using IOUtility;
+using System.Collections.Generic;
 
 public static class Persistence
 {
@@ -10,48 +10,36 @@ public static class Persistence
     //  | |_| \__ \  __/ |
     //   \___/|___/\___|_|
 
-    /* User data file location */
-    private static string UserDataPath
-    {
-        get
-        {
-            if (Application.isMobilePlatform)
-            {
-                return Application.persistentDataPath + "/UserData.json";
-            }
-
-            // Debug purposes
-            return "UserData.json";
-        }
-    }
-
-    /* Serialize the user and save data locally */
+    /* Serialize the user and save as a json file */
     public static void SaveUser(User user)
     {
         // Serialize the user
-        string userDataJson = StringUtility.ToJson(new SerializedUser(user));
+        SerializedUser serializedUser = new SerializedUser(user);
 
-        // Write to local file
-        File.WriteAllText(UserDataPath, userDataJson);
-        Debug.Log("Saved user");
+        // Save serialized user to local file
+        Save.AsTxt(Paths.UserData, serializedUser);
+
+        // TODO remove debug log
+        UnityEngine.Debug.Log("Saved user");
     }
 
     /* Get deserialized user from local save data or create a new user */
     public static User LoadUser()
     {
         // Initialize a new user when no local save data exists
-        if (!DoesFileExistAtPath(UserDataPath))
+        if (!PathUtility.Exists(Paths.UserData))
         {
-            Debug.Log("No local user data. Created new user");
+            UnityEngine.Debug.Log("No local user data. Created new user");
             return CreateUser();
         }
 
-        Debug.Log("Loaded user");
+        // Load raw user data
+        string userDataJson = Load.AsTxt(Paths.UserData);
 
-        // Read contents of existing local user data json
-        string userDataJson = File.ReadAllText(UserDataPath);
+        // TODO remove debug log
+        UnityEngine.Debug.Log("Loaded user");
 
-        // Get a serialized user from the user data json
+        // Construct the serialized user from the raw user data
         SerializedUser userData =
             StringUtility.FromJson<SerializedUser>(userDataJson);
 
@@ -81,85 +69,59 @@ public static class Persistence
     //  | |   | | | | (_) | || (_) \__ \
     //  \_|   |_| |_|\___/ \__\___/|___/
 
-    /* Photos root file directory */
-    private static string PhotosRootPath
-    {
-        get
-        {
-            if (Application.isMobilePlatform)
-            {
-                return Application.persistentDataPath + "/Photos";
-            }
-
-            // Debug purposes
-            return "Persistence/Photos";
-        }
-    }
-
-    /* Serialize the photo and save data locally */
+    /* Serialize the photo and save it locally to a png file */
     public static void SavePhoto(Guest guest, Photo photo)
     {
-        // Get the pathname for the local photo file
-        string photoPath = GetGuestPhotoFilePath(guest, photo);
+        // Get the path to the local photo file
+        string photoPath = Paths.GuestPhotoFile(guest.Name, photo);
 
         // Do not continue if the photo has already been saved
-        if (DoesFileExistAtPath(photoPath)) return;
+        if (PathUtility.Exists(photoPath)) return;
 
-        // Encode the photo as a PNG byte array
-        SerializedPhoto serializedPhoto = new SerializedPhoto(photo);
+        // Save photo to local file
+        Save.AsBytes(photoPath, photo.Bytes);
+    }
 
-        // Write to local file
-        File.WriteAllBytes(photoPath, serializedPhoto.Bytes);
+    /* Load and decode all saved photos */
+    public static Photos[] LoadPhotos()
+    {
+        // Initialize a list of Photos
+        List<Photos> photosList = new List<Photos>();
+        photosList.Capacity = DataInitializer.AllGuests.Length;
+
+        // Create a Photos element for each guest
+        foreach (Guest guest in DataInitializer.AllGuests)
+        {
+            // Get the path to the photo directory of this guest
+            string directory = Paths.GuestPhotoDirectory(guest.Name);
+
+            // Get all the encoded image files in this photo directory
+            List<byte[]> images = PathUtility.GetPngFilesInDirectory(directory);
+
+            // Create a Photos with all the image files
+            Photos photos = new Photos(guest.Name, images);
+
+            // Add the Photos of this guest to the list of all Photos
+            photosList.Add(photos);
+        }
+
+        // Return all the Photos for each guest as an array
+        return photosList.ToArray();
     }
 
     /* Create a photo directory for each guest */
     private static void InitializePhotoDirectories()
     {
-        // Create a directory for each guest in which its photos are saved
+        // Create a directory for each guest where its photos are saved
         foreach (Guest guest in DataInitializer.AllGuests)
         {
             // Get the path to use for the new directory
-            string path = GetGuestPhotoDirectory(guest);
+            string photoDirectoryPath = Paths.GuestPhotoDirectory(guest.Name);
 
-            // Get the directory info for this path
-            DirectoryInfo directory = new DirectoryInfo(path);
-
-            // Create the new directory
-            directory.Create();
+            // Create the new directory at this path
+            PathUtility.CreateDirectory(photoDirectoryPath);
         }
 
-    }
-
-    //   _   _ _   _ _ _ _   _
-    //  | | | | | (_) (_) | (_)
-    //  | | | | |_ _| |_| |_ _  ___  ___
-    //  | | | | __| | | | __| |/ _ \/ __|
-    //  | |_| | |_| | | | |_| |  __/\__ \
-    //   \___/ \__|_|_|_|\__|_|\___||___/
-
-    /* Check if a local file exists at the provided path */
-    public static bool DoesFileExistAtPath(string path)
-    {
-        return File.Exists(path);
-    }
-
-    /* Get the full path to the streaming asset */
-    public static string GetAbsoluteAssetPath(string assetPath)
-    {
-        return Path.Combine(Application.streamingAssetsPath, assetPath);
-    }
-
-    /* Get the path to the directory containing all photos of this guest */
-    private static string GetGuestPhotoDirectory(Guest guest)
-    {
-        return Path.Combine(PhotosRootPath, guest.Name);
-    }
-
-    /* Get the full path to the guest photo */
-    private static string GetGuestPhotoFilePath(Guest guest, Photo photo)
-    {
-        string fileName = photo.ID + ".png";
-        return Path.Combine(PhotosRootPath, guest.Name, fileName);
     }
 
 }

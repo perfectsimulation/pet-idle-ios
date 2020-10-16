@@ -8,13 +8,14 @@ public class GameManager : MonoBehaviour
     // User
     private User User;
 
-    // Load user data from local persistence
+    // Load all game data
     void Awake()
     {
         this.User = Persistence.LoadUser();
+        this.User.Notes.HydratePhotos(Persistence.LoadPhotos());
     }
 
-    // Provide other scripts with user data and initialize their parameters
+    // Provide other scripts with game data and initialize their parameters
     void Start()
     {
         // Give the coin balance to the menu manager
