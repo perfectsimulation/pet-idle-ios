@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour
         // Give the photo preview of photos content a callback to save photos
         this.MenuManager.SetupSavePhotoDelegate(this.SavePhoto);
 
-        // Give the active biome state loaded from user data to the active biome
+        // Give the active biome state of user data to the active biome
         this.MenuManager.SetupBiome(this.User.ActiveBiome);
     }
 

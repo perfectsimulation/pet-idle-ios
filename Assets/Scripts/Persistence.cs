@@ -95,11 +95,14 @@ public static class Persistence
             // Get the path to the photo directory of this guest
             string directory = Paths.GuestPhotoDirectory(guest.Name);
 
+            // Get all the image file names in this photo directory
+            string[] fileNames = PathUtility.GetFileNamesInDirectory(directory);
+
             // Get all the encoded image files in this photo directory
             List<byte[]> images = PathUtility.GetPngFilesInDirectory(directory);
 
             // Create a Photos with all the image files
-            Photos photos = new Photos(guest.Name, images);
+            Photos photos = new Photos(guest.Name, images, fileNames);
 
             // Add the Photos of this guest to the list of all Photos
             photosList.Add(photos);

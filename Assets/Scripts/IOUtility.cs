@@ -43,11 +43,10 @@ namespace IOUtility
             return Path.Combine(PhotosDirectory, guestName);
         }
 
-        /* Get the path to the guest photo png file */
+        /* Get the path to the guest photo file */
         public static string GuestPhotoFile(string guestName, Photo photo)
         {
-            string fileName = photo.ID + ".png";
-            return Path.Combine(GuestPhotoDirectory(guestName), fileName);
+            return Path.Combine(GuestPhotoDirectory(guestName), photo.ID);
         }
 
         /* Get the path to the streaming asset */
@@ -74,6 +73,31 @@ namespace IOUtility
             Directory.CreateDirectory(path);
         }
 
+        /* Get all the file names in the directory at this path */
+        public static string[] GetFileNamesInDirectory(string path)
+        {
+            // Initialize a string list for all the file names
+            List<string> fileNames = new List<string>();
+
+            // Return empty array if the directory does not exist
+            if (!Exists(path)) return fileNames.ToArray();
+
+            // Get all the file paths in this directory
+            IEnumerable<string> filePaths = Directory.EnumerateFiles(path);
+
+            // Get the file name and extension of each file path
+            foreach (string filePath in filePaths)
+            {
+                string fileName = Path.GetFileName(filePath);
+
+                // Add the file name to the list of file names
+                fileNames.Add(fileName);
+            }
+
+            // Return the array of file names
+            return fileNames.ToArray();
+        }
+
         /* Get all the png files in the directory at this path */
         public static List<byte[]> GetPngFilesInDirectory(string path)
         {
@@ -83,7 +107,7 @@ namespace IOUtility
             // Return empty list if the directory does not exist
             if (!Exists(path)) return imageFiles;
 
-            // Get the names of all files with a png extension in this directory
+            // Get the paths of all files with a png extension in this directory
             string png = "*.png";
             IEnumerable<string> filePaths = Directory.EnumerateFiles(path, png);
 

@@ -85,6 +85,7 @@ GameObject:
   - component: {fileID: 5066262516839223468}
   - component: {fileID: 8269972486846859761}
   - component: {fileID: 3308730833873669448}
+  - component: {fileID: 5282475625303513284}
   m_Layer: 5
   m_Name: PhotoButton
   m_TagString: Untagged
@@ -191,3 +192,17 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &5282475625303513284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8874827192205404502}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b0f364cadc1c45d6959d6fe6162847f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Image: {fileID: 8098165850053638046}
+  Button: {fileID: 3308730833873669448}

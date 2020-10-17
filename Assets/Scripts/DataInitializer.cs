@@ -28,7 +28,7 @@ public static class DataInitializer
     };
 
     /* Friendship level thresholds for all Guests */
-    public static int[] FriendshipLevelThresholds = { 50, 100, 200, 300, 400, 500, 700 };
+    public static int[] FriendshipThresholds = { 50, 100, 200, 300, 400, 500, 700 };
 
     /* Image asset for guests who have visited, but have not yet been seen in the active biome */
     public static string UnsightedGuestImageAsset = "Images/Hamsters/unknown.png";

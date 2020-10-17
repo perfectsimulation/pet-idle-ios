@@ -101,6 +101,7 @@ public class GiftsContent : MonoBehaviour
     // Called when a guest departs to add its gift to the gifts content
     public void AddGift(Gift gift)
     {
+        // TODO add gift to gifts
         // Reset unclaimed coin credit
         this.UnclaimedCoinCredit = this.Gifts.GetTotalCoins();
 
@@ -217,6 +218,7 @@ public class GiftsContent : MonoBehaviour
             Destroy(giftButton);
         }
 
+        // Clear the list of instantiated clones
         this.InstantiatedPrefabs.Clear();
 
     }

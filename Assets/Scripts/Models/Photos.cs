@@ -14,19 +14,19 @@ public class Photos
     }
 
     /* Create Photos from save data */
-    public Photos(string guestName, List<byte[]> imageFiles)
+    public Photos(string guestName, List<byte[]> images, string[] fileNames)
     {
         this.GuestName = guestName;
 
         // Initialize a new photo list
         this.PhotoList = new List<Photo>();
-        this.PhotoList.Capacity = imageFiles.Count;
+        this.PhotoList.Capacity = images.Count;
 
-        // Decode and and add each image to the photo list
-        foreach (byte[] imageFile in imageFiles)
+        // Decode and add each image to the photo list
+        for (int i = 0; i < images.Count; i++)
         {
             // Decode image file into a photo
-            Photo photo = new Photo(imageFile);
+            Photo photo = new Photo(images[i], fileNames[i]);
 
             // Add photo to photo list
             this.PhotoList.Add(photo);
@@ -68,8 +68,8 @@ public class Photos
 
 public class Photo
 {
-    public Texture2D Texture;
     public string ID;
+    public Texture2D Texture;
     public byte[] Bytes
     {
         get
@@ -86,26 +86,31 @@ public class Photo
     /* Create Photo from texture */
     public Photo(Texture2D texture)
     {
+        this.ID = this.GenerateFileName();
         this.Texture = texture;
-        this.ID = this.GenerateID();
     }
 
     /* Create Photo from save data */
-    public Photo(byte[] bytes)
+    public Photo(byte[] bytes, string fileName)
     {
+        // Use the file name for the ID
+        this.ID = fileName;
+
         // Initialize a new texture
         this.Texture = new Texture2D(2, 2);
-        this.ID = this.GenerateID();
 
         // Replace texture contents with encoded image byte data
         ImageConversion.LoadImage(this.Texture, bytes);
     }
 
-    // Generate filename for persisting this photo
-    private string GenerateID()
+    // Generate file name for persisting this photo
+    private string GenerateFileName()
     {
-        // Return string value of the current datetime
-        return System.DateTime.Now.ToString("ddMMyyyyHHmmss");
+        // Append png extension to current datetime string
+        string id = string.Format("{0}.png",
+            System.DateTime.Now.ToString("ddMMyyyyHHmmss"));
+
+        return id;
     }
 
 }

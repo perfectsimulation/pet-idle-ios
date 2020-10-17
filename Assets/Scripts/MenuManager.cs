@@ -56,7 +56,7 @@ public class MenuManager : MonoBehaviour
         // Assign market item detail to market content
         this.MarketContent.SetupItemDetail(this.MarketItemDetail);
 
-        // Assign open market item detail to market content
+        // Assign open market item detail delegate to market content
         this.MarketContent.SetupOpenItemDetailDelegate(this.FocusMarketItemDetail);
 
         // Assign open need funds delegate to market item detail
@@ -71,13 +71,19 @@ public class MenuManager : MonoBehaviour
         // Assign note detail to notes content
         this.NotesContent.SetupNoteDetail(this.NoteDetail);
 
-        // Assign open note detail to notes content
+        // Assign open note detail delegate to notes content
         this.NotesContent.SetupOpenNoteDetailDelegate(this.FocusNoteDetail);
+
+        // Assign hydrate photos delegate to notes content
+        this.NotesContent.SetupHydratePhotosDelegate(this.HydratePhotos);
+
+        // Assign open photos delegate to note detail through notes content
+        this.NotesContent.SetupOpenPhotosDelegate(this.FocusPhotosMenu);
 
         // Assign photo detail to photos content
         this.PhotosContent.SetupPhotoDetail(this.PhotoDetail);
 
-        // Assign open photo detail to photos content
+        // Assign open photo detail delegate to photos content
         this.PhotosContent.SetupOpenPhotoDetailDelegate(this.FocusPhotoDetail);
 
         // Assign set photo slot delegate to active biome
@@ -86,7 +92,7 @@ public class MenuManager : MonoBehaviour
         // Assign photo preview to photo capture
         this.PhotoCapture.SetupPhotoPreview(this.PhotoPreview);
 
-        // Assign open photo preview to photo capture
+        // Assign open photo preview delegate to photo capture
         this.PhotoCapture.SetupOpenPhotoPreviewDelegate(this.FocusPhotoPreview);
     }
 
@@ -120,6 +126,12 @@ public class MenuManager : MonoBehaviour
     public void HydrateGifts(Gifts gifts)
     {
         this.GiftsContent.HydrateGifts(gifts);
+    }
+
+    // Assign photos to photos content from notes content
+    public void HydratePhotos(Photos photos)
+    {
+        this.PhotosContent.HydratePhotos(photos);
     }
 
     // Assign purchase item delegate to market content from game manager
@@ -409,8 +421,8 @@ public class MenuManager : MonoBehaviour
         // Move tap out to close button behind the photo detail panel
         this.PrepareTapOutToClose(this.PhotoDetail.gameObject);
 
-        // Set listener of close buttons to focus the photos menu
-        this.SetCloseButtonListener(this.FocusPhotosMenu);
+        // Set listener of close buttons to hide the photo detail
+        this.SetCloseButtonListener(this.PhotoDetail.Hide);
 
         // Remove the highlighted state on the photo button
         EventSystem.current.SetSelectedGameObject(null);

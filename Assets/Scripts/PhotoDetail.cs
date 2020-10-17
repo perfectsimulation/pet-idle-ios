@@ -2,5 +2,14 @@
 
 public class PhotoDetail : MonoBehaviour
 {
-    // TODO
+    public void Hide()
+    {
+        this.gameObject.SetActive(false);
+    }
+
+    public void DeletePhoto()
+    {
+        // TODO implement delete photo
+    }
+
 }

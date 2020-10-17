@@ -29,6 +29,11 @@ public class NotesContent : MonoBehaviour
     public delegate void NoteDetailDelegate();
     private NoteDetailDelegate OpenNoteDetailDelegate;
 
+    // Delegate to hydrate photos from menu manager
+    [HideInInspector]
+    public delegate void HydratePhotosDelegate(Photos photos);
+    private HydratePhotosDelegate HydratePhotosContentDelegate;
+
     void Awake()
     {
         // Cache components to layout prefabs after receiving data from game manager
@@ -46,6 +51,18 @@ public class NotesContent : MonoBehaviour
     public void SetupOpenNoteDetailDelegate(NoteDetailDelegate callback)
     {
         this.OpenNoteDetailDelegate = callback;
+    }
+
+    // Assign hydrate photos delegate to note detail from menu manager
+    public void SetupHydratePhotosDelegate(HydratePhotosDelegate callback)
+    {
+        this.HydratePhotosContentDelegate = callback;
+    }
+
+    // Assign open photos menu delegate to note detail from menu manager
+    public void SetupOpenPhotosDelegate(NoteDetail.PhotosMenuDelegate callback)
+    {
+        this.NoteDetail.SetupOpenPhotosMenuDelegate(callback);
     }
 
     // Assign notes to notes content
@@ -115,14 +132,14 @@ public class NotesContent : MonoBehaviour
         foreach (DictionaryEntry guestNote in this.Notes.GuestNotes)
         {
             Note note = (Note)guestNote.Value;
-            Guest guest = note.Guest;
 
             // Instantiate the prefab clone with this as the parent
             prefabObject = Instantiate(this.Prefab, this.transform);
 
             // TODO Set custom properties dependent on the note
-            prefabObject.name = guest.Name;
+            prefabObject.name = note.Guest.Name;
 
+            // TODO implement note button script
             // Get all the image components on the note button prefab
             Image[] images = prefabObject.GetComponentsInChildren<Image>();
 
@@ -147,8 +164,8 @@ public class NotesContent : MonoBehaviour
             // Null check for name text component
             if (nameText == null) continue;
 
-            // Set guest name to name text component
-            nameText.text = guest.Name;
+            // Set name text to guest name
+            nameText.text = note.Guest.Name;
 
             // Get the button component on the note button prefab
             Button button = prefabObject.GetComponent<Button>();
@@ -160,10 +177,10 @@ public class NotesContent : MonoBehaviour
             button.interactable = note.VisitCount > 0;
 
             // Set onClick of the new note button with the delegate passed down from game manager
-            button.onClick.AddListener(() => this.OnNoteButtonPress(guest, note));
+            button.onClick.AddListener(() => this.OnNoteButtonPress(note));
 
             // Add the new note button to the dictionary of instantiated prefabs
-            this.InstantiatedPrefabs.Add(guest.Name, prefabObject);
+            this.InstantiatedPrefabs.Add(note.Guest.Name, prefabObject);
         }
 
     }
@@ -201,10 +218,16 @@ public class NotesContent : MonoBehaviour
         button.interactable = note.VisitCount > 0;
     }
 
-    // Open the note detail panel and hydrate it with the note of the pressed button
-    private void OnNoteButtonPress(Guest guest, Note note)
+    // Hydrate and open the note detail panel with the selected note
+    private void OnNoteButtonPress(Note note)
     {
-        this.NoteDetail.Hydrate(guest, note);
+        // Hydrate note detail with the note
+        this.NoteDetail.Hydrate(note);
+
+        // Hydrate photos content of photos menu from menu manager
+        this.HydratePhotosContentDelegate(note.Photos);
+
+        // Open the note detail from menu manager
         this.OpenNoteDetailDelegate();
     }
 
