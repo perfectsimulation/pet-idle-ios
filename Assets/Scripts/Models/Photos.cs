@@ -58,6 +58,12 @@ public class Photos
         this.PhotoList.Add(photo);
     }
 
+    // Remove the photo from the photo list
+    public void Remove(Photo photo)
+    {
+        this.PhotoList.Remove(photo);
+    }
+
     // Empty the photo list
     public void Clear()
     {

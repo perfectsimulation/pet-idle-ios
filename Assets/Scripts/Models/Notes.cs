@@ -46,11 +46,11 @@ public class Notes
     public int Count { get { return this.GuestNotes.Count; } }
 
     // Custom indexing
-    public Note this[Guest guest]
+    public Note this[string guestName]
     {
         get
         {
-            return (Note)this.GuestNotes[(object)guest.Name];
+            return (Note)this.GuestNotes[guestName];
         }
     }
 
@@ -61,7 +61,7 @@ public class Notes
         foreach (Photos photos in photosArray)
         {
             // Get the note for this guest
-            Note note = (Note)this.GuestNotes[(object)photos.GuestName];
+            Note note = this[photos.GuestName];
 
             // Set the Photos of the note
             note.SetPhotos(photos);
@@ -69,11 +69,24 @@ public class Notes
 
     }
 
+    // Set photos for the note of this guest
+    public void SetPhotos(string guestName, Photos photos)
+    {
+        // Get the note for this guest
+        Note note = this[guestName];
+
+        // Do not continue if there was an issue getting the note
+        if (note == null) return;
+
+        // Set photos of this note to new value
+        note.SetPhotos(photos);
+    }
+
     // Increment the visit count of this guest when it departs
     public void UpdateVisitCount(SlotGuest slotGuest)
     {
         // Get the note for this guest
-        Note note = (Note)this.GuestNotes[(object)slotGuest.Guest.Name];
+        Note note = this[slotGuest.Guest.Name];
 
         // Do not continue if there was an issue getting the note
         if (note == null) return;
@@ -86,13 +99,23 @@ public class Notes
     }
 
     // Update the friendship points of this guest
-    public void UpdateFriendship(Guest guest, int friendshipPoints)
+    public void UpdateFriendship(string guestName, int friendshipPoints)
     {
         // Get the note for the guest
-        Note note = (Note)this.GuestNotes[(object)guest.Name];
+        Note note = this[guestName];
 
         // Increase the friendship points for this guest
         note.AddFriendshipPoints(friendshipPoints);
+    }
+
+    // Add a photo to the note of this guest
+    public void AddPhoto(string guestName, Photo photo)
+    {
+        // Get the note for the guest
+        Note note = this[guestName];
+
+        // Add the new photo to the photos of this guest note
+        note.AddPhoto(photo);
     }
 
     // Get a list of names of all guests that have been seen in the active biome
@@ -122,17 +145,7 @@ public class Notes
         return sightedGuestNames;
     }
 
-    // Add a photo to the note of this guest
-    public void AddPhoto(Guest guest, Photo photo)
-    {
-        // Get the note for the guest
-        Note note = (Note)this.GuestNotes[(object)guest.Name];
-
-        // Add the new photo to the photos of this guest note
-        note.AddPhoto(photo);
-    }
-
-    // Record the sighting of the guest if it is visiting for first time
+    // Record sighting of the guest if it is seen for the first time
     private void CheckForFirstSighting(Note note, SlotGuest slotGuest)
     {
         // Check if guest is currently in the active biome for the first time

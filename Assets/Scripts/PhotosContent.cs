@@ -55,6 +55,12 @@ public class PhotosContent : MonoBehaviour
         this.PhotoDetail.SetupDeletePhotoDelegate(callback);
     }
 
+    // Assign on close delegate to photo detail from menu manager
+    public void SetupOnCloseDetailDelegate(PhotoDetail.CloseDelegate callback)
+    {
+        this.PhotoDetail.SetupOnCloseDelegate(callback);
+    }
+
     // Assign photos to photos content and layout photo menu items
     public void HydratePhotos(Photos photos)
     {

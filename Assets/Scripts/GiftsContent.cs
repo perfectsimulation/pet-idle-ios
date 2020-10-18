@@ -39,7 +39,7 @@ public class GiftsContent : MonoBehaviour
 
     // Delegate to save claimed friendships to user from game manager
     [HideInInspector]
-    public delegate void ClaimFriendshipDelegate(Guest guest, int friendship);
+    public delegate void ClaimFriendshipDelegate(string guestName, int friendship);
     private ClaimFriendshipDelegate SaveFriendshipDelegate;
 
     void Awake()
@@ -262,7 +262,7 @@ public class GiftsContent : MonoBehaviour
         // Call delegate to save friendship reward for each gift
         foreach (Gift gift in this.Gifts.GiftList)
         {
-            this.SaveFriendshipDelegate(gift.Guest, gift.FriendshipPoints);
+            this.SaveFriendshipDelegate(gift.Guest.Name, gift.FriendshipPoints);
         }
 
     }

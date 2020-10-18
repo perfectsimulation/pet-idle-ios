@@ -180,4 +180,15 @@ namespace IOUtility
 
     }
 
+    /* Delete utility functions */
+    public static class Delete
+    {
+        /* Delete the file at this path */
+        public static void File(string path)
+        {
+            System.IO.File.Delete(path);
+        }
+
+    }
+
 }

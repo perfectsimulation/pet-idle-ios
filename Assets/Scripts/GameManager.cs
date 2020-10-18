@@ -106,7 +106,7 @@ public class GameManager : MonoBehaviour
         this.User.Notes.UpdateVisitCount(slotGuest);
 
         // Update notes in notes content
-        this.MenuManager.UpdateNotes(slotGuest.Guest, this.User.Notes);
+        this.MenuManager.UpdateNotes(slotGuest.Guest.Name, this.User.Notes);
 
         Persistence.SaveUser(this.User);
     }
@@ -121,32 +121,32 @@ public class GameManager : MonoBehaviour
         this.MenuManager.AddGift(gift);
 
         // Update notes in notes content
-        this.MenuManager.UpdateNotes(gift.Guest, this.User.Notes);
+        this.MenuManager.UpdateNotes(gift.Guest.Name, this.User.Notes);
 
         Persistence.SaveUser(this.User);
     }
 
     // Delegate called when a gift is claimed to update guest friendship
-    public void SaveFriendship(Guest guest, int friendshipPoints)
+    public void SaveFriendship(string guestName, int friendshipPoints)
     {
-        this.User.Notes.UpdateFriendship(guest, friendshipPoints);
+        this.User.Notes.UpdateFriendship(guestName, friendshipPoints);
 
         // Update notes in notes content
-        this.MenuManager.UpdateNotes(guest, this.User.Notes);
+        this.MenuManager.UpdateNotes(guestName, this.User.Notes);
 
         Persistence.SaveUser(this.User);
     }
 
     // Delegate called when a photo is saved to a guest note
-    public void SavePhoto(Guest guest, Photo photo)
+    public void SavePhoto(string guestName, Photo photo)
     {
-        this.User.Notes.AddPhoto(guest, photo);
+        this.User.Notes.AddPhoto(guestName, photo);
 
         // Update notes in notes content
-        this.MenuManager.UpdateNotes(guest, this.User.Notes);
+        this.MenuManager.UpdateNotes(guestName, this.User.Notes);
 
         Persistence.SaveUser(this.User);
-        Persistence.SavePhoto(guest.Name, photo);
+        Persistence.SavePhoto(guestName, photo);
     }
 
     // Delegate called when a photo is deleted from photo detail panel
@@ -154,7 +154,13 @@ public class GameManager : MonoBehaviour
     {
         Persistence.DeletePhoto(guestName, photo);
 
-        //TODO update photos in user notes
+        // Remove the photo from note in user data
+        this.User.Notes[guestName].Photos.Remove(photo);
+
+        // Update notes in notes content
+        this.MenuManager.UpdateNotes(guestName, this.User.Notes);
+
+        Persistence.SaveUser(this.User);
     }
 
     // Save the current user data before closing the application

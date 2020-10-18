@@ -20,10 +20,21 @@ public class PhotoDetail : MonoBehaviour
     public delegate void DeletePhotoDelegate(string guestName, Photo photo);
     private DeletePhotoDelegate DeleteSelectedPhotoDelegate;
 
+    // Delegate to close the photo detail from the menu manager
+    [HideInInspector]
+    public delegate void CloseDelegate();
+    private CloseDelegate OnCloseDelegate;
+
     // Assign delete photo delegate from game manager
     public void SetupDeletePhotoDelegate(DeletePhotoDelegate callback)
     {
         this.DeleteSelectedPhotoDelegate = callback;
+    }
+
+    // Assign on close delegate from menu manager
+    public void SetupOnCloseDelegate(CloseDelegate callback)
+    {
+        this.OnCloseDelegate = callback;
     }
 
     // Assign guest name when photo menu item is pressed in photos content
@@ -41,10 +52,14 @@ public class PhotoDetail : MonoBehaviour
         this.SetImage();
     }
 
-    // Delete this photo in game manager
+    // Delete photo from user data and local persistence from game manager
     public void DeletePhoto()
     {
+        // Delete this photo
         this.DeleteSelectedPhotoDelegate(this.GuestName, this.Photo);
+
+        // Close the photo preview to refocus the photos menu
+        this.OnCloseDelegate();
     }
 
     // Assign photo to the image component

@@ -86,6 +86,9 @@ public class MenuManager : MonoBehaviour
         // Assign open photo detail delegate to photos content
         this.PhotosContent.SetupOpenPhotoDetailDelegate(this.FocusPhotoDetail);
 
+        // Assign on close delegate to photo detail
+        this.PhotosContent.SetupOnCloseDetailDelegate(this.FocusPhotosMenu);
+
         // Assign set photo slot delegate to active biome
         this.ActiveBiome.SetupSetPhotoSlotDelegate(this.FocusPhotoCapture);
 
@@ -94,6 +97,9 @@ public class MenuManager : MonoBehaviour
 
         // Assign open photo preview delegate to photo capture
         this.PhotoCapture.SetupOpenPhotoPreviewDelegate(this.FocusPhotoPreview);
+
+        // Assign on close delegate to photo preview
+        this.PhotoCapture.SetupOnClosePreviewDelegate(this.RetakePhoto);
     }
 
     // Assign coins to menus that use them
@@ -201,9 +207,10 @@ public class MenuManager : MonoBehaviour
     }
 
     // Update the notes in notes content
-    public void UpdateNotes(Guest guest, Notes notes)
+    public void UpdateNotes(string guestName, Notes notes)
     {
-        this.NotesContent.UpdateNotes(guest, notes);
+        this.NotesContent.UpdateNotes(guestName, notes);
+        this.PhotosContent.HydratePhotos(notes[guestName].Photos);
         this.GiftsContent.HydrateSightedGuests(notes.GetSightedGuestNames());
     }
 
@@ -492,11 +499,22 @@ public class MenuManager : MonoBehaviour
     // Show photo preview in the photo capture container
     private void FocusPhotoPreview()
     {
-        // Set active the photo preview
-        this.PhotoPreview.Show();
+        this.PhotoPreview.gameObject.SetActive(true);
 
-        // Prevent interaction with everything behind the photo preview\
+        // Prevent interaction with everything behind the photo preview
         this.PreventBackgroundInteraction(this.PhotoPreview.gameObject);
+    }
+
+    // Dismiss photo preview when the retake photo button is pressed
+    private void RetakePhoto()
+    {
+        this.PhotoPreview.gameObject.SetActive(false);
+
+        // Set listener of close buttons to restart photo capture process
+        this.SetCloseButtonListener(this.BeginPhotoCaptureFlow);
+
+        // Disable tap out to close photo preview
+        this.DisableTapOutToCloseButton();
     }
 
     // Select an item for slot placement from inventory item button press
@@ -530,12 +548,10 @@ public class MenuManager : MonoBehaviour
         this.FocusActiveBiome();
         this.MainMenuButton.gameObject.SetActive(false);
         this.CloseButton.gameObject.SetActive(true);
+        this.PhotoPreview.gameObject.SetActive(false);
 
         // Enable the photo capture container object
         this.PhotoCapture.gameObject.SetActive(true);
-
-        // Hide photo preview for now
-        this.PhotoPreview.Hide();
 
         // Remove guest of last photo capture
         this.PhotoCapture.RemoveGuest();

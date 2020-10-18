@@ -10,13 +10,13 @@ public class PhotoPreview : MonoBehaviour
     // Image of captured photo
     public Image PhotoImage;
 
-    // Button to add the captured photo to the note of the assigned guest
+    // Add the captured photo to the note of the assigned guest
     public Button KeepButton;
 
-    // Button to discard the captured photo and restart photo capture flow
+    // Discard the captured photo and restart photo capture flow
     public Button RetakeButton;
 
-    // The guest that the photo will belong to in notes
+    // The guest the photo will belong to in notes
     private Guest Guest;
 
     // The photo created from the texture generated from photo capture
@@ -24,30 +24,22 @@ public class PhotoPreview : MonoBehaviour
 
     // Delegate to save photo to user data in game manager
     [HideInInspector]
-    public delegate void SavePhotoDelegate(Guest guest, Photo photo);
+    public delegate void SavePhotoDelegate(string guestName, Photo photo);
     private SavePhotoDelegate SaveCapturedPhotoDelegate;
 
-    // Delegate to retake photo
+    // Delegate to close the photo preview from the menu manager
     [HideInInspector]
-    public delegate void RetakePhotoDelegate();
-    private RetakePhotoDelegate RetakeCapturedPhotoDelegate;
+    public delegate void CloseDelegate();
+    private CloseDelegate OnCloseDelegate;
 
-    public void Show()
-    {
-        this.gameObject.SetActive(true);
-    }
-
-    public void Hide()
-    {
-        this.gameObject.SetActive(false);
-    }
-
+    // Set the guest to whom the saved photo will belong
     public void SetGuest(Guest guest)
     {
         this.Guest = guest;
         this.SetSaveText();
     }
 
+    // Remove the guest when photo is discarded
     public void RemoveGuest()
     {
         this.Guest = null;
@@ -59,10 +51,10 @@ public class PhotoPreview : MonoBehaviour
         this.SaveCapturedPhotoDelegate = callback;
     }
 
-    // Assign retake photo delegate from menu manager
-    public void SetupRetakePhotoDelegate(RetakePhotoDelegate callback)
+    // Assign on close delegate from menu manager
+    public void SetupOnCloseDelegate(CloseDelegate callback)
     {
-        this.RetakeCapturedPhotoDelegate = callback;
+        this.OnCloseDelegate = callback;
     }
 
     // Create the photo image sprite from the newly generated texture
@@ -75,17 +67,20 @@ public class PhotoPreview : MonoBehaviour
         this.Photo = new Photo(texture);
     }
 
-    // Save the captured photo to user data
+    // Save the captured photo to user data from game manager
     public void OnKeepButtonPress()
     {
-        // Call delegate to save the photo in game manager
-        this.SaveCapturedPhotoDelegate(this.Guest, this.Photo);
+        // Call delegate to save the photo of this guest in game manager
+        this.SaveCapturedPhotoDelegate(this.Guest.Name, this.Photo);
+
+        // Close the photo preview
+        this.OnCloseDelegate();
     }
 
-    // Reject the captured photo and restart photo capture flow
+    // Close the photo preview without saving the captured photo
     public void OnRetakeButtonPress()
     {
-        //TODOthis.RetakeCapturedPhotoDelegate();
+        this.OnCloseDelegate();
     }
 
     // Set the text of the confirmation message of this preview modal

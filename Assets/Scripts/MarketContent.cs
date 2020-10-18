@@ -87,7 +87,7 @@ public class MarketContent : MonoBehaviour
         this.OpenPurchaseSuccessDelegate = callback;
     }
 
-    // Assign on close delegate from menu manager to the item detail panel
+    // Assign on close delegate to the item detail panel from menu manager
     public void SetupOnCloseDetailDelegate(MarketItemDetail.CloseDelegate callback)
     {
         this.ItemDetail.SetupOnCloseDelegate(callback);

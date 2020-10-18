@@ -84,10 +84,10 @@ public class PhotoCapture : MonoBehaviour
         this.PhotoPreview.SetupSavePhotoDelegate(callback);
     }
 
-    // Assign retake photo delegate to photo preview from menu manager
-    public void SetupRetakePhotoDelegate(PhotoPreview.RetakePhotoDelegate callback)
+    // Assign on close delegate to the photo preview from menu manager
+    public void SetupOnClosePreviewDelegate(PhotoPreview.CloseDelegate callback)
     {
-        this.PhotoPreview.SetupRetakePhotoDelegate(callback);
+        this.PhotoPreview.SetupOnCloseDelegate(callback);
     }
 
     // Trigger a photo capture during the next frame update

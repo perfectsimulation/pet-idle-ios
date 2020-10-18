@@ -81,18 +81,19 @@ public class NotesContent : MonoBehaviour
     }
 
     // Update notes for this guest
-    public void UpdateNotes(Guest guest, Notes notes)
+    public void UpdateNotes(string guestName, Notes notes)
     {
+        // TODO change first argument to guest name
         this.Notes = notes;
 
         // Get the note button of the updated guest
-        GameObject noteButton = this.InstantiatedPrefabs[guest.Name];
+        GameObject noteButton = this.InstantiatedPrefabs[guestName];
 
         // Do not continue if the note button was not retrieved
         if (noteButton == null) return;
 
         // Update the note button for this guest
-        this.UpdateNoteButton(guest, noteButton);
+        this.UpdateNoteButton(guestName, noteButton);
     }
 
     // Calculate and set the scroll view height based on layout properties
@@ -186,10 +187,10 @@ public class NotesContent : MonoBehaviour
     }
 
     // Update note button
-    private void UpdateNoteButton(Guest guest, GameObject noteButton)
+    private void UpdateNoteButton(string guestName, GameObject noteButton)
     {
         // Get the note associated with this note button
-        Note note = this.Notes[guest];
+        Note note = this.Notes[guestName];
 
         // Get all the image components on the note button prefab
         Image[] images = noteButton.GetComponentsInChildren<Image>();

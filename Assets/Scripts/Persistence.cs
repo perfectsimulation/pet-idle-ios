@@ -29,15 +29,11 @@ public static class Persistence
         // Initialize a new user when no local save data exists
         if (!PathUtility.Exists(Paths.UserData))
         {
-            UnityEngine.Debug.Log("No local user data. Created new user");
             return CreateUser();
         }
 
         // Load raw user data
         string userDataJson = Load.AsTxt(Paths.UserData);
-
-        // TODO remove debug log
-        UnityEngine.Debug.Log("Loaded user");
 
         // Construct the serialized user from the raw user data
         SerializedUser userData =
@@ -115,8 +111,11 @@ public static class Persistence
     /* Delete the photo */
     public static void DeletePhoto(string guestName, Photo photo)
     {
-        //TODO
-        UnityEngine.Debug.Log("Deleted photo");
+        // Get the path of the photo file
+        string path = Paths.GuestPhotoFile(guestName, photo);
+
+        // Delete the photo at this path
+        Delete.File(path);
     }
 
     /* Create a photo directory for each guest */
