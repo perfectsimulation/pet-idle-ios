@@ -49,6 +49,12 @@ public class PhotosContent : MonoBehaviour
         this.OpenPhotoDetailDelegate = callback;
     }
 
+    // Assign delete photo delegate to photo detail from game manager
+    public void SetupDeletePhotoDelegate(PhotoDetail.DeletePhotoDelegate callback)
+    {
+        this.PhotoDetail.SetupDeletePhotoDelegate(callback);
+    }
+
     // Assign photos to photos content and layout photo menu items
     public void HydratePhotos(Photos photos)
     {
@@ -130,10 +136,10 @@ public class PhotosContent : MonoBehaviour
             if (photoButton == null) continue;
 
             // Set the photo image sprite using the photo texture
-            photoButton.SetSprite(photo.Texture);
+            photoButton.SetPhoto(photo);
 
             // Set the onClick of this photo menu item to open the photo detail
-            photoButton.SetButtonListener(this.OnPhotoButtonPress);
+            photoButton.Button.onClick.AddListener(() => this.OnPhotoButtonPress(photo));
         }
 
     }
@@ -157,8 +163,10 @@ public class PhotosContent : MonoBehaviour
     }
 
     // Open the photo detail panel with the selected photo
-    private void OnPhotoButtonPress()
+    private void OnPhotoButtonPress(Photo photo)
     {
+        this.PhotoDetail.SetGuestName(this.Photos.GuestName);
+        this.PhotoDetail.SetPhoto(photo);
         this.OpenPhotoDetailDelegate();
     }
 

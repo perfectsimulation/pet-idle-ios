@@ -70,10 +70,10 @@ public static class Persistence
     //  \_|   |_| |_|\___/ \__\___/|___/
 
     /* Serialize the photo and save it locally to a png file */
-    public static void SavePhoto(Guest guest, Photo photo)
+    public static void SavePhoto(string guestName, Photo photo)
     {
         // Get the path to the local photo file
-        string photoPath = Paths.GuestPhotoFile(guest.Name, photo);
+        string photoPath = Paths.GuestPhotoFile(guestName, photo);
 
         // Do not continue if the photo has already been saved
         if (PathUtility.Exists(photoPath)) return;
@@ -110,6 +110,13 @@ public static class Persistence
 
         // Return all the Photos for each guest as an array
         return photosList.ToArray();
+    }
+
+    /* Delete the photo */
+    public static void DeletePhoto(string guestName, Photo photo)
+    {
+        //TODO
+        UnityEngine.Debug.Log("Deleted photo");
     }
 
     /* Create a photo directory for each guest */

@@ -176,6 +176,12 @@ public class MenuManager : MonoBehaviour
         this.PhotoCapture.SetupSavePhotoDelegate(callback);
     }
 
+    // Assign delete photo delegate to photo detatil from game manager
+    public void SetupDeletePhotoDelegate(PhotoDetail.DeletePhotoDelegate callback)
+    {
+        this.PhotosContent.SetupDeletePhotoDelegate(callback);
+    }
+
     // Assign biome to active biome, called from game manager
     public void SetupBiome(SerializedBiomeObject biomeObject)
     {
@@ -421,8 +427,8 @@ public class MenuManager : MonoBehaviour
         // Move tap out to close button behind the photo detail panel
         this.PrepareTapOutToClose(this.PhotoDetail.gameObject);
 
-        // Set listener of close buttons to hide the photo detail
-        this.SetCloseButtonListener(this.PhotoDetail.Hide);
+        // Set listener of close buttons to focus the photos menu
+        this.SetCloseButtonListener(this.FocusPhotosMenu);
 
         // Remove the highlighted state on the photo button
         EventSystem.current.SetSelectedGameObject(null);

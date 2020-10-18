@@ -9,23 +9,19 @@ public class PhotoButton : MonoBehaviour
     // Button component of this photo menu item
     public Button Button;
 
-    // Button onClick behavior
-    public delegate void ButtonListener();
+    // Set when photo content is populating photo menu items
+    private Photo Photo;
 
     // Set the sprite of the image component
-    public void SetSprite(Texture2D texture)
+    public void SetPhoto(Photo photo)
     {
-        // Create a sprite using this texture
-        Sprite sprite = ImageUtility.CreateSprite(texture);
+        this.Photo = photo;
+
+        // Create a sprite using the texture of the photo
+        Sprite sprite = ImageUtility.CreateSprite(this.Photo.Texture);
 
         // Set the sprite of the image component
         this.Image.sprite = sprite;
-    }
-
-    // Set the onClick listener of the button component
-    public void SetButtonListener(ButtonListener listener)
-    {
-        this.Button.onClick.AddListener(() => listener());
     }
 
 }

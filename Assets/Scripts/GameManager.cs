@@ -51,8 +51,11 @@ public class GameManager : MonoBehaviour
         // Give the menu manager a callback to save claimed friendship points
         this.MenuManager.SetupClaimFriendshipDelegate(this.SaveFriendship);
 
-        // Give the photo preview of photos content a callback to save photos
+        // Give the photo preview of photo capture a callback to save photos
         this.MenuManager.SetupSavePhotoDelegate(this.SavePhoto);
+
+        // Give the photo detail of photos content a callback to delete photos
+        this.MenuManager.SetupDeletePhotoDelegate(this.DeletePhoto);
 
         // Give the active biome state of user data to the active biome
         this.MenuManager.SetupBiome(this.User.ActiveBiome);
@@ -143,7 +146,15 @@ public class GameManager : MonoBehaviour
         this.MenuManager.UpdateNotes(guest, this.User.Notes);
 
         Persistence.SaveUser(this.User);
-        Persistence.SavePhoto(guest, photo);
+        Persistence.SavePhoto(guest.Name, photo);
+    }
+
+    // Delegate called when a photo is deleted from photo detail panel
+    public void DeletePhoto(string guestName, Photo photo)
+    {
+        Persistence.DeletePhoto(guestName, photo);
+
+        //TODO update photos in user notes
     }
 
     // Save the current user data before closing the application
