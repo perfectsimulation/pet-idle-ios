@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-
-public class User
+﻿public class User
 {
     public int Coins;
     public Inventory Inventory;
-    public List<Biome> UnlockedBiomes;
-    public SerializedBiomeObject ActiveBiome;
+    public SerializedActiveBiome BiomeState;
     public Notes Notes;
     public Gifts Gifts;
 
@@ -14,8 +11,7 @@ public class User
     {
         this.Coins = 300;
         this.Inventory = new Inventory();
-        this.UnlockedBiomes = new List<Biome>() { DataInitializer.Field };
-        this.ActiveBiome = new SerializedBiomeObject(DataInitializer.Field);
+        this.BiomeState = new SerializedActiveBiome();
         this.Notes = new Notes();
         this.Gifts = new Gifts();
     }
@@ -25,8 +21,7 @@ public class User
     {
         this.Coins = serializedUser.Coins;
         this.Inventory = new Inventory(serializedUser.Inventory);
-        this.UnlockedBiomes = Serializer.ArrayToList(serializedUser.UnlockedBiomes);
-        this.ActiveBiome = serializedUser.ActiveBiome;
+        this.BiomeState = serializedUser.BiomeState;
         this.Notes = new Notes(serializedUser.Notes);
         this.Gifts = new Gifts(serializedUser.Gifts);
     }
@@ -38,8 +33,7 @@ public class SerializedUser
 {
     public int Coins;
     public SerializedInventory Inventory;
-    public Biome[] UnlockedBiomes;
-    public SerializedBiomeObject ActiveBiome;
+    public SerializedActiveBiome BiomeState;
     public SerializedNotes Notes;
     public SerializedGifts Gifts;
 
@@ -48,8 +42,7 @@ public class SerializedUser
     {
         this.Coins = user.Coins;
         this.Inventory = new SerializedInventory(user.Inventory);
-        this.UnlockedBiomes = Serializer.ListToArray(user.UnlockedBiomes);
-        this.ActiveBiome = user.ActiveBiome;
+        this.BiomeState = user.BiomeState;
         this.Notes = new SerializedNotes(user.Notes);
         this.Gifts = new SerializedGifts(user.Gifts);
     }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class PhotoButton : MonoBehaviour
+public class PhotoMenuItem : MonoBehaviour
 {
     // Image component of this photo menu item
     public Image Image;
@@ -12,7 +12,7 @@ public class PhotoButton : MonoBehaviour
     // Set when photo content is populating photo menu items
     private Photo Photo;
 
-    // Set the sprite of the image component
+    // Set the sprite of the image component using this photo
     public void SetPhoto(Photo photo)
     {
         this.Photo = photo;

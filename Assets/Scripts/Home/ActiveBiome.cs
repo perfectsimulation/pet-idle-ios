@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class BiomeObject : MonoBehaviour
+public class ActiveBiome : MonoBehaviour
 {
-    public Biome Biome;
-
     // Slots on the active biome
     public Slot[] Slots;
 
@@ -16,7 +14,7 @@ public class BiomeObject : MonoBehaviour
 
     // Delegate to save user data with an updated active biome state
     [HideInInspector]
-    public delegate void SaveBiomeDelegate(SerializedBiomeObject updatedBiome);
+    public delegate void SaveBiomeDelegate(SerializedActiveBiome updatedBiome);
     private SaveBiomeDelegate SaveUpdatedActiveBiomeDelegate;
 
     // Delegate to focus the active biome from the menu manager
@@ -55,11 +53,9 @@ public class BiomeObject : MonoBehaviour
 
     }
 
-    // Restore active biome state from saved data on app start
-    public void SetupBiome(Biome biome, SerializedSlot[] serializedSlots)
+    // Restore biome state from saved data on app start
+    public void RestoreState(SerializedSlot[] serializedSlots)
     {
-        this.Biome = biome;
-
         // Initialize the list of visiting guests
         this.VisitingGuestList = new List<Guest>();
 
@@ -165,7 +161,7 @@ public class BiomeObject : MonoBehaviour
         this.FocusActiveBiomeDelegate();
 
         // Call delegate from game manager to save user with updated slot data
-        this.SaveUpdatedActiveBiomeDelegate(new SerializedBiomeObject(this));
+        this.SaveUpdatedActiveBiomeDelegate(new SerializedActiveBiome(this));
     }
 
     // Delegate called from slot button to capture photo of this guest
@@ -227,7 +223,7 @@ public class BiomeObject : MonoBehaviour
         }
 
         // Call delegate from game manager to save user with updated slot data
-        this.SaveUpdatedActiveBiomeDelegate(new SerializedBiomeObject(this));
+        this.SaveUpdatedActiveBiomeDelegate(new SerializedActiveBiome(this));
     }
 
     // Randomly select a guest to visit the slot of this item based on item visit chances
@@ -259,7 +255,7 @@ public class BiomeObject : MonoBehaviour
         }
 
         // Call delegate from game manager to save user with updated slot data
-        this.SaveUpdatedActiveBiomeDelegate(new SerializedBiomeObject(this));
+        this.SaveUpdatedActiveBiomeDelegate(new SerializedActiveBiome(this));
         return selectedGuest;
     }
 
@@ -289,35 +285,29 @@ public class BiomeObject : MonoBehaviour
 }
 
 [System.Serializable]
-public class SerializedBiomeObject
+public class SerializedActiveBiome
 {
-    public Biome Biome;
     public SerializedSlot[] Slots;
 
-    public SerializedBiomeObject() { }
-
-    /* Constructor used only when making a new user */
-    public SerializedBiomeObject(Biome biome)
+    /* Create a new active biome for a new user */
+    public SerializedActiveBiome()
     {
-        this.Biome = biome;
-
         // TODO maybe set a variable in Biome for number of slots
         this.Slots = new SerializedSlot[6];
     }
 
-    /* Serialize a biome object */
-    public SerializedBiomeObject(BiomeObject biomeObject)
+    /* Serialize an active biome */
+    public SerializedActiveBiome(ActiveBiome activeBiome)
     {
         // Each Slot needs to be converted to a SerializedSlot
-        SerializedSlot[] serializedSlots = new SerializedSlot[biomeObject.Slots.Length];
+        SerializedSlot[] serializedSlots = new SerializedSlot[activeBiome.Slots.Length];
 
+        // Serialize the slot and add it to the serialized slot array
         for (int i = 0; i < serializedSlots.Length; i++)
         {
-            // Serialize the slot and add it to the serialized slot array
-            serializedSlots[i] = new SerializedSlot(biomeObject.Slots[i]);
+            serializedSlots[i] = new SerializedSlot(activeBiome.Slots[i]);
         }
 
-        this.Biome = biomeObject.Biome;
         this.Slots = serializedSlots;
     }
 

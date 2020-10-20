@@ -269,8 +269,8 @@ MonoBehaviour:
   NotesContent: {fileID: 503174431}
   GiftsContent: {fileID: 1026988382}
   PhotosContent: {fileID: 167427060}
-  InventoryItemDetail: {fileID: 1648496072}
-  MarketItemDetail: {fileID: 425970691}
+  InventoryDetail: {fileID: 1648496072}
+  MarketDetail: {fileID: 425970691}
   NoteDetail: {fileID: 1862059293}
   PhotoDetail: {fileID: 1120618969}
   PhotoPreview: {fileID: 874089418}
@@ -3162,7 +3162,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1120618969}
-        m_MethodName: DeletePhoto
+        m_MethodName: OnPressDeleteButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3233,7 +3233,7 @@ GameObject:
   - component: {fileID: 425970689}
   - component: {fileID: 425970691}
   m_Layer: 5
-  m_Name: ItemDetail
+  m_Name: MarketDetail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3318,8 +3318,8 @@ MonoBehaviour:
   Description: {fileID: 1307160019}
   BackButton: {fileID: 1388897511}
   BuyButton: {fileID: 626216658}
-  NeedFundsPanel: {fileID: 1002318003}
-  PurchaseSuccessPanel: {fileID: 2079567666}
+  FailurePanel: {fileID: 1002318003}
+  SuccessPanel: {fileID: 2079567666}
 --- !u!1 &430677453
 GameObject:
   m_ObjectHideFlags: 0
@@ -7148,7 +7148,7 @@ GameObject:
   - component: {fileID: 1002318006}
   - component: {fileID: 1002318005}
   m_Layer: 5
-  m_Name: NeedFunds
+  m_Name: FailurePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7414,20 +7414,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d01122f087e24c13b59ee90d0f1f35c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Biome:
-    Name: Default Biome
-    AllowedGuests:
-    - Name: Beanman
-      Nature: 
-      EarliestArrivalInMinutes: 1
-      LatestArrivalInMinutes: 5
-      EarliestDepartureInMinutes: 10
-      LatestDepartureInMinutes: 30
-      MinimumCoinDrop: 8
-      MaximumCoinDrop: 20
-      MinimumFriendshipPointReward: 0
-      MaximumFriendshipPointReward: 0
-      ImageAssetPath: Assets/Images/Hamsters/hamster-cream.png
   Slots:
   - {fileID: 1031773041}
   - {fileID: 2004390817}
@@ -8759,7 +8745,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 947745071}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -9939,7 +9925,7 @@ GameObject:
   - component: {fileID: 1648496070}
   - component: {fileID: 1648496072}
   m_Layer: 5
-  m_Name: ItemDetail
+  m_Name: InventoryDetail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10577,7 +10563,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1862059293}
-        m_MethodName: OnPhotosButtonPress
+        m_MethodName: OnPressPhotosButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -12293,7 +12279,7 @@ GameObject:
   - component: {fileID: 2079567669}
   - component: {fileID: 2079567668}
   m_Layer: 5
-  m_Name: PurchaseSuccess
+  m_Name: SuccessPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

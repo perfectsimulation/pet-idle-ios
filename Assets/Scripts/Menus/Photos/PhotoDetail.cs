@@ -15,26 +15,26 @@ public class PhotoDetail : MonoBehaviour
     // Set from photos content when a photo menu item is pressed
     private Photo Photo;
 
-    // Delegate to open the photo detail from menu manager
+    // Delete the photo from menu manager
     [HideInInspector]
     public delegate void DeletePhotoDelegate(string guestName, Photo photo);
-    private DeletePhotoDelegate DeleteSelectedPhotoDelegate;
+    private DeletePhotoDelegate DeletePhoto;
 
-    // Delegate to close the photo detail from the menu manager
+    // Close the photo detail panel from the menu manager
     [HideInInspector]
-    public delegate void CloseDelegate();
-    private CloseDelegate OnCloseDelegate;
+    public delegate void OnCloseDelegate();
+    private OnCloseDelegate OnClose;
 
     // Assign delete photo delegate from game manager
-    public void SetupDeletePhotoDelegate(DeletePhotoDelegate callback)
+    public void DelegateDeletePhoto(DeletePhotoDelegate callback)
     {
-        this.DeleteSelectedPhotoDelegate = callback;
+        this.DeletePhoto = callback;
     }
 
     // Assign on close delegate from menu manager
-    public void SetupOnCloseDelegate(CloseDelegate callback)
+    public void DelegateOnClose(OnCloseDelegate callback)
     {
-        this.OnCloseDelegate = callback;
+        this.OnClose = callback;
     }
 
     // Assign guest name when photo menu item is pressed in photos content
@@ -53,16 +53,16 @@ public class PhotoDetail : MonoBehaviour
     }
 
     // Delete photo from user data and local persistence from game manager
-    public void DeletePhoto()
+    public void OnPressDeleteButton()
     {
         // Delete this photo
-        this.DeleteSelectedPhotoDelegate(this.GuestName, this.Photo);
+        this.DeletePhoto(this.GuestName, this.Photo);
 
         // Close the photo preview to refocus the photos menu
-        this.OnCloseDelegate();
+        this.OnClose();
     }
 
-    // Assign photo to the image component
+    // Create a sprite out of the photo texture and assign it to the image
     private void SetImage()
     {
         // Create the sprite out of the photo texture

@@ -12,18 +12,18 @@ public class NoteDetail : MonoBehaviour
     public TextMeshProUGUI NotesText;
     public Button PhotosButton;
 
-    // Set when a note button of notes content is pressed
+    // Set when a note menu item of notes content is pressed
     private Note Note;
 
-    // Delegate to open the photos menu from menu manager
+    // Open the photos menu from menu manager
     [HideInInspector]
-    public delegate void PhotosMenuDelegate();
-    private PhotosMenuDelegate OpenPhotosMenuDelegate;
+    public delegate void OpenPhotosDelegate();
+    private OpenPhotosDelegate OpenPhotos;
 
     // Assign open photos menu delegate from menu manager
-    public void SetupOpenPhotosMenuDelegate(PhotosMenuDelegate callback)
+    public void DelegateOpenPhotos(OpenPhotosDelegate callback)
     {
-        this.OpenPhotosMenuDelegate = callback;
+        this.OpenPhotos = callback;
     }
 
     // Set note from notes content when a note menu item is pressed
@@ -32,7 +32,7 @@ public class NoteDetail : MonoBehaviour
         this.Note = note;
 
         // Display details of the guest of this note
-        if (this.Note.HasBeenSighted)
+        if (this.Note.HasBeenSeen)
         {
             // Show all guest details
             this.HydrateKnownGuest();
@@ -45,10 +45,10 @@ public class NoteDetail : MonoBehaviour
 
     }
 
-    // Open the photos menu with the photos from this note
-    public void OnPhotosButtonPress()
+    // Open the photos menu from menu manager with the photos from this note
+    public void OnPressPhotosButton()
     {
-        this.OpenPhotosMenuDelegate();
+        this.OpenPhotos();
     }
 
     // Fill in details from guest note
@@ -71,7 +71,7 @@ public class NoteDetail : MonoBehaviour
     private void HydrateUnknownGuest()
     {
         string name = this.Note.Guest.Name;
-        string guestImagePath = DataInitializer.UnsightedGuestImageAsset;
+        string guestImagePath = DataInitializer.UnseenGuestImageAsset;
         string heartImagePath = this.GetHeartImage(this.Note.FriendshipPoints);
         string visitText = "Visits: " + this.Note.VisitCount;
         string natureText = "Nature: " + this.Note.Guest.Nature;
@@ -83,7 +83,7 @@ public class NoteDetail : MonoBehaviour
         this.NatureText.SetText(natureText);
     }
 
-    // Get the heart image path to friendship points of guest
+    // Get the heart image path to use based on friendship points of this guest
     private string GetHeartImage(int friendshipPoints)
     {
         int friendshipLevel = 0;

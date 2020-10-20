@@ -150,7 +150,7 @@ public class Slot : MonoBehaviour
         this.SlotGuest = new SlotGuest(guest, item);
     }
 
-    // Only called on app start to restore saved guest data for this session
+    // Restore saved guest data for this session on app start
     public void SetGuestFromSaveData(SerializedSlotGuest serializedSlotGuest)
     {
         this.SlotGuest = new SlotGuest(serializedSlotGuest);
@@ -208,9 +208,6 @@ public class Slot : MonoBehaviour
         // Remove the guest if it has departed
         else if (this.SlotGuest.IsDeparted())
         {
-            // Save the gift from the departed guest
-            this.SaveGuestGiftDelegate(this.SlotGuest.Gift);
-
             // Remove the departed guest
             this.RemoveGuest();
 
@@ -229,6 +226,9 @@ public class Slot : MonoBehaviour
 
         // Reset the slot image to show the item alone
         this.SetSlotSprite(this.SlotItem.Item.ImageAssetPath);
+
+        // Save the gift from the departed guest
+        this.SaveGuestGiftDelegate(this.SlotGuest.Gift);
 
         // Tell active biome to remove the departing guest from the guest list
         this.RemoveDepartingGuestDelegate(this.SlotGuest.Guest);

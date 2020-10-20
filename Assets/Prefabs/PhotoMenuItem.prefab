@@ -85,9 +85,9 @@ GameObject:
   - component: {fileID: 5066262516839223468}
   - component: {fileID: 8269972486846859761}
   - component: {fileID: 3308730833873669448}
-  - component: {fileID: 5282475625303513284}
+  - component: {fileID: 6218817738229422750}
   m_Layer: 5
-  m_Name: PhotoButton
+  m_Name: PhotoMenuItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -192,7 +192,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &5282475625303513284
+--- !u!114 &6218817738229422750
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

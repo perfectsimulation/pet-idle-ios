@@ -57,8 +57,8 @@ public class GameManager : MonoBehaviour
         // Give the photo detail of photos content a callback to delete photos
         this.MenuManager.SetupDeletePhotoDelegate(this.DeletePhoto);
 
-        // Give the active biome state of user data to the active biome
-        this.MenuManager.SetupBiome(this.User.ActiveBiome);
+        // Give the biome state of user data to the active biome
+        this.MenuManager.RestoreBiomeState(this.User.BiomeState);
     }
 
     // Delegate called in market content to update user inventory and coins
@@ -79,10 +79,10 @@ public class GameManager : MonoBehaviour
         Persistence.SaveUser(this.User);
     }
 
-    // Delegate called in active biome to update user active biome state
-    public void SaveActiveBiome(SerializedBiomeObject updatedBiomeState)
+    // Delegate called in active biome to update user biome state
+    public void SaveActiveBiome(SerializedActiveBiome updatedBiomeState)
     {
-        this.User.ActiveBiome = updatedBiomeState;
+        this.User.BiomeState = updatedBiomeState;
 
         Persistence.SaveUser(this.User);
     }

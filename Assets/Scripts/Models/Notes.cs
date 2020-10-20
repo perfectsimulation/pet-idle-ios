@@ -91,8 +91,8 @@ public class Notes
         // Do not continue if there was an issue getting the note
         if (note == null) return;
 
-        // Check if this is the first sighting of this guest
-        this.CheckForFirstSighting(note, slotGuest);
+        // Check if this is the first encounter with this guest
+        this.CheckForFirstEncounter(note, slotGuest);
 
         // Increase the visit count for this guest
         note.IncrementVisitCount();
@@ -119,10 +119,10 @@ public class Notes
     }
 
     // Get a list of names of all guests that have been seen in the active biome
-    public List<string> GetSightedGuestNames()
+    public List<string> GetSeenGuestNames()
     {
         // Initialize the list of guests
-        List<string> sightedGuestNames = new List<string>();
+        List<string> seenGuestNames = new List<string>();
 
         // Get arrays of the keys and values of guest notes
         ICollection keys = this.GuestNotes.Keys;
@@ -135,24 +135,24 @@ public class Notes
         for (int i = 0; i < this.GuestNotes.Count; i++)
         {
             // Check the note to see if the guest has been seen
-            if (notes[i].HasBeenSighted)
+            if (notes[i].HasBeenSeen)
             {
                 // Add the seen guest to the list
-                sightedGuestNames.Add(guestNames[i]);
+                seenGuestNames.Add(guestNames[i]);
             }
         }
 
-        return sightedGuestNames;
+        return seenGuestNames;
     }
 
-    // Record sighting of the guest if it is seen for the first time
-    private void CheckForFirstSighting(Note note, SlotGuest slotGuest)
+    // Record first encounter with the guest if it is seen for the first time
+    private void CheckForFirstEncounter(Note note, SlotGuest slotGuest)
     {
         // Check if guest is currently in the active biome for the first time
-        if (!note.HasBeenSighted && slotGuest.IsVisiting())
+        if (!note.HasBeenSeen && slotGuest.IsVisiting())
         {
-            // Record the first sighting of this guest
-            note.RecordFirstSighting();
+            // Record the first encounter of this guest
+            note.RecordFirstEncounter();
             note.SetImagePath(slotGuest.Guest.ImageAssetPath);
         }
     }
@@ -163,7 +163,7 @@ public class Note
 {
     public Guest Guest { get; private set; }
     public string ImagePath { get; private set; }
-    public bool HasBeenSighted { get; private set; }
+    public bool HasBeenSeen { get; private set; }
     public int VisitCount { get; private set; }
     public int FriendshipPoints { get; private set; }
     public Photos Photos { get; private set; }
@@ -172,8 +172,8 @@ public class Note
     public Note(Guest guest)
     {
         this.Guest = guest;
-        this.ImagePath = DataInitializer.UnsightedGuestImageAsset;
-        this.HasBeenSighted = false;
+        this.ImagePath = DataInitializer.UnseenGuestImageAsset;
+        this.HasBeenSeen = false;
         this.VisitCount = 0;
         this.FriendshipPoints = 0;
         this.Photos = new Photos(guest.Name);
@@ -184,7 +184,7 @@ public class Note
     {
         this.Guest = serializedNote.Guest;
         this.ImagePath = serializedNote.ImagePath;
-        this.HasBeenSighted = serializedNote.HasBeenSighted;
+        this.HasBeenSeen = serializedNote.HasBeenSeen;
         this.VisitCount = serializedNote.VisitCount;
         this.FriendshipPoints = serializedNote.FriendshipPoints;
         this.Photos = new Photos(serializedNote.Guest.Name);
@@ -209,9 +209,9 @@ public class Note
     }
 
     // Indicate if guest has been seen in the active biome
-    public void RecordFirstSighting()
+    public void RecordFirstEncounter()
     {
-        this.HasBeenSighted = true;
+        this.HasBeenSeen = true;
     }
 
     // Increment visit count automatically
@@ -233,7 +233,7 @@ public class SerializedNote
 {
     public Guest Guest;
     public string ImagePath;
-    public bool HasBeenSighted;
+    public bool HasBeenSeen;
     public int VisitCount;
     public int FriendshipPoints;
 
@@ -244,7 +244,7 @@ public class SerializedNote
     {
         this.Guest = guest;
         this.ImagePath = note.ImagePath;
-        this.HasBeenSighted = note.HasBeenSighted;
+        this.HasBeenSeen = note.HasBeenSeen;
         this.VisitCount = note.VisitCount;
         this.FriendshipPoints = note.FriendshipPoints;
     }

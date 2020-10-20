@@ -7,25 +7,25 @@ public class PhotosContent : MonoBehaviour
     // The photo menu item prefab
     public GameObject Prefab;
 
-    // The rect transform of this photos container
+    // The rect transform of this photos menu list
     private RectTransform RectTransform;
 
     // Auto-layout script for the photo menu items
     private GridLayoutGroup GridLayoutGroup;
 
-    // Keep list of all instantiated photo menu item
-    private List<GameObject> InstantiatedClones;
+    // List of all instantiated photo menu items
+    private List<GameObject> MenuItemClones;
 
-    // Set from note detail when its photos button is pressed
+    // Set from note detail when the photos button is pressed
     private Photos Photos;
 
     // The photo detail component of the photo detail panel
     private PhotoDetail PhotoDetail;
 
-    // Delegate to open the photo detail from menu manager
+    // Open the photo detail panel from menu manager
     [HideInInspector]
-    public delegate void PhotoDetailDelegate();
-    private PhotoDetailDelegate OpenPhotoDetailDelegate;
+    public delegate void OpenDetailDelegate();
+    private OpenDetailDelegate OpenDetail;
 
     void Awake()
     {
@@ -34,31 +34,31 @@ public class PhotosContent : MonoBehaviour
         this.GridLayoutGroup = this.gameObject.GetComponent<GridLayoutGroup>();
 
         // Initialize list for instantiated photo menu item clones
-        this.InstantiatedClones = new List<GameObject>();
+        this.MenuItemClones = new List<GameObject>();
     }
 
     // Assign photo detail component from menu manager
-    public void SetupPhotoDetail(PhotoDetail photoDetail)
+    public void AssignPhotoDetail(PhotoDetail photoDetail)
     {
         this.PhotoDetail = photoDetail;
     }
 
-    // Assign open photo detail delegate from menu manager
-    public void SetupOpenPhotoDetailDelegate(PhotoDetailDelegate callback)
+    // Assign open detail delegate from menu manager
+    public void DelegateOpenDetail(OpenDetailDelegate callback)
     {
-        this.OpenPhotoDetailDelegate = callback;
+        this.OpenDetail = callback;
     }
 
-    // Assign delete photo delegate to photo detail from game manager
-    public void SetupDeletePhotoDelegate(PhotoDetail.DeletePhotoDelegate callback)
+    // Assign delete photo delegate from game manager to the photo detail
+    public void DelegateDeletePhoto(PhotoDetail.DeletePhotoDelegate callback)
     {
-        this.PhotoDetail.SetupDeletePhotoDelegate(callback);
+        this.PhotoDetail.DelegateDeletePhoto(callback);
     }
 
-    // Assign on close delegate to photo detail from menu manager
-    public void SetupOnCloseDetailDelegate(PhotoDetail.CloseDelegate callback)
+    // Assign on close delegate from menu manager to the photo detail
+    public void DelegateOnCloseDetail(PhotoDetail.OnCloseDelegate callback)
     {
-        this.PhotoDetail.SetupOnCloseDelegate(callback);
+        this.PhotoDetail.DelegateOnClose(callback);
     }
 
     // Assign photos to photos content and layout photo menu items
@@ -114,38 +114,34 @@ public class PhotosContent : MonoBehaviour
     // Populate the photos menu with photo menu items
     private void Populate()
     {
-        // Cache a reference to reuse for making each clone
+        // Cache references to reuse for making each clone
         GameObject clone;
-
-        // Cache guest name to use in names of photo menu item clones
-        string guestName = this.Photos.GuestName;
+        PhotoMenuItem photoMenuItem;
 
         // Instantiate a photo menu item for each photo in photos
-        for (int i = 0; i < this.Photos.Count; i++)
+        foreach (Photo photo in this.Photos.PhotoList)
         {
-            // Cache the photo to use for this menu item
-            Photo photo = this.Photos[i];
-
             // Clone the menu item prefab and parent it to this menu transform
             clone = Instantiate(this.Prefab, this.transform);
 
-            // Add the new photo menu item to the list of instantiated clones
-            this.InstantiatedClones.Add(clone);
+            // Add the new photo menu item to the list of clones
+            this.MenuItemClones.Add(clone);
 
-            // Name the clone with the enumeration and guest name
-            clone.name = string.Format("{0}-{1}", i, guestName);
+            // Name the clone with the ID of the photo
+            clone.name = photo.ID;
 
-            // Cache the photo button component of the photo menu item
-            PhotoButton photoButton = clone.GetComponent<PhotoButton>();
+            // Cache the photo menu item component of the menu item
+            photoMenuItem = clone.GetComponent<PhotoMenuItem>();
 
-            // Skip if the photo button component was not found
-            if (photoButton == null) continue;
+            // Skip if the photo menu item component was not found
+            if (photoMenuItem == null) continue;
 
-            // Set the photo image sprite using the photo texture
-            photoButton.SetPhoto(photo);
+            // Assign the photo to this photo menu item
+            photoMenuItem.SetPhoto(photo);
 
             // Set the onClick of this photo menu item to open the photo detail
-            photoButton.Button.onClick.AddListener(() => this.OnPhotoButtonPress(photo));
+            photoMenuItem.Button.onClick.AddListener(
+                () => this.OnPhotoMenuItemPress(photo));
         }
 
     }
@@ -154,26 +150,26 @@ public class PhotosContent : MonoBehaviour
     private void DestroyMenuItems()
     {
         // Do not continue if the list of clones has not been set
-        if (this.InstantiatedClones == null) return;
+        if (this.MenuItemClones == null) return;
 
         // Destroy each clone in the list of clones
-        foreach (GameObject photoButton in this.InstantiatedClones)
+        foreach (GameObject photoMenuItem in this.MenuItemClones)
         {
             // TODO implement object pooling
-            Destroy(photoButton);
+            Destroy(photoMenuItem);
         }
 
         // Clear the list of instantiated clones
-        this.InstantiatedClones.Clear();
+        this.MenuItemClones.Clear();
 
     }
 
-    // Open the photo detail panel with the selected photo
-    private void OnPhotoButtonPress(Photo photo)
+    // Open the photo detail panel for this guest with the selected photo
+    private void OnPhotoMenuItemPress(Photo photo)
     {
         this.PhotoDetail.SetGuestName(this.Photos.GuestName);
         this.PhotoDetail.SetPhoto(photo);
-        this.OpenPhotoDetailDelegate();
+        this.OpenDetail();
     }
 
 }

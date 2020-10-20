@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
-    public BiomeObject ActiveBiome;
+    public ActiveBiome ActiveBiome;
     public GameObject MainMenuPanel;
     public Button MainMenuButton;
     public Button CloseButton;
@@ -21,8 +21,8 @@ public class MenuManager : MonoBehaviour
     public NotesContent NotesContent;
     public GiftsContent GiftsContent;
     public PhotosContent PhotosContent;
-    public InventoryItemDetail InventoryItemDetail;
-    public MarketItemDetail MarketItemDetail;
+    public InventoryDetail InventoryDetail;
+    public MarketDetail MarketDetail;
     public NoteDetail NoteDetail;
     public PhotoDetail PhotoDetail;
     public PhotoPreview PhotoPreview;
@@ -41,53 +41,53 @@ public class MenuManager : MonoBehaviour
         // Assign focus biome delegate to active biome
         this.ActiveBiome.SetupFocusBiomeDelegate(this.FocusActiveBiome);
 
-        // Assign inventory item detail to inventory content
-        this.InventoryContent.SetupItemDetail(this.InventoryItemDetail);
+        // Assign inventory detail to inventory content
+        this.InventoryContent.AssignInventoryDetail(this.InventoryDetail);
 
-        // Assign open inventory item detail to inventory content
-        this.InventoryContent.SetupOpenItemDetailDelegate(this.FocusInventoryItemDetail);
+        // Assign open inventory detail delegate to inventory content
+        this.InventoryContent.DelegateOpenDetail(this.FocusInventoryDetail);
 
-        // Assign item placement delegate to inventory content
-        this.InventoryContent.SetupItemPlacementDelegate(this.BeginItemPlacementFlow);
+        // Assign place item delegate to inventory content
+        this.InventoryContent.DelegatePlaceItem(this.BeginItemPlacementFlow);
 
-        // Assign on close delegate to inventory item detail
-        this.InventoryContent.SetupOnCloseDetailDelegate(this.CloseButton.onClick.Invoke);
+        // Assign on close inventory detail delegate to inventory content
+        this.InventoryContent.DelegateOnCloseDetail(this.CloseButton.onClick.Invoke);
 
-        // Assign market item detail to market content
-        this.MarketContent.SetupItemDetail(this.MarketItemDetail);
+        // Assign market detail to market content
+        this.MarketContent.AssignMarketDetail(this.MarketDetail);
 
-        // Assign open market item detail delegate to market content
-        this.MarketContent.SetupOpenItemDetailDelegate(this.FocusMarketItemDetail);
+        // Assign open market detail delegate to market content
+        this.MarketContent.DelegateOpenDetail(this.FocusMarketDetail);
 
-        // Assign open need funds delegate to market item detail
-        this.MarketContent.SetupNeedFundsDelegate(this.FocusNeedFundsPanel);
+        // Assign on purchase failure delegate to market detail
+        this.MarketContent.DelegateOnPurchaseFailure(this.FocusPurchaseFailure);
 
-        // Assign open purchase success delegate to market item detail
-        this.MarketContent.SetupPurchaseSuccessDelegate(this.FocusPurchaseSuccessPanel);
+        // Assign on purchase success delegate to market detail
+        this.MarketContent.DelegateOnPurchaseSuccess(this.FocusPurchaseSuccess);
 
-        // Assign on close delegate to market item detail
-        this.MarketContent.SetupOnCloseDetailDelegate(this.CloseButton.onClick.Invoke);
+        // Assign on close market detail delegate to market content
+        this.MarketContent.DelegateOnCloseDetail(this.CloseButton.onClick.Invoke);
 
         // Assign note detail to notes content
-        this.NotesContent.SetupNoteDetail(this.NoteDetail);
+        this.NotesContent.AssignNoteDetail(this.NoteDetail);
 
         // Assign open note detail delegate to notes content
-        this.NotesContent.SetupOpenNoteDetailDelegate(this.FocusNoteDetail);
+        this.NotesContent.DelegateOpenDetail(this.FocusNoteDetail);
 
         // Assign hydrate photos delegate to notes content
-        this.NotesContent.SetupHydratePhotosDelegate(this.HydratePhotos);
+        this.NotesContent.DelegateHydratePhotos(this.HydratePhotos);
 
         // Assign open photos delegate to note detail through notes content
-        this.NotesContent.SetupOpenPhotosDelegate(this.FocusPhotosMenu);
+        this.NotesContent.DelegateOpenPhotos(this.FocusPhotosMenu);
 
         // Assign photo detail to photos content
-        this.PhotosContent.SetupPhotoDetail(this.PhotoDetail);
+        this.PhotosContent.AssignPhotoDetail(this.PhotoDetail);
 
         // Assign open photo detail delegate to photos content
-        this.PhotosContent.SetupOpenPhotoDetailDelegate(this.FocusPhotoDetail);
+        this.PhotosContent.DelegateOpenDetail(this.FocusPhotoDetail);
 
         // Assign on close delegate to photo detail
-        this.PhotosContent.SetupOnCloseDetailDelegate(this.FocusPhotosMenu);
+        this.PhotosContent.DelegateOnCloseDetail(this.FocusPhotosMenu);
 
         // Assign set photo slot delegate to active biome
         this.ActiveBiome.SetupSetPhotoSlotDelegate(this.FocusPhotoCapture);
@@ -102,96 +102,96 @@ public class MenuManager : MonoBehaviour
         this.PhotoCapture.SetupOnClosePreviewDelegate(this.RetakePhoto);
     }
 
-    // Assign coins to menus that use them
+    // Assign coins from game manager to menus that use them
     public void HydrateCoins(int coins)
     {
         this.MarketContent.HydrateCoins(coins);
         this.GiftsContent.HydrateCoins(coins);
     }
 
-    // Assign inventory to inventory content from game manager
+    // Assign inventory from game manager to inventory content
     public void HydrateInventory(Inventory inventory)
     {
         this.InventoryContent.HydrateInventory(inventory);
     }
 
-    // Assign market to market content from game manager
+    // Assign market from game manager to market content
     public void HydrateMarket(Inventory inventory)
     {
         this.MarketContent.HydrateMarket(new Market(inventory));
     }
 
-    // Assign notes to notes content from game manager
+    // Assign notes from game manager to notes content
     public void HydrateNotes(Notes notes)
     {
         this.NotesContent.HydrateNotes(notes);
-        this.GiftsContent.HydrateSightedGuests(notes.GetSightedGuestNames());
+        this.GiftsContent.HydrateSeenGuests(notes.GetSeenGuestNames());
     }
 
-    // Assign gifts to gifts content from game manager
+    // Assign gifts from game manager to gifts content
     public void HydrateGifts(Gifts gifts)
     {
         this.GiftsContent.HydrateGifts(gifts);
     }
 
-    // Assign photos to photos content from notes content
+    // Assign photos from notes content to photos content
     public void HydratePhotos(Photos photos)
     {
         this.PhotosContent.HydratePhotos(photos);
     }
 
-    // Assign purchase item delegate to market content from game manager
+    // Assign purchase item delegate from game manager to market content
     public void SetupPurchaseItemDelegate(MarketContent.PurchaseItemDelegate callback)
     {
-        this.MarketContent.SetupPurchaseItemDelegate(callback);
+        this.MarketContent.DelegatePurchaseItem(callback);
     }
 
-    // Assign update biome delegate to active biome from game manager
-    public void SetupSaveBiomeDelegate(BiomeObject.SaveBiomeDelegate callback)
+    // Assign save biome delegate from game manager to active biome
+    public void SetupSaveBiomeDelegate(ActiveBiome.SaveBiomeDelegate callback)
     {
         this.ActiveBiome.SetupSaveBiomeDelegate(callback);
     }
 
-    // Assign save guest visit delegate to active biome from game manager
+    // Assign save guest visit delegate from game manager to active biome
     public void SetupSaveVisitDelegate(Slot.SaveVisitDelegate callback)
     {
         this.ActiveBiome.SetupSaveVisitDelegate(callback);
     }
 
-    // Assign save gift delegate to active biome from game manager
+    // Assign save gift delegate from game manager to active biome
     public void SetupSaveGiftDelegate(Slot.SaveGiftDelegate callback)
     {
         this.ActiveBiome.SetupSaveGiftDelegate(callback);
     }
 
-    // Assign claim coins delegate to gifts content from game manager
-    public void SetupClaimCoinsDelegate(GiftsContent.ClaimCoinsDelegate callback)
+    // Assign save coins delegate from game manager to gifts content
+    public void SetupClaimCoinsDelegate(GiftsContent.SaveCoinsDelegate callback)
     {
-        this.GiftsContent.SetupClaimCoinsDelegate(callback);
+        this.GiftsContent.DelegateSaveCoins(callback);
     }
 
-    // Assign claim friendship delegate to gifts content from game manager
-    public void SetupClaimFriendshipDelegate(GiftsContent.ClaimFriendshipDelegate callback)
+    // Assign save friendship delegate from game manager to gifts content
+    public void SetupClaimFriendshipDelegate(GiftsContent.SaveFriendshipDelegate callback)
     {
-        this.GiftsContent.SetupClaimFriendshipDelegate(callback);
+        this.GiftsContent.DelegateSaveFriendship(callback);
     }
 
-    // Assign save photo delegate to photos content from game manager
+    // Assign save photo delegate from game manager to photos content
     public void SetupSavePhotoDelegate(PhotoPreview.SavePhotoDelegate callback)
     {
         this.PhotoCapture.SetupSavePhotoDelegate(callback);
     }
 
-    // Assign delete photo delegate to photo detatil from game manager
+    // Assign delete photo delegate from game manager to photo detatil
     public void SetupDeletePhotoDelegate(PhotoDetail.DeletePhotoDelegate callback)
     {
-        this.PhotosContent.SetupDeletePhotoDelegate(callback);
+        this.PhotosContent.DelegateDeletePhoto(callback);
     }
 
-    // Assign biome to active biome, called from game manager
-    public void SetupBiome(SerializedBiomeObject biomeObject)
+    // Assign biome state from game manager to active biome
+    public void RestoreBiomeState(SerializedActiveBiome biomeState)
     {
-        this.ActiveBiome.SetupBiome(biomeObject.Biome, biomeObject.Slots);
+        this.ActiveBiome.RestoreState(biomeState.Slots);
     }
 
     // Add a newly purchased item to inventory content
@@ -200,7 +200,7 @@ public class MenuManager : MonoBehaviour
         this.InventoryContent.AddItem(item);
     }
 
-    // Add a newly purchased item to inventory content
+    // Add a newly received gift to gifts content
     public void AddGift(Gift gift)
     {
         this.GiftsContent.AddGift(gift);
@@ -211,7 +211,7 @@ public class MenuManager : MonoBehaviour
     {
         this.NotesContent.UpdateNotes(guestName, notes);
         this.PhotosContent.HydratePhotos(notes[guestName].Photos);
-        this.GiftsContent.HydrateSightedGuests(notes.GetSightedGuestNames());
+        this.GiftsContent.HydrateSeenGuests(notes.GetSeenGuestNames());
     }
 
     // Display the main menu panel and close button
@@ -263,8 +263,8 @@ public class MenuManager : MonoBehaviour
         this.GiftsMenuPanel.SetActive(false);
         this.PhotosMenuPanel.SetActive(false);
         this.PhotoCapture.gameObject.SetActive(false);
-        this.InventoryItemDetail.gameObject.SetActive(false);
-        this.MarketItemDetail.gameObject.SetActive(false);
+        this.InventoryDetail.gameObject.SetActive(false);
+        this.MarketDetail.gameObject.SetActive(false);
         this.NoteDetail.gameObject.SetActive(false);
         this.PhotoDetail.gameObject.SetActive(false);
         this.PhotoPreview.gameObject.SetActive(false);
@@ -289,8 +289,8 @@ public class MenuManager : MonoBehaviour
         this.GiftsMenuPanel.SetActive(false);
         this.PhotosMenuPanel.SetActive(false);
         this.PhotoCapture.gameObject.SetActive(false);
-        this.InventoryItemDetail.gameObject.SetActive(false);
-        this.MarketItemDetail.gameObject.SetActive(false);
+        this.InventoryDetail.gameObject.SetActive(false);
+        this.MarketDetail.gameObject.SetActive(false);
         this.NoteDetail.gameObject.SetActive(false);
         this.PhotoDetail.gameObject.SetActive(false);
         this.PhotoPreview.gameObject.SetActive(false);
@@ -310,7 +310,7 @@ public class MenuManager : MonoBehaviour
     {
         this.MainMenuPanel.SetActive(false);
         this.InventoryMenuPanel.SetActive(true);
-        this.InventoryItemDetail.gameObject.SetActive(false);
+        this.InventoryDetail.gameObject.SetActive(false);
 
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
@@ -324,9 +324,9 @@ public class MenuManager : MonoBehaviour
     {
         this.MainMenuPanel.SetActive(false);
         this.MarketMenuPanel.SetActive(true);
-        this.MarketItemDetail.gameObject.SetActive(false);
-        this.MarketItemDetail.CloseNeedFundsPanel();
-        this.MarketItemDetail.ClosePurchaseSuccessPanel();
+        this.MarketDetail.gameObject.SetActive(false);
+        this.MarketDetail.CloseFailurePanel();
+        this.MarketDetail.CloseSuccessPanel();
 
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
@@ -373,17 +373,17 @@ public class MenuManager : MonoBehaviour
         // Move tap out to close button behind the main menu
         this.PrepareTapOutToClose(this.MainMenuPanel);
 
-        // Set listener of close buttons to refocus the note detail
+        // Set listener of close buttons to focus the note detail
         this.SetCloseButtonListener(this.FocusNoteDetail);
     }
 
     // Display the inventory item detail panel
-    private void FocusInventoryItemDetail()
+    private void FocusInventoryDetail()
     {
-        this.InventoryItemDetail.gameObject.SetActive(true);
+        this.InventoryDetail.gameObject.SetActive(true);
 
-        // Move tap out to close button behind the inventory item detail panel
-        this.PrepareTapOutToClose(this.InventoryItemDetail.gameObject);
+        // Move tap out to close button behind the inventory detail panel
+        this.PrepareTapOutToClose(this.InventoryDetail.gameObject);
 
         // Set listener of close buttons to focus the inventory menu
         this.SetCloseButtonListener(this.FocusInventoryMenu);
@@ -392,17 +392,17 @@ public class MenuManager : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(null);
     }
 
-    // Show the market item detail in the market menu
-    private void FocusMarketItemDetail()
+    // Show the market detail in the market menu
+    private void FocusMarketDetail()
     {
-        this.MarketItemDetail.gameObject.SetActive(true);
-        this.MarketItemDetail.CloseNeedFundsPanel();
-        this.MarketItemDetail.ClosePurchaseSuccessPanel();
+        this.MarketDetail.gameObject.SetActive(true);
+        this.MarketDetail.CloseFailurePanel();
+        this.MarketDetail.CloseSuccessPanel();
 
-        // Move tap out to close button behind the inventory item detail panel
-        this.PrepareTapOutToClose(this.MarketItemDetail.gameObject);
+        // Move tap out to close button behind the market detail panel
+        this.PrepareTapOutToClose(this.MarketDetail.gameObject);
 
-        // Set listener of close buttons to focus the inventory menu
+        // Set listener of close buttons to focus the market menu
         this.SetCloseButtonListener(this.FocusMarketMenu);
 
         // Remove the highlighted state on the item button
@@ -437,35 +437,35 @@ public class MenuManager : MonoBehaviour
         // Set listener of close buttons to focus the photos menu
         this.SetCloseButtonListener(this.FocusPhotosMenu);
 
-        // Remove the highlighted state on the photo button
+        // Remove the highlighted state on the photo menu item
         EventSystem.current.SetSelectedGameObject(null);
     }
 
-    // Show need funds panel in market item detail
-    private void FocusNeedFundsPanel()
+    // Show purchase failure panel in market detail
+    private void FocusPurchaseFailure()
     {
-        this.MarketItemDetail.OpenNeedFundsPanel();
+        this.MarketDetail.OpenFailurePanel();
 
-        // Move tap out to close button behind the inventory item detail panel
-        this.PrepareTapOutToClose(this.MarketItemDetail.NeedFundsPanel);
+        // Move tap out to close button behind failure panel in market detail
+        this.PrepareTapOutToClose(this.MarketDetail.FailurePanel);
 
-        // Set listener of close buttons to focus the inventory menu
-        this.SetCloseButtonListener(this.FocusMarketItemDetail);
+        // Set listener of close buttons to focus the market detail
+        this.SetCloseButtonListener(this.FocusMarketDetail);
 
         // Remove the highlighted state on the item button
         EventSystem.current.SetSelectedGameObject(null);
     }
 
-    // Show purchase success panel in market item detail
-    private void FocusPurchaseSuccessPanel()
+    // Show purchase success panel in market detail
+    private void FocusPurchaseSuccess()
     {
-        this.MarketItemDetail.OpenPurchaseSuccessPanel();
+        this.MarketDetail.OpenSuccessPanel();
 
-        // Move tap out to close button behind the inventory item detail panel
-        this.PrepareTapOutToClose(this.MarketItemDetail.PurchaseSuccessPanel);
+        // Move tap out to close button behind success panel in market detail
+        this.PrepareTapOutToClose(this.MarketDetail.SuccessPanel);
 
-        // Set listener of close buttons to focus the inventory menu
-        this.SetCloseButtonListener(this.FocusMarketItemDetail);
+        // Set listener of close buttons to focus the market detail
+        this.SetCloseButtonListener(this.FocusMarketDetail);
 
         // Remove the highlighted state on the item button
         EventSystem.current.SetSelectedGameObject(null);
@@ -505,7 +505,7 @@ public class MenuManager : MonoBehaviour
         this.PreventBackgroundInteraction(this.PhotoPreview.gameObject);
     }
 
-    // Dismiss photo preview when the retake photo button is pressed
+    // Dismiss photo preview when the retake photo menu item is pressed
     private void RetakePhoto()
     {
         this.PhotoPreview.gameObject.SetActive(false);
