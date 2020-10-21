@@ -505,7 +505,7 @@ public class MenuManager : MonoBehaviour
         this.PreventBackgroundInteraction(this.PhotoPreview.gameObject);
     }
 
-    // Dismiss photo preview when the retake photo menu item is pressed
+    // Dismiss photo preview when the retake photo button is pressed
     private void RetakePhoto()
     {
         this.PhotoPreview.gameObject.SetActive(false);

@@ -18,7 +18,7 @@ public class GiftsContent : MonoBehaviour
     private GridLayoutGroup GridLayoutGroup;
 
     // List of all instantiated gift menu items
-    private List<GameObject> MenuItemClones;
+    private List<GiftMenuItem> MenuItemClones;
 
     // The user coin balance assigned by game manager
     private int UserCoins;
@@ -49,7 +49,7 @@ public class GiftsContent : MonoBehaviour
         this.GridLayoutGroup = this.gameObject.GetComponent<GridLayoutGroup>();
 
         // Initialize list for instantiated inventory menu item clones
-        this.MenuItemClones = new List<GameObject>();
+        this.MenuItemClones = new List<GiftMenuItem>();
     }
 
     // Assign save coins delegate from game manager
@@ -70,7 +70,7 @@ public class GiftsContent : MonoBehaviour
         this.UserCoins = coins;
 
         // Update coin text with coin balance of user
-        this.UpdateCoinText();
+        this.CoinText.text = this.UserCoins.ToString();
     }
 
     // Assign list of seen guest names from menu manager
@@ -80,7 +80,7 @@ public class GiftsContent : MonoBehaviour
         this.SeenGuestNames = seenGuestNames;
 
         // Update guest images for existing gifts
-        this.UpdateGuestImages();
+        this.UpdateMenuItems();
     }
 
     // Assign gifts from game manager to gifts content
@@ -112,7 +112,7 @@ public class GiftsContent : MonoBehaviour
     }
 
     // Claim all gifts at once
-    public void OnCollectButtonPress()
+    public void OnPressCollectButton()
     {
         // Do not continue if there are no gifts to collect
         if (this.Gifts.Count == 0) return;
@@ -165,7 +165,7 @@ public class GiftsContent : MonoBehaviour
         this.RectTransform.sizeDelta = new Vector2(screenWidth, height);
     }
 
-    // Add a new gift menu item for this gift
+    // Create and add a new gift menu item for this gift
     private void Populate(Gift gift)
     {
         this.Populate(new Gift[] { gift });
@@ -184,9 +184,6 @@ public class GiftsContent : MonoBehaviour
             // Clone the menu item prefab and parent it to this menu transform
             menuItem = Instantiate(this.Prefab, this.transform);
 
-            // Add the new gift menu item to the list of clones
-            this.MenuItemClones.Add(menuItem);
-
             // Name the menu item using the guest name of this gift
             menuItem.name = string.Format("{0}Gift", gift.Guest.Name);
 
@@ -196,31 +193,36 @@ public class GiftsContent : MonoBehaviour
             // Skip if the gift menu item component was not found
             if (giftMenuItem == null) continue;
 
-            // Set gift menu item properties
-            giftMenuItem.Hydrate(gift.Guest);
+            // Assign the gift to the menu item to fill in details
+            giftMenuItem.SetGift(gift);
+
+            // Show default image for guest if it has not been seen before
             giftMenuItem.SetGuestImage(this.HasSeenGuest(gift.Guest.Name));
-            giftMenuItem.SetItemImage(gift.Item);
-            giftMenuItem.SetCoinText(gift.Coins);
-            giftMenuItem.SetFriendshipText(gift.FriendshipPoints);
+
+            // Add the new gift menu item to the list of clones
+            this.MenuItemClones.Add(giftMenuItem);
         }
 
     }
 
-    // Destroy all instantiated gift menu item clones
-    private void DestroyMenuItems()
+    // Indicate if the guest has been seen in the active biome at least once
+    private bool HasSeenGuest(string guestName)
     {
-        // Do not continue if the list of clones has not been set
-        if (this.MenuItemClones == null) return;
+        return this.SeenGuestNames.Contains(guestName);
+    }
 
-        // Destroy each clone in the list of clones
-        foreach (GameObject giftMenuItem in this.MenuItemClones)
+    // Update guest images in gift menu items when seen guest list is updated
+    private void UpdateMenuItems()
+    {
+        foreach (GiftMenuItem giftMenuItem in this.MenuItemClones)
         {
-            // TODO implement object pooling
-            Destroy(giftMenuItem);
+            // Get the guest name of this gift menu item
+            string guestName = giftMenuItem.Gift.Guest.Name;
+
+            // Set the guest image sprite according to updated seen guest list
+            giftMenuItem.SetGuestImage(this.HasSeenGuest(guestName));
         }
 
-        // Clear the list of instantiated clones
-        this.MenuItemClones.Clear();
     }
 
     // Save friendship rewards from game manager
@@ -234,36 +236,21 @@ public class GiftsContent : MonoBehaviour
 
     }
 
-    // Indicate if the guest has been seen in the active biome at least once
-    private bool HasSeenGuest(string guestName)
+    // Destroy all instantiated gift menu item clones
+    private void DestroyMenuItems()
     {
-        return this.SeenGuestNames.Contains(guestName);
-    }
+        // Do not continue if the list of clones has not been set
+        if (this.MenuItemClones == null) return;
 
-    // Update guest images in gift menu items when seen guest list is updated
-    private void UpdateGuestImages()
-    {
-        foreach (GameObject menuItem in this.MenuItemClones)
+        // Destroy each clone in the list of clones
+        foreach (GiftMenuItem giftMenuItem in this.MenuItemClones)
         {
-            // Get the gift menu item component of the menu item
-            GiftMenuItem giftMenuItem = menuItem.GetComponent<GiftMenuItem>();
-
-            // Do not continue if the gift menu item component was not found
-            if (giftMenuItem == null) continue;
-
-            // Get the guest name of this gift menu item
-            string guestName = giftMenuItem.Guest.Name;
-
-            // Set the guest image sprite according to updated seen guest list
-            giftMenuItem.SetGuestImage(this.SeenGuestNames.Contains(guestName));
+            // TODO implement object pooling
+            Destroy(giftMenuItem.gameObject);
         }
 
-    }
-
-    // Update coin text with current user coin amount
-    private void UpdateCoinText()
-    {
-        this.CoinText.text = this.UserCoins.ToString();
+        // Clear the list of instantiated clones
+        this.MenuItemClones.Clear();
     }
 
 }

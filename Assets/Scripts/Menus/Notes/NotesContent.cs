@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,7 +15,7 @@ public class NotesContent : MonoBehaviour
     private GridLayoutGroup GridLayoutGroup;
 
     // Dictionary of all instantiated note menu items by guest name
-    private Dictionary<string, GameObject> MenuItemClones;
+    private Dictionary<string, NoteMenuItem> MenuItemClones;
 
     // The notes assigned by game manager
     private Notes Notes;
@@ -71,7 +70,7 @@ public class NotesContent : MonoBehaviour
         this.Notes = notes;
 
         // Initialize dictionary of instantiated note menu items
-        this.MenuItemClones = new Dictionary<string, GameObject>();
+        this.MenuItemClones = new Dictionary<string, NoteMenuItem>();
 
         // Size the scroll view to accommodate all note menu items
         this.PrepareScrollViewForLayout();
@@ -85,14 +84,20 @@ public class NotesContent : MonoBehaviour
     {
         this.Notes = notes;
 
+        // Get the updated note
+        Note note = this.Notes[guestName];
+
+        // Do not continue if there was an issue getting the note
+        if (note == null) return;
+
         // Get the note menu item for the updated guest
-        GameObject noteMenuItem = this.MenuItemClones[guestName];
+        NoteMenuItem noteMenuItem = this.MenuItemClones[guestName];
 
         // Do not continue if the note menu item was not retrieved
         if (noteMenuItem == null) return;
 
-        // Update the note menu item for this guest
-        this.UpdateNoteButton(guestName, noteMenuItem);
+        // Update the note menu item for this guest with the updated note
+        this.UpdateMenuItem(noteMenuItem, note);
     }
 
     // Calculate and set the scroll view height based on layout properties
@@ -126,8 +131,9 @@ public class NotesContent : MonoBehaviour
     // Populate the notes menu with note menu items
     private void Populate()
     {
-        // Cache a reference to reuse for making each clone
+        // Cache references to reuse for making each clone
         GameObject menuItem;
+        NoteMenuItem noteMenuItem;
 
         // Instantiate a note menu item for each note in notes
         foreach (DictionaryEntry guestNote in this.Notes.GuestNotes)
@@ -137,84 +143,25 @@ public class NotesContent : MonoBehaviour
             // Instantiate the prefab clone with this as the parent
             menuItem = Instantiate(this.Prefab, this.transform);
 
+            // Name the menu item with the guest name of this note
             menuItem.name = note.Guest.Name;
 
-            // Get all the image components on the note menu item prefab
-            Image[] images = menuItem.GetComponentsInChildren<Image>();
+            // Cache the note menu item component of the menu item
+            noteMenuItem = menuItem.GetComponent<NoteMenuItem>();
 
-            // Null check for image component array
-            if (images == null) continue;
+            // Skip if the note menu item component was not found
+            if (noteMenuItem == null) continue;
 
-            // Select the image component in the child
-            foreach (Image image in images)
-            {
-                // TODO add third case for positive visit count with no sighting
-                // Ignore the image component in the root component
-                if (image.gameObject.GetInstanceID() != menuItem.GetInstanceID())
-                {
-                    // Create and set guest image sprite of this new guest button
-                    image.sprite = ImageUtility.CreateSprite(note.ImagePath);
-                }
-            }
+            // Assign the note to the menu item to fill in details
+            noteMenuItem.SetNote(note);
 
-            // Get the text component on the note menu item prefab
-            TextMeshProUGUI nameText = menuItem.GetComponentInChildren<TextMeshProUGUI>();
+            // Set onClick of the menu item to show its note with note detail
+            noteMenuItem.DelegateOnClick(this.OnPressMenuItem);
 
-            // Null check for name text component
-            if (nameText == null) continue;
-
-            // Set name text to guest name
-            nameText.text = note.Guest.Name;
-
-            // Get the button component on the note menu item prefab
-            Button button = menuItem.GetComponent<Button>();
-
-            // Null check for button component
-            if (button == null) continue;
-
-            // Disable button if guest has not yet visited
-            button.interactable = note.VisitCount > 0;
-
-            // Set onClick of the new note menu item with the delegate passed down from game manager
-            button.onClick.AddListener(() => this.OnPressMenuItem(note));
-
-            // Add the new note menu item to the dictionary of instantiated prefabs
-            this.MenuItemClones.Add(note.Guest.Name, menuItem);
+            // Add the new note menu item to the dictionary of clones
+            this.MenuItemClones.Add(note.Guest.Name, noteMenuItem);
         }
 
-    }
-
-    // Update note menu item
-    private void UpdateNoteButton(string guestName, GameObject noteMenuItem)
-    {
-        // Get the note associated with this note menu item
-        Note note = this.Notes[guestName];
-
-        // Get all the image components on the note menu item prefab
-        Image[] images = noteMenuItem.GetComponentsInChildren<Image>();
-
-        // Null check for image component array
-        if (images == null) return;
-
-        // Select the image component in the child
-        foreach (Image image in images)
-        {
-            // Ignore the image component in the root component
-            if (image.gameObject.GetInstanceID() != noteMenuItem.GetInstanceID())
-            {
-                // Create and set guest image sprite of this new guest button
-                image.sprite = ImageUtility.CreateSprite(note.ImagePath);
-            }
-        }
-
-        // Get the button component on the note menu item prefab
-        Button button = noteMenuItem.GetComponent<Button>();
-
-        // Null check for button component
-        if (button == null) return;
-
-        // Disable button if guest has not yet visited
-        button.interactable = note.VisitCount > 0;
     }
 
     // Hydrate and open the note detail panel with the selected menu item
@@ -228,6 +175,13 @@ public class NotesContent : MonoBehaviour
 
         // Open the note detail panel from menu manager
         this.OpenDetail();
+    }
+
+    // Update note menu item with note changes
+    private void UpdateMenuItem(NoteMenuItem noteMenuItem, Note note)
+    {
+        // Change the note menu item details with the updated note
+        noteMenuItem.SetNote(note);
     }
 
 }

@@ -87,7 +87,7 @@ public class InventoryContent : MonoBehaviour
         this.Populate(item);
 
         // Sort the new menu item into the layout of existing menu items
-        this.InsertNewMenuItemIntoGridLayout();
+        this.UpdateMenuWithItem();
     }
 
     // Calculate and set the scroll view height based on layout properties
@@ -118,7 +118,7 @@ public class InventoryContent : MonoBehaviour
         this.RectTransform.sizeDelta = new Vector2(screenWidth, height);
     }
 
-    // Add a new inventory menu item for this item
+    // Create and add a new inventory menu item for this item
     private void Populate(Item item)
     {
         // Clone a new inventory menu item in the inventory menu
@@ -128,8 +128,9 @@ public class InventoryContent : MonoBehaviour
     // Populate the inventory menu with menu items using the item array
     private void Populate(Item[] items)
     {
-        // Cache a reference to reuse for making each clone
+        // Cache references to reuse for making each clone
         GameObject menuItem;
+        InventoryMenuItem inventoryMenuItem;
 
         // Instantiate an inventory menu item for each item in the item array
         foreach (Item item in items)
@@ -137,52 +138,44 @@ public class InventoryContent : MonoBehaviour
             // Clone the menu item prefab and parent it to this menu transform
             menuItem = Instantiate(this.Prefab, this.transform);
 
-            // Add the new inventory menu item to the dictionary of clones
-            this.MenuItemClones.Add(item.Name, menuItem);
-
-            // TODO make inventorymenuitem script
+            // Name the menu item with the item name
             menuItem.name = item.Name;
 
-            // Get all the image components on the inventory menu item clone
-            Image[] images = menuItem.GetComponentsInChildren<Image>();
+            // Cache the inventory menu item component of the menu item
+            inventoryMenuItem = menuItem.GetComponent<InventoryMenuItem>();
 
-            // Null check for image component array
-            if (images == null) continue;
+            // Skip if the inventory menu item component was not found
+            if (inventoryMenuItem == null) continue;
 
-            // Select the image component in the child
-            foreach (Image image in images)
-            {
-                // Ignore the image component in the root component
-                if (image.gameObject.GetInstanceID() != menuItem.GetInstanceID())
-                {
-                    // Create and set item image sprite on the child image
-                    image.sprite = ImageUtility.CreateSprite(item.ImageAssetPath);
-                }
-            }
+            // Assign the item to the menu item to fill in details
+            inventoryMenuItem.SetItem(item);
 
-            // Get the button component on the inventory menu item clone
-            Button button = menuItem.GetComponent<Button>();
+            // Indicate if item is currently in the active biome
+            //TODOinventoryMenuItem.SetInBiomeStatus();
 
-            // Null check for button component
-            if (button == null) continue;
+            // Set onClick of the menu item to show its item with item detail
+            inventoryMenuItem.DelegateOnClick(this.OnPressMenuItem);
 
-            // Set onClick of the new inventory menu item with the delegate passed down from game manager
-            button.onClick.AddListener(() => this.OnMenuItemPress(item));
+            // Add the new inventory menu item to the dictionary of clones
+            this.MenuItemClones.Add(item.Name, menuItem);
         }
 
     }
 
-    // Open the inventory detail with the item of the selected menu item
-    private void OnMenuItemPress(Item item)
+    // Hydrate and open the inventory detail with item of selected menu item
+    private void OnPressMenuItem(Item item)
     {
+        // Hydrate inventory detail with the item of this menu item
         this.InventoryDetail.Hydrate(item);
+
+        // Open the inventory detail panel from menu manager
         this.OpenDetail();
     }
 
     // Insert the newest menu item into the ordered dictionary and hierarchy
-    private void InsertNewMenuItemIntoGridLayout()
+    private void UpdateMenuWithItem()
     {
-        // Inventory needs to be sorted since a new item was just appended
+        // Need to sort inventory since a new item was just appended
         this.Inventory.ItemList = Inventory.Sort(this.Inventory.ItemList);
 
         // Get arrays of the unsorted keys and values of the ordered dictionary
@@ -193,7 +186,7 @@ public class InventoryContent : MonoBehaviour
         unsortedKeys.CopyTo(unsortedItemNames, 0);
         unsortedValues.CopyTo(unsortedClones, 0);
 
-        // Initialize variable for the index to use when parenting this item
+        // Initialize variable for the index to use to sort this item
         int sortedIndex = -1;
 
         // Compare items in sorted and unsorted item arrays one by one
@@ -202,7 +195,7 @@ public class InventoryContent : MonoBehaviour
             // Find the first index where the item names do not match
             if (!this.Inventory[i].Name.Equals(unsortedItemNames[i]))
             {
-                // Assign index to use when adding the item to the hierarchy
+                // Cache this index to use to sort the new item
                 sortedIndex = i;
 
                 // No need to continue since there is only one unsorted item
@@ -217,13 +210,13 @@ public class InventoryContent : MonoBehaviour
         string itemName = unsortedItemNames[unsortedItemNames.Length - 1];
         GameObject itemClone = unsortedClones[unsortedClones.Length - 1];
 
-        // Remove the new item at the end of the ordered dictionary
+        // Remove the new menu item at the end of the ordered dictionary
         this.MenuItemClones.RemoveAt(this.MenuItemClones.Count - 1);
 
-        // Insert the new item into the ordered dictionary at the sorted index
+        // Insert the new menu item into the dictionary at the sorted index
         this.MenuItemClones.Insert(sortedIndex, itemName, itemClone);
 
-        // Insert the new menu item clone into the hierarchy at the sorted index
+        // Insert the new menu item into the hierarchy at the sorted index
         itemClone.transform.SetSiblingIndex(sortedIndex);
     }
 

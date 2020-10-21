@@ -2,32 +2,29 @@
 
 public class Market
 {
-    // Keep track of purchases with dictionary of item keys and bool values
-    public OrderedDictionary ItemPurchaseRecord;
+    // Dictionary of item keys with bool values for their purchase status
+    public OrderedDictionary Items;
 
-    /* Default no-arg constructor */
-    public Market() { }
-
-    /* Constructor from inventory */
+    /* Create Market from Inventory */
     public Market(Inventory inventory)
     {
-        // Initialize the dictionary with known capacity of all items
+        // Initialize the items dictionary with known capacity of all items
         int capacity = DataInitializer.AllItems.Length;
-        this.ItemPurchaseRecord = new OrderedDictionary(capacity);
+        this.Items = new OrderedDictionary(capacity);
 
-        // Loop through all items and check which ones the user already has
+        // Loop through all items and check which ones the user already owns
         foreach(Item item in DataInitializer.AllItems)
         {
             bool isPurchased = inventory.Contains(item);
 
-            // Add an entry in the item purchase record for this item
-            this.ItemPurchaseRecord.Add(item, isPurchased);
+            // Add an entry in the items dictionary for this item
+            this.Items.Add(item, isPurchased);
         }
 
     }
 
-    // Get the total number of items in the item purchase record
-    public int Count { get { return this.ItemPurchaseRecord.Count; } }
+    // Get the total number of items
+    public int Count { get { return this.Items.Count; } }
 
     // Custom indexing
     public Item this[int index]
@@ -39,15 +36,16 @@ public class Market
     }
 
     // Check if the item has been purchased
-    public bool Contains(Item item)
+    public bool HasPurchased(Item item)
     {
-        return (bool)this.ItemPurchaseRecord[item];
+        return (bool)this.Items[item];
     }
 
-    // Set value of this item key to true in item purchase record
+    // Record item purchase by changing its value in items dictionary
     public void RecordItemPurchase(Item item)
     {
-        this.ItemPurchaseRecord[item] = true;
+        // Indicate purchase by setting the value of this item key to true
+        this.Items[item] = true;
     }
 
 }

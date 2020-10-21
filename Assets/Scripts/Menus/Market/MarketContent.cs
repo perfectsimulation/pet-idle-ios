@@ -19,7 +19,7 @@ public class MarketContent : MonoBehaviour
     private GridLayoutGroup GridLayoutGroup;
 
     // Dictionary of all instantiated market menu items by item name
-    private Dictionary<string, GameObject> MenuItemClones;
+    private Dictionary<string, MarketMenuItem> MenuItemClones;
 
     // The market assigned by game manager
     private Market Market;
@@ -103,7 +103,7 @@ public class MarketContent : MonoBehaviour
         this.UserCoins = coins;
 
         // Update coin text with user coins
-        this.UpdateCoinText();
+        this.CoinText.text = this.UserCoins.ToString();
     }
 
     // Assign market to market content
@@ -112,7 +112,7 @@ public class MarketContent : MonoBehaviour
         this.Market = market;
 
         // Initialize list for instantiated market menu item clones
-        this.MenuItemClones = new Dictionary<string, GameObject>();
+        this.MenuItemClones = new Dictionary<string, MarketMenuItem>();
 
         // Size the scroll view to accommodate all market menu items
         this.PrepareScrollViewForLayout();
@@ -152,58 +152,43 @@ public class MarketContent : MonoBehaviour
     // Populate the market menu with market menu items
     private void Populate()
     {
-        // Cache a reference to reuse for making each clone
+        // Cache references to reuse for making each clone
         GameObject menuItem;
+        MarketMenuItem marketMenuItem;
 
         // Instantiate a market menu item for each item in market
-        foreach (DictionaryEntry marketItem in this.Market.ItemPurchaseRecord)
+        foreach (DictionaryEntry marketItem in this.Market.Items)
         {
             Item item = (Item)marketItem.Key;
 
             // Clone the menu item prefab and parent it to this menu transform
             menuItem = Instantiate(this.Prefab, this.transform);
 
-            // Add the new market menu item to the dictionary of clones
-            this.MenuItemClones.Add(item.Name, menuItem);
-
-            // TODO make marketmenuitem script
+            // Name the menu item with the item name
             menuItem.name = item.Name;
 
-            // Get all the image components on the menu item clone
-            Image[] images = menuItem.GetComponentsInChildren<Image>();
+            // Cache the market menu item component of the menu item
+            marketMenuItem = menuItem.GetComponent<MarketMenuItem>();
 
-            // Null check for image component array
-            if (images == null) continue;
+            // Skip if the market menu item component was not found
+            if (marketMenuItem == null) continue;
 
-            // Select the image component in the child
-            foreach (Image image in images)
-            {
-                // Ignore the image component in the root component
-                if (image.gameObject.GetInstanceID() != menuItem.GetInstanceID())
-                {
-                    // Create and set item image sprite on the child image
-                    image.sprite = ImageUtility.CreateSprite(item.ImageAssetPath);
-                }
-            }
+            // Assign the item to the menu item to fill in details
+            marketMenuItem.SetItem(item);
 
-            // TODO If marketItem.Value = true, show "item purchased" overlay
+            // Disable interaction if the item has already been purchased
+            marketMenuItem.SetPurchaseStatus(this.Market.HasPurchased(item));
 
-            // Get the button component on the market menu item clone
-            Button button = menuItem.GetComponent<Button>();
+            // Set onClick of the menu item to show its item with item detail
+            marketMenuItem.DelegateOnClick(this.OnPressMenuItem);
 
-            // Null check for button component
-            if (button == null) continue;
-
-            // If the user already owns this item, disable interaction on the button
-            button.interactable = !this.Market.ItemPurchaseRecord[item].Equals(true);
-
-            // Set onClick of the market menu item with the delegate passed down from game manager
-            button.onClick.AddListener(() => this.OnPressMenuItem(item));
+            // Add the new market menu item to the dictionary of clones
+            this.MenuItemClones.Add(item.Name, marketMenuItem);
         }
 
     }
 
-    // Open the market detail panel with the selected menu item
+    // Hydrate and open the market detail panel with the selected menu item
     private void OnPressMenuItem(Item item)
     {
         // Hydrate market detail with the item of this menu item
@@ -213,32 +198,29 @@ public class MarketContent : MonoBehaviour
         this.OpenDetail();
     }
 
-    // Validate purchase eligibility before calling item purchase delegate
+    // Validate purchase eligibility before calling back to purchase item
     private void ValidatePurchase(Item item)
     {
         // Do not continue if the user already purchased this item
-        if (this.Market.Contains(item)) return;
+        if (this.Market.HasPurchased(item)) return;
 
         // Allow purchase if the user has more coins than the price of the item
         if (this.UserCoins > item.Price)
         {
-            // Update market and market content to reflect new item purchase
+            // Callback to game manager to purchase the item
             this.PurchaseItem(item);
 
             // Open the purchase success panel in the market detail
             this.OnPurchaseSuccess();
 
-            // Set isPurchased to true for this item
+            // Indicate this item has been purchased in this market
             this.Market.RecordItemPurchase(item);
 
-            // Prevent duplicate purchase by disabling market detail buy button
+            // Prevent duplicate purchase by disabling the buy button
             this.MarketDetail.DisablePurchase();
 
-            // Prevent opening market detail with this item again
-            this.DisableItemButton(item);
-
-            // Show purchase overlay for the newly purchased overlay
-            this.ShowPurchaseOverlay();
+            // Prevent opening the market detail with this item again
+            this.UpdateMenuWithPurchase(item);
         }
         else
         {
@@ -248,30 +230,17 @@ public class MarketContent : MonoBehaviour
 
     }
 
-    // Disable button component on the market menu item for this item
-    private void DisableItemButton(Item item)
+    // Reflect purchase within market menu item for this item
+    private void UpdateMenuWithPurchase(Item item)
     {
-        // Get the market menu item and its button component
-        GameObject menuItem = this.MenuItemClones[item.Name];
-        Button buttonComponent = menuItem.GetComponent<Button>();
+        // Get the market menu item for this item
+        MarketMenuItem menuItem = this.MenuItemClones[item.Name];
 
-        // Do not continue if there was a problem getting the button component
-        if (buttonComponent == null) return;
+        // Skip if the market menu item component was not found
+        if (menuItem == null) return;
 
-        // Disable interaction on this markett menu item
-        buttonComponent.interactable = false;
-    }
-
-    // Show purchase overlay on market menu item
-    private void ShowPurchaseOverlay()
-    {
-        // TODO
-    }
-
-    // Update coin text with current user coin amount
-    private void UpdateCoinText()
-    {
-        this.CoinText.text = this.UserCoins.ToString();
+        // Set purchase status to true in the market menu item
+        menuItem.SetPurchaseStatus(true);
     }
 
 }

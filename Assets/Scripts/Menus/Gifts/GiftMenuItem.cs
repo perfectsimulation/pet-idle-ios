@@ -4,21 +4,40 @@ using UnityEngine.UI;
 
 public class GiftMenuItem : MonoBehaviour
 {
-    // Set from gifts content when a gift menu item is pressed
-    public Guest Guest { get; private set; }
-
+    // Text component for the guest name of this gift menu item
     public TextMeshProUGUI GuestNameText;
+
+    // Guest image component of this gift menu item
     public Image GuestImage;
+
+    // Item image component of this gift menu item
     public Image ItemImage;
+
+    // Text component for the coin reward of this gift menu item
     public TextMeshProUGUI CoinText;
+
+    // Text component for the friendship reward of this gift menu item
     public TextMeshProUGUI FriendshipText;
 
-    public void Hydrate(Guest guest)
-    {
-        this.Guest = guest;
+    // Set from gifts content when a gift menu item is pressed
+    public Gift Gift { get; private set; }
 
-        // Set guest name
-        this.GuestNameText.text = guest.Name;
+    // Assign gift to this gift menu item and fill in details
+    public void SetGift(Gift gift)
+    {
+        this.Gift = gift;
+
+        // Use the name of the guest of this gift to set the guest name text
+        this.SetGuestNameText(gift.Guest.Name);
+
+        // Use the image path of the item of this gift to set the item sprite
+        this.SetItemImage(gift.Item.ImageAssetPath);
+
+        // Use the coin reward of this gift to set the coin text
+        this.SetCoinText(gift.Coins);
+
+        // Use the friendship reward of this gift to set the friendship text
+        this.SetFriendshipText(gift.FriendshipPoints);
     }
 
     // Set guest image sprite depending on previous encounter (or lack thereof)
@@ -27,18 +46,23 @@ public class GiftMenuItem : MonoBehaviour
         this.GuestImage.sprite = this.SelectGuestImage(hasBeenSeen);
     }
 
-    // Set item image sprite using the image asset path of the item
-    public void SetItemImage(Item item)
+    private void SetGuestNameText(string guestName)
     {
-        this.ItemImage.sprite = this.SelectItemImage(item);
+        this.GuestNameText.text = guestName;
     }
 
-    public void SetCoinText(int coins)
+    // Set item image sprite using this image asset path
+    private void SetItemImage(string imagePath)
+    {
+        this.ItemImage.sprite = this.SelectItemImage(imagePath);
+    }
+
+    private void SetCoinText(int coins)
     {
         this.CoinText.text = string.Format("x {0}", coins);
     }
 
-    public void SetFriendshipText(int friendshipPoints)
+    private void SetFriendshipText(int friendshipPoints)
     {
         this.FriendshipText.text = string.Format("+ {0}", friendshipPoints);
     }
@@ -53,7 +77,7 @@ public class GiftMenuItem : MonoBehaviour
         if (hasBeenSeen)
         {
             // Use guest image if guest has been seen at least once
-            sprite = ImageUtility.CreateSprite(this.Guest.ImageAssetPath);
+            sprite = ImageUtility.CreateSprite(this.Gift.Guest.ImageAssetPath);
         }
         else
         {
@@ -66,11 +90,11 @@ public class GiftMenuItem : MonoBehaviour
         return sprite;
     }
 
-    // Create a sprite to use for the item
-    private Sprite SelectItemImage(Item item)
+    // Create a sprite to use for the item using the image at this image path
+    private Sprite SelectItemImage(string imagePath)
     {
         // Use default item image asset
-        return ImageUtility.CreateSprite(item.ImageAssetPath);
+        return ImageUtility.CreateSprite(imagePath);
     }
 
 }

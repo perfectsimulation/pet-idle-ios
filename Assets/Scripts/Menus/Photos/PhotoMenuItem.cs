@@ -12,6 +12,10 @@ public class PhotoMenuItem : MonoBehaviour
     // Set when photo content is populating photo menu items
     private Photo Photo;
 
+    // Open photo detail from menu manager with this photo
+    [HideInInspector]
+    public delegate void OnPressDelegate(Photo photo);
+
     // Set the sprite of the image component using this photo
     public void SetPhoto(Photo photo)
     {
@@ -22,6 +26,12 @@ public class PhotoMenuItem : MonoBehaviour
 
         // Set the sprite of the image component
         this.Image.sprite = sprite;
+    }
+
+    // Assign on click delegate from photos content to button component
+    public void DelegateOnClick(OnPressDelegate callback)
+    {
+        this.Button.onClick.AddListener(() => callback(this.Photo));
     }
 
 }

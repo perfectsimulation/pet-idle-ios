@@ -242,8 +242,9 @@ GameObject:
   - component: {fileID: 4256128658914545792}
   - component: {fileID: 5016431552415617802}
   - component: {fileID: 870672686944564000}
+  - component: {fileID: 3196993336475131269}
   m_Layer: 5
-  m_Name: NotesGuestButton
+  m_Name: NoteMenuItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -349,3 +350,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3196993336475131269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8149128581589019825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 985c2fe1996dc41c09416edcc1b9b570, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Image: {fileID: 2606699358851057991}
+  NameText: {fileID: 1092997534765464572}
+  Button: {fileID: 870672686944564000}
