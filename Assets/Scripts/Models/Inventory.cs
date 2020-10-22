@@ -12,11 +12,11 @@ public class Inventory
     {
         this.ItemList = new List<Item>()
         {
-            DataInitializer.ItemE,
-            DataInitializer.ItemF,
-            DataInitializer.ItemG,
-            DataInitializer.ItemH,
-            DataInitializer.ItemI
+            DataInitializer.Ball,
+            DataInitializer.Basket,
+            DataInitializer.Bathtub,
+            DataInitializer.Globe,
+            DataInitializer.Peanut
         };
     }
 
