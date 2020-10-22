@@ -31,7 +31,7 @@ public class GiftMenuItem : MonoBehaviour
         this.SetGuestNameText(gift.Guest.Name);
 
         // Use the image path of the item of this gift to set the item sprite
-        this.SetItemImage(gift.Item.ImageAssetPath);
+        this.SetItemImage(gift.Item.ImagePath);
 
         // Use the coin reward of this gift to set the coin text
         this.SetCoinText(gift.Coins);
@@ -77,7 +77,7 @@ public class GiftMenuItem : MonoBehaviour
         if (hasBeenSeen)
         {
             // Use guest image if guest has been seen at least once
-            sprite = ImageUtility.CreateSprite(this.Gift.Guest.ImageAssetPath);
+            sprite = ImageUtility.CreateSprite(this.Gift.Guest.ImagePath);
         }
         else
         {

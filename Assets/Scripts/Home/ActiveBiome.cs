@@ -181,9 +181,13 @@ public class ActiveBiome : MonoBehaviour
         for (int i = 0; i < this.Slots.Length; i++)
         {
             // If the serialized slot has an item, assign it to the corresponding slot
-            if (serializedSlots[i].Item != null &&
-                Item.IsValid(serializedSlots[i].Item))
+            if (serializedSlots[i].ItemName != null &&
+                serializedSlots[i].ItemName != string.Empty &&
+                Item.IsValid(serializedSlots[i].ItemName))
             {
+                // Create an item from the serialized item of this slot
+                Item item = new Item(serializedSlots[i].ItemName);
+
                 // Pass the slot a delegate to retrigger new guests
                 this.Slots[i].SetupSelectGuestDelegate(this.SelectGuestToVisit);
 
@@ -191,7 +195,7 @@ public class ActiveBiome : MonoBehaviour
                 this.Slots[i].SetupRemoveGuestDelegate(this.RemoveGuest);
 
                 // Assign the item to the slot
-                this.Slots[i].SetItemFromSaveData(serializedSlots[i].Item);
+                this.Slots[i].RestoreSlotItem(item);
 
                 // If the serialized slot has a guest, assign it to the corresponding slot
                 if (serializedSlots[i].SlotGuest != null &&
@@ -206,7 +210,6 @@ public class ActiveBiome : MonoBehaviour
                 else
                 {
                     // Initialize a new guest for this slot
-                    Item item = new Item(serializedSlots[i].Item);
                     Guest guest = this.SelectGuestToVisit(item);
                     this.Slots[i].InitializeGuest(guest, item);
                 }
@@ -233,21 +236,21 @@ public class ActiveBiome : MonoBehaviour
         float guestChance = Random.value;
         Guest selectedGuest = new Guest();
 
-        // Select a guest from the visit chances dictionary of the item
-        foreach (KeyValuePair<Guest, float> visitChance in item.VisitChances)
+        // Select a guest by chance from the visitors of the item
+        foreach (Visit visit in item.Visitors.Chances)
         {
             // If the random number is lower than the visit chance, select that Guest
-            if (guestChance < visitChance.Value)
+            if (guestChance < visit.Chance)
             {
                 // Check if the guest is already currently visiting the active biome
-                if (this.VisitingGuestList.Contains(visitChance.Key))
+                if (this.VisitingGuestList.Contains(visit.Guest))
                 {
                     // Skip this guest if it is already visiting a different slot
                     continue;
                 }
 
                 // Select this guest to visit this slot
-                selectedGuest = visitChance.Key;
+                selectedGuest = visit.Guest;
 
                 break;
             }

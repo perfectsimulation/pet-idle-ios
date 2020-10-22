@@ -10,12 +10,6 @@
         this.Item = item;
     }
 
-    /* Create SlotItem from save data */
-    public SlotItem(SerializedItem serializedItem)
-    {
-        this.Item = new Item(serializedItem);
-    }
-
     public void RemoveItem()
     {
         this.Item = null;

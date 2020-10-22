@@ -32,7 +32,7 @@ public class Guest
     public int MaximumFriendshipPointReward;
 
     // Persistence path of guest png asset
-    public string ImageAssetPath;
+    public string ImagePath;
 
     /* Default no-arg constructor */
     public Guest() { }
@@ -49,7 +49,7 @@ public class Guest
         int maximumCoinDrop,
         int minimumFriendshipPointReward,
         int maximumFriendshipPointReward,
-        string imageAssetPath)
+        string imagePath)
     {
         this.Name = name;
         this.Nature = nature;
@@ -61,7 +61,7 @@ public class Guest
         this.MaximumCoinDrop = maximumCoinDrop;
         this.MinimumFriendshipPointReward = minimumFriendshipPointReward;
         this.MaximumFriendshipPointReward = maximumFriendshipPointReward;
-        this.ImageAssetPath = imageAssetPath;
+        this.ImagePath = imagePath;
     }
 
     // Two guests are equal if they have the same name

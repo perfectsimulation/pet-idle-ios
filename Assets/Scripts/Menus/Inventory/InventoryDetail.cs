@@ -41,7 +41,7 @@ public class InventoryDetail : MonoBehaviour
         this.Item = item;
 
         string title = item.Name;
-        string imagePath = item.ImageAssetPath;
+        string imagePath = item.ImagePath;
         // TODO add description field to item
 
         this.Title.SetText(title);

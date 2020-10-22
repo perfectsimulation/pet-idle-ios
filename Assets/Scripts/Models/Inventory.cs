@@ -10,14 +10,7 @@ public class Inventory
     /* Initialize a brand new Inventory with starter items */
     public Inventory()
     {
-        this.ItemList = new List<Item>()
-        {
-            DataInitializer.Ball,
-            DataInitializer.Basket,
-            DataInitializer.Bathtub,
-            DataInitializer.Globe,
-            DataInitializer.Peanut
-        };
+        this.ItemList = DataInitializer.StarterItems.ToList();
     }
 
     /* Create Inventory from save data */
@@ -26,9 +19,9 @@ public class Inventory
         List<Item> itemList = new List<Item>();
         itemList.Capacity = serializedInventory.Length;
 
-        foreach (SerializedItem serializedItem in serializedInventory.ItemArray)
+        foreach (string itemName in serializedInventory.ItemNames)
         {
-            itemList.Add(new Item(serializedItem));
+            itemList.Add(new Item(itemName));
         }
 
         this.ItemList = itemList;
@@ -133,22 +126,22 @@ public class Inventory
 [Serializable]
 public class SerializedInventory
 {
-    // Array of all items in the user inventory
-    public SerializedItem[] ItemArray;
+    // Array of names for all items in the user inventory
+    public string[] ItemNames;
 
     /* Create SerializedInventory from Inventory */
     public SerializedInventory(Inventory inventory)
     {
-        SerializedItem[] itemArray = new SerializedItem[inventory.Count];
+        string[] itemNames = new string[inventory.Count];
 
         for (int i = 0; i < inventory.Count; i++)
         {
-            itemArray[i] = new SerializedItem(inventory[i]);
+            itemNames[i] = inventory[i].Name;
         }
 
-        this.ItemArray = itemArray;
+        this.ItemNames = itemNames;
     }
 
-    // Get the total number of serialized items
-    public int Length { get { return this.ItemArray.Length; } }
+    // Get the total number of item names
+    public int Length { get { return this.ItemNames.Length; } }
 }

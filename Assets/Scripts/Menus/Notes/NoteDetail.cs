@@ -55,7 +55,7 @@ public class NoteDetail : MonoBehaviour
     private void HydrateKnownGuest()
     {
         string name = this.Note.Guest.Name;
-        string guestImagePath = this.Note.Guest.ImageAssetPath;
+        string guestImagePath = this.Note.Guest.ImagePath;
         string heartImagePath = this.GetHeartImage(this.Note.FriendshipPoints);
         string visitText = "Visits: " + this.Note.VisitCount;
         string natureText = "Nature: " + this.Note.Guest.Nature;

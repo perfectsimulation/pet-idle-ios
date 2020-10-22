@@ -153,7 +153,7 @@ public class Notes
         {
             // Record the first encounter of this guest
             note.RecordFirstEncounter();
-            note.SetImagePath(slotGuest.Guest.ImageAssetPath);
+            note.SetImagePath(slotGuest.Guest.ImagePath);
         }
     }
 

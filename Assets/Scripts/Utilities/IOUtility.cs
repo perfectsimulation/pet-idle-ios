@@ -14,7 +14,7 @@ namespace IOUtility
             {
                 if (Application.isMobilePlatform)
                 {
-                    return Application.persistentDataPath + "/UserData.json";
+                    return Path.Combine(PersistentDataPath, "UserData.json");
                 }
 
                 // Debug purposes
@@ -27,13 +27,34 @@ namespace IOUtility
         {
             get
             {
-                if (Application.isMobilePlatform)
-                {
-                    return Application.persistentDataPath + "/Photos";
-                }
+                return Path.Combine(PersistentDataPath, "Photos");
+            }
+        }
 
-                // Debug purposes
-                return "Persistence/Photos";
+        /* Guest image streaming asset directory location */
+        public static string StreamingGuestDirectory
+        {
+            get
+            {
+                return Path.Combine(StreamingAssetPath, "Images/Hamsters");
+            }
+        }
+
+        /* Item image streaming asset directory location */
+        public static string StreamingItemDirectory
+        {
+            get
+            {
+                return Path.Combine(StreamingAssetPath, "Images/Items");
+            }
+        }
+
+        /* Interaction image streaming asset directory location */
+        public static string StreamingInteractionDirectory
+        {
+            get
+            {
+                return Path.Combine(StreamingAssetPath, "Images/Interactions");
             }
         }
 
@@ -49,10 +70,59 @@ namespace IOUtility
             return Path.Combine(GuestPhotoDirectory(guestName), photo.ID);
         }
 
+        /* Get the path to the guest image streaming asset */
+        public static string GuestImageFile(string guestName)
+        {
+            string fileName = string.Format("{0}.png", guestName.ToLower());
+            return Path.Combine(StreamingGuestDirectory, fileName);
+        }
+
+        /* Get the path to the item image streaming asset */
+        public static string ItemImageFile(string itemName)
+        {
+            string fileName = string.Format("{0}.png", itemName.ToLower());
+            return Path.Combine(StreamingItemDirectory, fileName);
+        }
+
+        /* Get the path to the interaction image asset */
+        public static string InteractionImageFile(string guest, string item)
+        {
+            string fileName = string.Format(
+                "{0}-{1}.png",
+                guest.ToLower(),
+                item.ToLower());
+
+            return Path.Combine(StreamingInteractionDirectory, fileName);
+        }
+
         /* Get the path to the streaming asset */
         public static string StreamingAssetFile(string assetPath)
         {
             return Path.Combine(Application.streamingAssetsPath, assetPath);
+        }
+
+        /* Persistent data path */
+        private static string PersistentDataPath
+        {
+            get
+            {
+                if (Application.isMobilePlatform)
+                {
+                    return Application.persistentDataPath;
+                }
+
+                // Debug purposes
+                return "Persistence";
+            }
+        }
+
+        /* Streaming asset path */
+        private static string StreamingAssetPath
+        {
+            get
+            {
+                return Application.streamingAssetsPath;
+            }
         }
 
     }

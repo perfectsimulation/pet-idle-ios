@@ -101,7 +101,7 @@ public class Gift
     public Gift(SerializedGift serializedGift)
     {
         this.Guest = serializedGift.Guest;
-        this.Item = new Item(serializedGift.Item);
+        this.Item = new Item(serializedGift.ItemName);
         this.FriendshipPoints = serializedGift.FriendshipPoints;
         this.Coins = serializedGift.Coins;
     }
@@ -112,7 +112,7 @@ public class Gift
 public class SerializedGift
 {
     public Guest Guest;
-    public SerializedItem Item;
+    public string ItemName;
     public int FriendshipPoints;
     public int Coins;
 
@@ -120,7 +120,7 @@ public class SerializedGift
     public SerializedGift(Gift gift)
     {
         this.Guest = gift.Guest;
-        this.Item = new SerializedItem(gift.Item);
+        this.ItemName = gift.Item.Name;
         this.FriendshipPoints = gift.FriendshipPoints;
         this.Coins = gift.Coins;
     }

@@ -108,7 +108,7 @@ public class Slot : MonoBehaviour
         this.SlotItem = new SlotItem(item);
 
         // Set sprite using the image at the streaming asset path of the item
-        this.SetSlotSprite(item.ImageAssetPath);
+        this.SetSlotSprite(item.ImagePath);
 
         // Select and initialize a guest to visit the newly placed item
         Guest guest = this.SelectNewGuestDelegate(item);
@@ -119,13 +119,13 @@ public class Slot : MonoBehaviour
     }
 
     // Assign an item to the slot item of this slot
-    public void SetItemFromSaveData(SerializedItem serializedItem)
+    public void RestoreSlotItem(Item item)
     {
         // Create an item from the serialized item
-        this.SlotItem = new SlotItem(serializedItem);
+        this.SlotItem = new SlotItem(item);
 
         // Set sprite using the image at the streaming asset path of the item
-        this.SetSlotSprite(serializedItem.ImageAssetPath);
+        this.SetSlotSprite(item.ImagePath);
     }
 
     // Remove the item from this slot along with its guest
@@ -225,7 +225,7 @@ public class Slot : MonoBehaviour
         if (this.SlotGuest.Guest == null) return;
 
         // Reset the slot image to show the item alone
-        this.SetSlotSprite(this.SlotItem.Item.ImageAssetPath);
+        this.SetSlotSprite(this.SlotItem.Item.ImagePath);
 
         // Save the gift from the departed guest
         this.SaveGuestGiftDelegate(this.SlotGuest.Gift);
@@ -273,11 +273,11 @@ public class Slot : MonoBehaviour
     }
 
     // Set the sprite of the slot image to show the image at this path
-    private void SetSlotSprite(string imageAssetPath)
+    private void SetSlotSprite(string imagePath)
     {
         // Make sure the slot image is fully opaque
         this.SlotImage.color = Color.white;
-        this.SlotImage.sprite = ImageUtility.CreateSprite(imageAssetPath);
+        this.SlotImage.sprite = ImageUtility.CreateSprite(imagePath);
     }
 
     // Remove the sprite of the slot image and make it fully transparent
@@ -292,7 +292,7 @@ public class Slot : MonoBehaviour
 [System.Serializable]
 public class SerializedSlot
 {
-    public SerializedItem Item;
+    public string ItemName;
     public SerializedSlotGuest SlotGuest;
 
     public SerializedSlot() { }
@@ -302,7 +302,7 @@ public class SerializedSlot
     {
         if (slot.SlotItem.Item != null)
         {
-            this.Item = new SerializedItem(slot.SlotItem.Item);
+            this.ItemName = slot.SlotItem.Item.Name;
         }
 
         this.SlotGuest = new SerializedSlotGuest(slot.SlotGuest);

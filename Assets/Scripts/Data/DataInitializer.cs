@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using IOUtility;
+using System;
 
 public static class DataInitializer
 {
@@ -37,73 +38,8 @@ public static class DataInitializer
 
 
 
-
-    /* Guest visit chance dictionaries for Items, manually sorted by rarest guests first */
-    private static readonly Dictionary<Guest, float> ItemADictionary = new Dictionary<Guest, float>()
-    {
-        { Gizmo, 0.1f },
-        { Bear, 0.2f },
-        { Kujo, 0.3f },
-        { Pip, 0.4f },
-        { Muffin, 0.5f },
-        { Nugget, 0.6f },
-        { Daisy, 0.7f },
-        { Hamlet, 0.8f },
-        { Sammy, 0.9f },
-        { Biscuit, 1f }
-    };
-    private static readonly Dictionary<Guest, float> ItemBDictionary = new Dictionary<Guest, float>()
-    {
-        { Biscuit, 0.1f },
-        { Sammy, 0.2f },
-        { Hamlet, 0.3f },
-        { Daisy, 0.4f },
-        { Nugget, 0.5f },
-        { Muffin, 0.6f },
-        { Pip, 0.7f },
-        { Kujo, 0.8f },
-        { Bear, 0.9f },
-        { Gizmo, 1f }
-    };
-    private static readonly Dictionary<Guest, float> ItemCDictionary = new Dictionary<Guest, float>()
-    {
-        { Pip, 0.1f },
-        { Muffin, 0.2f },
-        { Kujo, 0.3f },
-        { Hamlet, 0.4f },
-        { Nugget, 0.5f },
-        { Biscuit, 0.6f },
-        { Daisy, 0.7f },
-        { Gizmo, 0.8f },
-        { Sammy, 0.9f },
-        { Bear, 1f }
-    };
-    private static readonly Dictionary<Guest, float> ItemDDictionary = new Dictionary<Guest, float>()
-    {
-        { Kujo, 0.1f },
-        { Pip, 0.2f },
-        { Bear, 0.3f },
-        { Nugget, 0.4f },
-        { Sammy, 0.5f },
-        { Gizmo, 0.6f },
-        { Hamlet, 0.7f },
-        { Biscuit, 0.8f },
-        { Muffin, 0.9f },
-        { Daisy, 1f }
-    };
-
-    /* Items */
-    public static readonly Item Ball = new Item("Ball", 3, "Images/Items/ball.png", ItemADictionary);
-    public static readonly Item Basket = new Item("Basket", 5, "Images/Items/basket.png", ItemBDictionary);
-    public static readonly Item Bathtub = new Item("Bathtub", 8, "Images/Items/bathtub.png", ItemCDictionary);
-    public static readonly Item Car = new Item("Car", 13, "Images/Items/car.png", ItemDDictionary);
-    public static readonly Item Globe = new Item("Globe", 3, "Images/Items/globe.png", ItemADictionary);
-    public static readonly Item Igloo = new Item("Igloo", 5, "Images/Items/igloo.png", ItemBDictionary);
-    public static readonly Item Wheel = new Item("Wheel", 8, "Images/Items/wheel.png", ItemCDictionary);
-    public static readonly Item Cheese = new Item("Cheese", 13, "Images/Items/Consumable/cheese.png", ItemDDictionary);
-    public static readonly Item Peanut = new Item("Peanut", 13, "Images/Items/Consumable/peanut.png", ItemDDictionary);
-
-    public static readonly Item[] AllItems = new Item[]
+    /* Item name enum used to construct items during game session */
+    private enum ItemName
     {
         Ball,
         Basket,
@@ -116,16 +52,304 @@ public static class DataInitializer
         Peanut
     };
 
+    /* Array of all items in the game */
+    public static readonly Item[] AllItems = new Item[]
+    {
+        ConstructItem(ItemName.Ball),
+        ConstructItem(ItemName.Basket),
+        ConstructItem(ItemName.Bathtub),
+        ConstructItem(ItemName.Car),
+        ConstructItem(ItemName.Globe),
+        ConstructItem(ItemName.Igloo),
+        ConstructItem(ItemName.Wheel),
+        ConstructItem(ItemName.Cheese),
+        ConstructItem(ItemName.Peanut)
+    };
+
+    /* Array of items to give a brand new user */
+    public static readonly Item[] StarterItems = new Item[]
+    {
+        ConstructItem(ItemName.Ball),
+        ConstructItem(ItemName.Basket),
+        ConstructItem(ItemName.Bathtub),
+        ConstructItem(ItemName.Globe),
+        ConstructItem(ItemName.Peanut)
+    };
+
+    /* Check if string represents a valid item name */
+    public static bool IsValidItem(string name)
+    {
+        // Get enum from item name string
+        ItemName itemName = (ItemName)Enum.Parse(typeof(ItemName), name, true);
+
+        // Check if item name is an enum of ItemName
+        return Enum.IsDefined(typeof(ItemName), itemName);
+    }
+
+    /* Create item from item name by assigning static item properties */
+    public static Item ConstructItem(string name)
+    {
+        // Initialize default item
+        Item item = new Item();
+
+        // Return default item if the item name string is not defined in enum
+        if (!IsValidItem(name))
+        {
+            return item;
+        }
+
+        // Get item name enum from item name string
+        ItemName itemName = (ItemName)Enum.Parse(typeof(ItemName), name, true);
+
+        // Construct the item from the item name enum
+        return ConstructItem(itemName);
+    }
+
+    /* Construct item */
+    private static Item ConstructItem(ItemName itemName)
+    {
+        return new Item(
+            itemName.ToString(),
+            GetItemPrice(itemName),
+            GetItemImagePath(itemName),
+            GetItemVisitors(itemName));
+    }
+
+    /* Get item price from item name */
+    private static int GetItemPrice(ItemName itemName)
+    {
+        switch (itemName)
+        {
+            // Ball
+            case ItemName.Ball:
+                return 8;
+
+            // Basket
+            case ItemName.Basket:
+                return 13;
+
+            // Bathtub
+            case ItemName.Bathtub:
+                return 19;
+
+            // Car
+            case ItemName.Car:
+                return 50;
+
+            // Globe
+            case ItemName.Globe:
+                return 31;
+
+            // Igloo
+            case ItemName.Igloo:
+                return 38;
+
+            // Wheel
+            case ItemName.Wheel:
+                return 44;
+
+            // Cheese
+            case ItemName.Cheese:
+                return 2;
+
+            // Peanut
+            case ItemName.Peanut:
+                return 1;
+
+            default:
+                return 0;
+
+        }
+
+    }
+
+    /* Get item image path from item name */
+    private static string GetItemImagePath(ItemName itemName)
+    {
+        return Paths.ItemImageFile(itemName.ToString());
+    }
+
+    /* Get item visitors from item name */
+    private static Visitors GetItemVisitors(ItemName itemName)
+    {
+        switch (itemName)
+        {
+            // Ball
+            case ItemName.Ball:
+                return new Visitors(new Visit[]
+                    {
+                        new Visit(Hamlet, 0.1f),
+                        new Visit(Gizmo, 0.2f),
+                        new Visit(Sammy, 0.3f),
+                        new Visit(Pip, 0.4f),
+                        new Visit(Daisy, 0.5f),
+                        new Visit(Biscuit, 0.6f),
+                        new Visit(Bear, 0.7f),
+                        new Visit(Muffin, 0.8f),
+                        new Visit(Nugget, 0.9f),
+                        new Visit(Kujo, 1.0f),
+                    }
+                );
+
+            // Basket
+            case ItemName.Basket:
+                return new Visitors(new Visit[]
+                    {
+                        new Visit(Pip, 0.1f),
+                        new Visit(Gizmo, 0.2f),
+                        new Visit(Biscuit, 0.3f),
+                        new Visit(Bear, 0.4f),
+                        new Visit(Sammy, 0.5f),
+                        new Visit(Kujo, 0.6f),
+                        new Visit(Daisy, 0.7f),
+                        new Visit(Nugget, 0.8f),
+                        new Visit(Muffin, 0.9f),
+                        new Visit(Hamlet, 1.0f),
+                    }
+                );
+
+            // Bathtub
+            case ItemName.Bathtub:
+                return new Visitors(new Visit[]
+                    {
+                        new Visit(Gizmo, 0.1f),
+                        new Visit(Kujo, 0.2f),
+                        new Visit(Nugget, 0.3f),
+                        new Visit(Biscuit, 0.4f),
+                        new Visit(Muffin, 0.5f),
+                        new Visit(Sammy, 0.6f),
+                        new Visit(Pip, 0.7f),
+                        new Visit(Bear, 0.8f),
+                        new Visit(Hamlet, 0.9f),
+                        new Visit(Daisy, 1.0f),
+                    }
+                );
+
+            // Car
+            case ItemName.Car:
+                return new Visitors(new Visit[]
+                    {
+                        new Visit(Nugget, 0.1f),
+                        new Visit(Daisy, 0.2f),
+                        new Visit(Bear, 0.3f),
+                        new Visit(Sammy, 0.4f),
+                        new Visit(Biscuit, 0.5f),
+                        new Visit(Muffin, 0.6f),
+                        new Visit(Pip, 0.7f),
+                        new Visit(Gizmo, 0.8f),
+                        new Visit(Kujo, 0.9f),
+                        new Visit(Hamlet, 1.0f),
+                    }
+                );
+
+            // Globe
+            case ItemName.Globe:
+                return new Visitors(new Visit[]
+                    {
+                        new Visit(Muffin, 0.1f),
+                        new Visit(Hamlet, 0.2f),
+                        new Visit(Kujo, 0.3f),
+                        new Visit(Bear, 0.4f),
+                        new Visit(Daisy, 0.5f),
+                        new Visit(Pip, 0.6f),
+                        new Visit(Biscuit, 0.7f),
+                        new Visit(Sammy, 1.0f),
+                        new Visit(Nugget, 0.8f),
+                        new Visit(Gizmo, 0.9f),
+                    }
+                );
+
+            // Igloo
+            case ItemName.Igloo:
+                return new Visitors(new Visit[]
+                    {
+                        new Visit(Sammy, 0.1f),
+                        new Visit(Hamlet, 0.2f),
+                        new Visit(Gizmo, 0.3f),
+                        new Visit(Biscuit, 0.4f),
+                        new Visit(Pip, 0.5f),
+                        new Visit(Kujo, 0.6f),
+                        new Visit(Muffin, 0.7f),
+                        new Visit(Daisy, 0.8f),
+                        new Visit(Bear, 0.9f),
+                        new Visit(Nugget, 1.0f),
+                    }
+                );
+
+            // Wheel
+            case ItemName.Wheel:
+                return new Visitors(new Visit[]
+                    {
+                        new Visit(Muffin, 0.1f),
+                        new Visit(Gizmo, 0.2f),
+                        new Visit(Nugget, 0.3f),
+                        new Visit(Biscuit, 0.4f),
+                        new Visit(Daisy, 0.5f),
+                        new Visit(Bear, 0.6f),
+                        new Visit(Hamlet, 0.7f),
+                        new Visit(Pip, 0.8f),
+                        new Visit(Sammy, 0.9f),
+                        new Visit(Kujo, 1.0f),
+                    }
+                );
+
+            // Cheese
+            case ItemName.Cheese:
+                return new Visitors(new Visit[]
+                    {
+                        new Visit(Gizmo, 0.1f),
+                        new Visit(Muffin, 0.2f),
+                        new Visit(Pip, 0.3f),
+                        new Visit(Biscuit, 0.4f),
+                        new Visit(Hamlet, 0.5f),
+                        new Visit(Nugget, 0.6f),
+                        new Visit(Daisy, 0.7f),
+                        new Visit(Sammy, 0.8f),
+                        new Visit(Kujo, 0.9f),
+                        new Visit(Bear, 1.0f),
+                    }
+                );
+
+            // Peanut
+            case ItemName.Peanut:
+                return new Visitors(new Visit[]
+                    {
+                        new Visit(Kujo, 0.1f),
+                        new Visit(Nugget, 0.2f),
+                        new Visit(Pip, 0.3f),
+                        new Visit(Daisy, 0.4f),
+                        new Visit(Sammy, 0.5f),
+                        new Visit(Hamlet, 0.6f),
+                        new Visit(Gizmo, 0.7f),
+                        new Visit(Bear, 0.8f),
+                        new Visit(Biscuit, 0.9f),
+                        new Visit(Muffin, 1.0f),
+                    }
+                );
+
+            default:
+                return new Visitors(new Visit[]
+                    {
+                        new Visit(Kujo, 0.1f),
+                        new Visit(Pip, 0.2f),
+                        new Visit(Bear, 0.3f),
+                        new Visit(Nugget, 0.4f),
+                        new Visit(Sammy, 0.5f),
+                        new Visit(Gizmo, 0.6f),
+                        new Visit(Hamlet, 0.7f),
+                        new Visit(Biscuit, 0.8f),
+                        new Visit(Muffin, 0.9f),
+                        new Visit(Daisy, 1.0f),
+                    }
+                );
+
+        }
+
+    }
 
 
 
 
-    /* Allowed Guests for Biomes */
-    public static readonly Guest[] FieldGuests = new Guest[] { Gizmo, Bear, Daisy, Hamlet };
-    public static readonly Guest[] ForestGuests = new Guest[] { Biscuit, Kujo, Nugget, Sammy, Muffin };
 
-    /* Biomes */
-    public static Biome Field = new Biome("Field", FieldGuests);
-    public static Biome Forest = new Biome("Forest", ForestGuests);
 
 }

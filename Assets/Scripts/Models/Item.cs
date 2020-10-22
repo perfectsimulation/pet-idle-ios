@@ -1,56 +1,44 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-public class Item
+﻿public class Item
 {
-    // Name of this item
+    // Unique ID for this item
     public string Name;
 
-    // Price to buy this item in the shop
+    // Price in coins needed to buy this item in the market
     public int Price;
 
-    // Path to the png to use for the SlotItem that owns this Item
-    public string ImageAssetPath;
+    // Path to the image to use for displaying a sprite of this item
+    public string ImagePath;
 
-    // Dictionary with guest keys and visit chance values
-    public Dictionary<Guest, float> VisitChances;
+    // Probabilities of all potential guests to visit this item
+    public Visitors Visitors;
 
     /* Default no-arg constructor */
     public Item() { }
 
-    /* Construct an item */
+    /* Construct an item from data initializer */
     public Item(
         string name,
         int price,
-        string imageAssetPath,
-        Dictionary<Guest, float> visitChances)
+        string imagePath,
+        Visitors visitors)
     {
         this.Name = name;
         this.Price = price;
-        this.ImageAssetPath = imageAssetPath;
-        this.VisitChances = visitChances;
+        this.ImagePath = imagePath;
+        this.Visitors = visitors;
     }
 
-    /* Deserialize an item */
-    public Item(SerializedItem serializedItem)
+    /* Construct an item from its name */
+    public Item(string name)
     {
-        Dictionary<Guest, float> visitChances = new Dictionary<Guest, float>();
-
-        // Make a visit chance dictionary from the serialized keys and values
-        for (int i = 0; i < serializedItem.VisitChancesDictionaryKeys.Length; i++)
-        {
-            Guest key = serializedItem.VisitChancesDictionaryKeys[i];
-            float value = serializedItem.VisitChancesDictionaryValues[i];
-            visitChances.Add(key, value);
-        }
-
-        this.Name = serializedItem.Name;
-        this.Price = serializedItem.Price;
-        this.ImageAssetPath = serializedItem.ImageAssetPath;
-        this.VisitChances = visitChances;
+        Item item = DataInitializer.ConstructItem(name);
+        this.Name = item.Name;
+        this.Price = item.Price;
+        this.ImagePath = item.ImagePath;
+        this.Visitors = item.Visitors;
     }
 
-    // Two items are equal if they have the same name
+    // Check item equivalency by comparing name strings
     public override bool Equals(object obj)
     {
         // If the other obj is not an Item, it is not equal
@@ -66,40 +54,36 @@ public class Item
         return base.GetHashCode();
     }
 
-    // This is a valid item if it has been assigned a non-empty name
-    public static bool IsValid(SerializedItem serializedItem)
+    // Check if the string represents a valid item defined in data initializer
+    public static bool IsValid(string name)
     {
-        if (serializedItem.Name != null &&
-            !serializedItem.Name.Equals(string.Empty))
-        {
-            return true;
-        }
-
-        return false;
+        return DataInitializer.IsValidItem(name);
     }
 
 }
 
-[System.Serializable]
-public class SerializedItem
+// Item property for all potential guest visits and their likelihoods
+public class Visitors
 {
-    public string Name;
-    public int Price;
-    public string ImageAssetPath;
-    public Guest[] VisitChancesDictionaryKeys;
-    public float[] VisitChancesDictionaryValues;
+    public Visit[] Chances;
 
-    /* Default no-arg constructor */
-    public SerializedItem() { }
-
-    /* Serialize an item */
-    public SerializedItem(Item item)
+    public Visitors(Visit[] chances)
     {
-        this.Name = item.Name;
-        this.Price = item.Price;
-        this.ImageAssetPath = item.ImageAssetPath;
-        this.VisitChancesDictionaryKeys = item.VisitChances.Keys.ToArray();
-        this.VisitChancesDictionaryValues = item.VisitChances.Values.ToArray();
+        this.Chances = chances;
+    }
+
+}
+
+// Chance of a visit by guest
+public class Visit
+{
+    public Guest Guest { get; private set; }
+    public float Chance { get; private set; }
+
+    public Visit(Guest guest, float chance)
+    {
+        this.Guest = guest;
+        this.Chance = chance;
     }
 
 }

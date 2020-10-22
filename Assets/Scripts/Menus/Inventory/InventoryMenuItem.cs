@@ -29,7 +29,7 @@ public class InventoryMenuItem : MonoBehaviour
         this.Item = item;
 
         // Use the image path of the item to set the sprite
-        this.SetSprite(item.ImageAssetPath);
+        this.SetSprite(item.ImagePath);
 
         // Use the name of the item to set the name text
         this.SetNameText(item.Name);
