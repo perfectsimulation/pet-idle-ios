@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class NoteDetail : MonoBehaviour
 {
-    public TextMeshProUGUI Name;
+    public TextMeshProUGUI NameText;
     public Image GuestImage;
     public Image FriendshipImage;
     public TextMeshProUGUI VisitCountText;
@@ -12,7 +12,7 @@ public class NoteDetail : MonoBehaviour
     public TextMeshProUGUI NotesText;
     public Button PhotosButton;
 
-    // Set when a note menu item of notes content is pressed
+    // Set from notes content when a note menu item is pressed
     private Note Note;
 
     // Open the photos menu from menu manager
@@ -26,23 +26,29 @@ public class NoteDetail : MonoBehaviour
         this.OpenPhotos = callback;
     }
 
-    // Set note from notes content when a note menu item is pressed
+    // Fill in note details from notes content when menu item is pressed
     public void Hydrate(Note note)
     {
+        // Cache this note
         this.Note = note;
 
-        // Display details of the guest of this note
-        if (this.Note.HasBeenSeen)
-        {
-            // Show all guest details
-            this.HydrateKnownGuest();
-        }
-        else
-        {
-            // Show default values for some guest details
-            this.HydrateUnknownGuest();
-        }
+        // Show guest name
+        this.SetNameText();
 
+        // Show guest image
+        this.SetGuestImageSprite();
+
+        // Show friendship image
+        this.SetFriendshipImageSprite();
+
+        // Show visit count
+        this.SetVisitCountText();
+
+        // Show guest nature
+        this.SetNatureText();
+
+        // Show guest description
+        this.SetDescriptionText();
     }
 
     // Open the photos menu from menu manager with the photos from this note
@@ -51,62 +57,56 @@ public class NoteDetail : MonoBehaviour
         this.OpenPhotos();
     }
 
-    // Fill in details from guest note
-    private void HydrateKnownGuest()
+    // Set name text with guest name
+    private void SetNameText()
     {
-        string name = this.Note.Guest.Name;
-        string guestImagePath = this.Note.Guest.ImagePath;
-        string heartImagePath = this.GetHeartImage(this.Note.FriendshipPoints);
-        string visitText = "Visits: " + this.Note.VisitCount;
-        string natureText = "Nature: " + this.Note.Guest.Nature;
-
-        this.Name.SetText(name);
-        this.GuestImage.sprite = ImageUtility.CreateSprite(guestImagePath);
-        this.FriendshipImage.sprite = ImageUtility.CreateSprite(heartImagePath);
-        this.VisitCountText.SetText(visitText);
-        this.NatureText.SetText(natureText);
+        this.NameText.SetText(this.Note.Guest.Name);
     }
 
-    // Show default values if guest has not been seen in active biome
-    private void HydrateUnknownGuest()
+    // Set sprite of guest image based on previous sighting (or lack thereof)
+    private void SetGuestImageSprite()
     {
-        string name = this.Note.Guest.Name;
-        string guestImagePath = DataInitializer.UnseenGuestImageAsset;
-        string heartImagePath = this.GetHeartImage(this.Note.FriendshipPoints);
-        string visitText = "Visits: " + this.Note.VisitCount;
-        string natureText = "Nature: " + this.Note.Guest.Nature;
+        // Get the sprite to use for the guest image
+        Sprite sprite = this.Note.Guest.GetGuestSprite(this.Note.HasBeenSeen);
 
-        this.Name.SetText(name);
-        this.GuestImage.sprite = ImageUtility.CreateSprite(guestImagePath);
-        this.FriendshipImage.sprite = ImageUtility.CreateSprite(heartImagePath);
-        this.VisitCountText.SetText(visitText);
-        this.NatureText.SetText(natureText);
+        // Set the guest image sprite
+        this.GuestImage.sprite = sprite;
     }
 
-    // Get the heart image path to use based on friendship points of this guest
-    private string GetHeartImage(int friendshipPoints)
+    // Set sprite of friendship image based on friendship points of this note
+    private void SetFriendshipImageSprite()
     {
-        int friendshipLevel = 0;
+        // Get the sprite to use for the friendship image
+        Sprite sprite = Guest.GetHeartLevelSprite(this.Note.FriendshipPoints);
 
-        // Set level to index of first threshold exceeding guest friendship
-        for (int i = 0; i < DataInitializer.FriendshipThresholds.Length; i++)
-        {
-            if (friendshipPoints < DataInitializer.FriendshipThresholds[i])
-            {
-                friendshipLevel = i;
-                break;
-            }
+        // Set the friendship image sprite
+        this.FriendshipImage.sprite = sprite;
+    }
 
-            // Assign highest level when guest friendship exceeds max threshold
-            friendshipLevel = i;
-        }
+    // Set visit count text based on visit count of this note
+    private void SetVisitCountText()
+    {
+        // Create string for visit count text
+        string text = string.Format("Visits: {0}", this.Note.VisitCount);
 
-        // Construct friendship image asset path for this friendship level
-        string assetPath = string.Format(
-            "Images/Friendship/heart-level-{0}.png",
-            friendshipLevel);
+        // Set text of the visit count text component
+        this.VisitCountText.text = text;
+    }
 
-        return assetPath;
+    // Set nature text based on nature of guest
+    private void SetNatureText()
+    {
+        // Create string for nature text
+        string text = string.Format("Nature: {0}", this.Note.Guest.Nature);
+
+        // Set text of the nature text component
+        this.NatureText.text = text;
+    }
+
+    // Set description text
+    private void SetDescriptionText()
+    {
+        // TODO
     }
 
 }

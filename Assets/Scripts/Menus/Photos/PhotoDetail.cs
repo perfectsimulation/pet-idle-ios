@@ -62,13 +62,13 @@ public class PhotoDetail : MonoBehaviour
         this.OnClose();
     }
 
-    // Create a sprite out of the photo texture and assign it to the image
+    // Set sprite of photo image
     private void SetImage()
     {
-        // Create the sprite out of the photo texture
-        Sprite sprite = ImageUtility.CreateSprite(this.Photo.Texture);
+        // Get the sprite to use for the photo image
+        Sprite sprite = this.Photo.GetSprite();
 
-        // Set the sprite of the image component
+        // Set the image sprite
         this.Image.sprite = sprite;
     }
 

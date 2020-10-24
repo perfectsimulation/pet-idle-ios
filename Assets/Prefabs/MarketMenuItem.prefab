@@ -134,7 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35670f1788efb45a0b436aba3940ccd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Image: {fileID: 1903388593183171632}
+  ItemImage: {fileID: 1903388593183171632}
   NameText: {fileID: 5640909472405636727}
   SoldRibbon: {fileID: 3448065058740701355}
   Button: {fileID: 8322066349617263102}

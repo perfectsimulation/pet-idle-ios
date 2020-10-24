@@ -26,7 +26,7 @@ public class SlotGuest
     /* Create SlotGuest from save data */
     public SlotGuest(SerializedSlotGuest serializedSlotGuest)
     {
-        this.Guest = serializedSlotGuest.Guest;
+        this.Guest = new Guest(serializedSlotGuest.GuestName);
         this.ArrivalDateTime = serializedSlotGuest.ArrivalDateTime;
         this.DepartureDateTime = serializedSlotGuest.DepartureDateTime;
         this.CoinDrop = serializedSlotGuest.CoinDrop;
@@ -148,7 +148,7 @@ public class SlotGuest
 [Serializable]
 public class SerializedSlotGuest
 {
-    public Guest Guest;
+    public string GuestName;
     public SerializedDateTime ArrivalDateTime;
     public SerializedDateTime DepartureDateTime;
     public int CoinDrop;
@@ -160,7 +160,7 @@ public class SerializedSlotGuest
     {
         if (slotGuest.Guest != null)
         {
-            this.Guest = slotGuest.Guest;
+            this.GuestName = slotGuest.Guest.Name;
             this.ArrivalDateTime = slotGuest.ArrivalDateTime;
             this.DepartureDateTime = slotGuest.DepartureDateTime;
             this.CoinDrop = slotGuest.CoinDrop;
@@ -169,7 +169,7 @@ public class SerializedSlotGuest
         }
         else
         {
-            this.Guest = null;
+            this.GuestName = null;
             this.ArrivalDateTime = DateTime.MinValue;
             this.DepartureDateTime = DateTime.MinValue;
             this.CoinDrop = 0;

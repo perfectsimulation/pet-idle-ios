@@ -752,7 +752,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1648496072}
-        m_MethodName: OnBackButtonPress
+        m_MethodName: OnPressBackButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1304,7 +1304,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1648496072}
-        m_MethodName: OnPlaceButtonPress
+        m_MethodName: OnPressPlaceButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3313,9 +3313,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 353e72b90f1cd4b85b730fb11992a9c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Title: {fileID: 682895438}
-  Image: {fileID: 1089233140}
-  Description: {fileID: 1307160019}
+  NameText: {fileID: 682895438}
+  ItemImage: {fileID: 1089233140}
+  DescriptionText: {fileID: 1307160019}
   BackButton: {fileID: 1388897511}
   BuyButton: {fileID: 626216658}
   FailurePanel: {fileID: 1002318003}
@@ -4102,7 +4102,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 425970691}
-        m_MethodName: OnBuyButtonPress
+        m_MethodName: OnPressBuyButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4578,7 +4578,7 @@ GameObject:
   - component: {fileID: 682895439}
   - component: {fileID: 682895438}
   m_Layer: 5
-  m_Name: Title
+  m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8745,7 +8745,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 947745071}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -9608,7 +9608,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 425970691}
-        m_MethodName: OnBackButtonPress
+        m_MethodName: OnPressBackButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10003,9 +10003,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22c0fb9f4ba5241a18aa6604851d705f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Title: {fileID: 1892167646}
-  Image: {fileID: 1965813184}
-  Description: {fileID: 1773241066}
+  NameText: {fileID: 1892167646}
+  ItemImage: {fileID: 1965813184}
+  DescriptionText: {fileID: 1773241066}
   BackButton: {fileID: 80572474}
   PlaceButton: {fileID: 177582816}
 --- !u!1 &1648772194
@@ -11542,7 +11542,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6326d49d69c99416aa57d6d84da45697, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: {fileID: 1721766821}
+  NameText: {fileID: 1721766821}
   GuestImage: {fileID: 430677455}
   FriendshipImage: {fileID: 173856690}
   VisitCountText: {fileID: 316881181}
@@ -11649,7 +11649,7 @@ GameObject:
   - component: {fileID: 1892167647}
   - component: {fileID: 1892167646}
   m_Layer: 5
-  m_Name: Title
+  m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

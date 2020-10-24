@@ -100,7 +100,7 @@ public class Gift
     /* Create Gift from save data */
     public Gift(SerializedGift serializedGift)
     {
-        this.Guest = serializedGift.Guest;
+        this.Guest = new Guest(serializedGift.GuestName);
         this.Item = new Item(serializedGift.ItemName);
         this.FriendshipPoints = serializedGift.FriendshipPoints;
         this.Coins = serializedGift.Coins;
@@ -111,7 +111,7 @@ public class Gift
 [System.Serializable]
 public class SerializedGift
 {
-    public Guest Guest;
+    public string GuestName;
     public string ItemName;
     public int FriendshipPoints;
     public int Coins;
@@ -119,7 +119,7 @@ public class SerializedGift
     /* Create SerializedGift from Gift */
     public SerializedGift(Gift gift)
     {
-        this.Guest = gift.Guest;
+        this.GuestName = gift.Guest.Name;
         this.ItemName = gift.Item.Name;
         this.FriendshipPoints = gift.FriendshipPoints;
         this.Coins = gift.Coins;

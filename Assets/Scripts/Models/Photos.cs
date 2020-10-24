@@ -109,6 +109,12 @@ public class Photo
         ImageConversion.LoadImage(this.Texture, bytes);
     }
 
+    // Create sprite for this photo
+    public Sprite GetSprite()
+    {
+        return ImageUtility.CreateSprite(this.Texture);
+    }
+
     // Generate file name for persisting this photo
     private string GenerateFileName()
     {

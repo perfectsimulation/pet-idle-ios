@@ -31,33 +31,6 @@ namespace IOUtility
             }
         }
 
-        /* Guest image streaming asset directory location */
-        public static string StreamingGuestDirectory
-        {
-            get
-            {
-                return Path.Combine(StreamingAssetPath, "Images/Hamsters");
-            }
-        }
-
-        /* Item image streaming asset directory location */
-        public static string StreamingItemDirectory
-        {
-            get
-            {
-                return Path.Combine(StreamingAssetPath, "Images/Items");
-            }
-        }
-
-        /* Interaction image streaming asset directory location */
-        public static string StreamingInteractionDirectory
-        {
-            get
-            {
-                return Path.Combine(StreamingAssetPath, "Images/Interactions");
-            }
-        }
-
         /* Get the path to the directory containing all photos of this guest */
         public static string GuestPhotoDirectory(string guestName)
         {
@@ -74,6 +47,13 @@ namespace IOUtility
         public static string GuestImageFile(string guestName)
         {
             string fileName = string.Format("{0}.png", guestName.ToLower());
+            return Path.Combine(StreamingGuestDirectory, fileName);
+        }
+
+        /* Get the path to the unknown guest image streaming asset */
+        public static string GuestUnknownImageFile()
+        {
+            string fileName = string.Format("unknown.png");
             return Path.Combine(StreamingGuestDirectory, fileName);
         }
 
@@ -95,10 +75,53 @@ namespace IOUtility
             return Path.Combine(StreamingInteractionDirectory, fileName);
         }
 
+        /* Get the path to the heart level image asset */
+        public static string HeartImageFile(string color)
+        {
+            string fileName = string.Format("heart-{0}.png", color.ToLower());
+            return Path.Combine(StreamingFriendshipDirectory, fileName);
+        }
+
         /* Get the path to the streaming asset */
         public static string StreamingAssetFile(string assetPath)
         {
             return Path.Combine(Application.streamingAssetsPath, assetPath);
+        }
+
+        /* Guest image streaming asset directory location */
+        private static string StreamingGuestDirectory
+        {
+            get
+            {
+                return Path.Combine(StreamingAssetPath, "Images/Hamsters");
+            }
+        }
+
+        /* Item image streaming asset directory location */
+        private static string StreamingItemDirectory
+        {
+            get
+            {
+                return Path.Combine(StreamingAssetPath, "Images/Items");
+            }
+        }
+
+        /* Interaction image streaming asset directory location */
+        private static string StreamingInteractionDirectory
+        {
+            get
+            {
+                return Path.Combine(StreamingAssetPath, "Images/Interactions");
+            }
+        }
+
+        /* Friendship image streaming asset directory location */
+        private static string StreamingFriendshipDirectory
+        {
+            get
+            {
+                return Path.Combine(StreamingAssetPath, "Images/Friendship");
+            }
         }
 
         /* Persistent data path */

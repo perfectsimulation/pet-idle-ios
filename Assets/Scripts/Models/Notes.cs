@@ -37,7 +37,7 @@ public class Notes
             Note note = new Note(serializedNote);
 
             // Add a dictionary entry for the note of this guest
-            this.GuestNotes.Add(serializedNote.Guest.Name, note);
+            this.GuestNotes.Add(serializedNote.GuestName, note);
         }
 
     }
@@ -153,7 +153,6 @@ public class Notes
         {
             // Record the first encounter of this guest
             note.RecordFirstEncounter();
-            note.SetImagePath(slotGuest.Guest.ImagePath);
         }
     }
 
@@ -162,7 +161,6 @@ public class Notes
 public class Note
 {
     public Guest Guest { get; private set; }
-    public string ImagePath { get; private set; }
     public bool HasBeenSeen { get; private set; }
     public int VisitCount { get; private set; }
     public int FriendshipPoints { get; private set; }
@@ -172,7 +170,6 @@ public class Note
     public Note(Guest guest)
     {
         this.Guest = guest;
-        this.ImagePath = DataInitializer.UnseenGuestImageAsset;
         this.HasBeenSeen = false;
         this.VisitCount = 0;
         this.FriendshipPoints = 0;
@@ -182,12 +179,11 @@ public class Note
     /* Create Note from save data */
     public Note(SerializedNote serializedNote)
     {
-        this.Guest = serializedNote.Guest;
-        this.ImagePath = serializedNote.ImagePath;
+        this.Guest = new Guest(serializedNote.GuestName);
         this.HasBeenSeen = serializedNote.HasBeenSeen;
         this.VisitCount = serializedNote.VisitCount;
         this.FriendshipPoints = serializedNote.FriendshipPoints;
-        this.Photos = new Photos(serializedNote.Guest.Name);
+        this.Photos = new Photos(serializedNote.GuestName);
     }
 
     // Set the Photos for this note
@@ -200,12 +196,6 @@ public class Note
     public void AddPhoto(Photo photo)
     {
         this.Photos.Add(photo);
-    }
-
-    // Set the image asset path used for this note
-    public void SetImagePath(string imagePath)
-    {
-        this.ImagePath = imagePath;
     }
 
     // Indicate if guest has been seen in the active biome
@@ -231,8 +221,7 @@ public class Note
 [System.Serializable]
 public class SerializedNote
 {
-    public Guest Guest;
-    public string ImagePath;
+    public string GuestName;
     public bool HasBeenSeen;
     public int VisitCount;
     public int FriendshipPoints;
@@ -242,8 +231,7 @@ public class SerializedNote
     /* Create SerializedNote from guest and note */
     public SerializedNote(Guest guest, Note note)
     {
-        this.Guest = guest;
-        this.ImagePath = note.ImagePath;
+        this.GuestName = guest.Name;
         this.HasBeenSeen = note.HasBeenSeen;
         this.VisitCount = note.VisitCount;
         this.FriendshipPoints = note.FriendshipPoints;

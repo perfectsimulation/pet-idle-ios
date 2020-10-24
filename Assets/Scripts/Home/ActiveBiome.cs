@@ -144,8 +144,13 @@ public class ActiveBiome : MonoBehaviour
             this.Slots[oldSlotIndex].RemoveItem();
         }
 
-        // Initialize the item in the newly selected slot
+        // Pass the slot a delegate to select new guests
         selectedSlot.SetupSelectGuestDelegate(this.SelectGuestToVisit);
+
+        // Pass the slot a delegate to remove departing guests
+        selectedSlot.SetupRemoveGuestDelegate(this.RemoveGuest);
+
+        // Initialize the item in the newly selected slot
         selectedSlot.InitializeItem(this.ItemToPlaceInActiveBiome);
 
         // End item placement flow for each slot
@@ -185,7 +190,7 @@ public class ActiveBiome : MonoBehaviour
                 serializedSlots[i].ItemName != string.Empty &&
                 Item.IsValid(serializedSlots[i].ItemName))
             {
-                // Create an item from the serialized item of this slot
+                // Create an item from this serialized item
                 Item item = new Item(serializedSlots[i].ItemName);
 
                 // Pass the slot a delegate to retrigger new guests
@@ -198,9 +203,9 @@ public class ActiveBiome : MonoBehaviour
                 this.Slots[i].RestoreSlotItem(item);
 
                 // If the serialized slot has a guest, assign it to the corresponding slot
-                if (serializedSlots[i].SlotGuest != null &&
-                    serializedSlots[i].SlotGuest.Guest != null &&
-                    Guest.IsValid(serializedSlots[i].SlotGuest.Guest))
+                if (serializedSlots[i].SlotGuest.GuestName != null &&
+                    serializedSlots[i].SlotGuest.GuestName != string.Empty &&
+                    Guest.IsValid(serializedSlots[i].SlotGuest.GuestName))
                 {
                     // Assign the guest to the slot
                     this.Slots[i].SetGuestFromSaveData(serializedSlots[i].SlotGuest);

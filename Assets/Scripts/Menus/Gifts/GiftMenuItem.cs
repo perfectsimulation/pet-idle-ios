@@ -19,82 +19,68 @@ public class GiftMenuItem : MonoBehaviour
     // Text component for the friendship reward of this gift menu item
     public TextMeshProUGUI FriendshipText;
 
-    // Set from gifts content when a gift menu item is pressed
+    // Set when gifts content creates this gift menu item
     public Gift Gift { get; private set; }
 
     // Assign gift to this gift menu item and fill in details
     public void SetGift(Gift gift)
     {
+        // Cache this gift
         this.Gift = gift;
 
-        // Use the name of the guest of this gift to set the guest name text
-        this.SetGuestNameText(gift.Guest.Name);
+        // Show guest name
+        this.SetGuestNameText();
 
-        // Use the image path of the item of this gift to set the item sprite
-        this.SetItemImage(gift.Item.ImagePath);
+        // Show item image
+        this.SetItemImage();
 
-        // Use the coin reward of this gift to set the coin text
-        this.SetCoinText(gift.Coins);
+        // Show coin reward amount
+        this.SetCoinText();
 
-        // Use the friendship reward of this gift to set the friendship text
-        this.SetFriendshipText(gift.FriendshipPoints);
+        // Show friendship point reward amount
+        this.SetFriendshipText();
     }
 
-    // Set guest image sprite depending on previous encounter (or lack thereof)
+    // Set sprite of guest image based on previous sighting (or lack thereof)
     public void SetGuestImage(bool hasBeenSeen)
     {
-        this.GuestImage.sprite = this.SelectGuestImage(hasBeenSeen);
+        this.GuestImage.sprite = this.Gift.Guest.GetGuestSprite(hasBeenSeen);
     }
 
-    private void SetGuestNameText(string guestName)
+    // Set guest name text with guest name
+    private void SetGuestNameText()
     {
-        this.GuestNameText.text = guestName;
+        this.GuestNameText.text = this.Gift.Guest.Name;
     }
 
-    // Set item image sprite using this image asset path
-    private void SetItemImage(string imagePath)
+    // Set sprite of item image
+    private void SetItemImage()
     {
-        this.ItemImage.sprite = this.SelectItemImage(imagePath);
+        // Get the sprite to use for the item image
+        Sprite sprite = this.Gift.Item.GetItemSprite();
+
+        // Set the item image sprite
+        this.ItemImage.sprite = sprite;
     }
 
-    private void SetCoinText(int coins)
+    // Set coin text with coins of gift
+    private void SetCoinText()
     {
-        this.CoinText.text = string.Format("x {0}", coins);
+        // Create string for coin text
+        string text = string.Format("x {0}", this.Gift.Coins);
+
+        // Set text of the coin text component
+        this.CoinText.text = text;
     }
 
-    private void SetFriendshipText(int friendshipPoints)
+    // Set friendship text with friendship points of gift
+    private void SetFriendshipText()
     {
-        this.FriendshipText.text = string.Format("+ {0}", friendshipPoints);
-    }
+        // Create string for friendship text
+        string text = string.Format("+ {0}", this.Gift.FriendshipPoints);
 
-    // Specify sprite to use for the guest from past encounter (or lack thereof)
-    private Sprite SelectGuestImage(bool hasBeenSeen)
-    {
-        // Declare variable for guest sprite
-        Sprite sprite;
-
-        // Create sprite to use for guest image
-        if (hasBeenSeen)
-        {
-            // Use guest image if guest has been seen at least once
-            sprite = ImageUtility.CreateSprite(this.Gift.Guest.ImagePath);
-        }
-        else
-        {
-            // Use unseen guest image if guest has never been seen
-            sprite =
-                ImageUtility.CreateSprite(
-                    DataInitializer.UnseenGuestImageAsset);
-        }
-
-        return sprite;
-    }
-
-    // Create a sprite to use for the item using the image at this image path
-    private Sprite SelectItemImage(string imagePath)
-    {
-        // Use default item image asset
-        return ImageUtility.CreateSprite(imagePath);
+        // Set text of the friendship text component
+        this.FriendshipText.text = text;
     }
 
 }

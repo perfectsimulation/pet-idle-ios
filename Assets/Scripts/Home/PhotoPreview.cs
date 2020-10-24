@@ -57,14 +57,14 @@ public class PhotoPreview : MonoBehaviour
         this.OnCloseDelegate = callback;
     }
 
-    // Create the photo image sprite from the newly generated texture
+    // Create the photo from the newly generated texture
     public void CreatePhoto(Texture2D texture)
     {
-        // Show photo as a sprite in the photo image component
-        this.SetPreviewSprite(texture);
-
         // Create a photo with the newly generated texture
         this.Photo = new Photo(texture);
+
+        // Show photo as a sprite in the photo image component
+        this.SetPhotoImageSprite();
     }
 
     // Save the captured photo to user data from game manager
@@ -90,13 +90,13 @@ public class PhotoPreview : MonoBehaviour
         this.SaveText.text = text;
     }
 
-    // Create and set a sprite in the photo image component using this texture
-    private void SetPreviewSprite(Texture2D texture)
+    // Set sprite of the photo image
+    private void SetPhotoImageSprite()
     {
-        // Create the sprite using this texture
-        Sprite sprite = ImageUtility.CreateSprite(texture);
+        // Get the sprite to use for the photo image
+        Sprite sprite = this.Photo.GetSprite();
 
-        // Set the sprite of the photo image component
+        // Set the image sprite
         this.PhotoImage.sprite = sprite;
     }
 

@@ -5,12 +5,12 @@ using UnityEngine.UI;
 public class InventoryMenuItem : MonoBehaviour
 {
     // Image component of this inventory menu item
-    public Image Image;
+    public Image ItemImage;
 
     // Text component for the item name of this inventory menu item
     public TextMeshProUGUI NameText;
 
-    // Show out ribbon when item is currently placed in active biome
+    // Show this indicator when the item is currently placed in active biome
     public Image OutRibbon;
 
     // Button component of this inventory menu item
@@ -26,16 +26,17 @@ public class InventoryMenuItem : MonoBehaviour
     // Assign item to this inventory menu item and fill in details
     public void SetItem(Item item)
     {
+        // Cache this item
         this.Item = item;
 
-        // Use the image path of the item to set the sprite
-        this.SetSprite(item.ImagePath);
+        // Show item image
+        this.SetItemImageSprite();
 
-        // Use the name of the item to set the name text
-        this.SetNameText(item.Name);
+        // Show item name
+        this.SetNameText();
     }
 
-    // Show/hide 'in use' indicator
+    // Show/hide out ribbon during/after item placement in active biome
     public void SetInBiomeStatus(bool isInBiome)
     {
         // Show out ribbon image if the item is currently in the active biome
@@ -48,25 +49,26 @@ public class InventoryMenuItem : MonoBehaviour
         this.Button.onClick.AddListener(() => callback(this.Item));
     }
 
-    // Set the sprite of the image component
-    private void SetSprite(string imagePath)
+    // Set sprite of item image
+    private void SetItemImageSprite()
     {
-        // Create a sprite using the image path of the note
-        Sprite sprite = ImageUtility.CreateSprite(imagePath);
+        // Get the sprite to use for the item image
+        Sprite sprite = this.Item.GetItemSprite();
 
-        // Set the sprite of the image component
-        this.Image.sprite = sprite;
+        // Set the item image sprite
+        this.ItemImage.sprite = sprite;
     }
 
-    // Set the name text using the name of this item
-    private void SetNameText(string itemName)
+    // Set name text with item name
+    private void SetNameText()
     {
-        this.NameText.text = itemName;
+        this.NameText.text = this.Item.Name;
     }
 
-    // Show/hide out ribbon depending on the placement of item in active biome
+    // Indicate when item is currently placed in active biome
     private void ShowOutRibbon(bool isInBiome)
     {
+        // TODO
         this.OutRibbon.gameObject.SetActive(isInBiome);
     }
 

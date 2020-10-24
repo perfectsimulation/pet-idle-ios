@@ -4,8 +4,8 @@ using UnityEngine.UI;
 
 public class NoteMenuItem : MonoBehaviour
 {
-    // Image component of this note menu item
-    public Image Image;
+    // Guest image component of this note menu item
+    public Image GuestImage;
 
     // Text component for the guest name of this note menu item
     public TextMeshProUGUI NameText;
@@ -23,16 +23,17 @@ public class NoteMenuItem : MonoBehaviour
     // Assign note to this note menu item and fill in details
     public void SetNote(Note note)
     {
+        // Cache this note
         this.Note = note;
 
         // Use the image path of the note to set the sprite
-        this.SetSprite(note.ImagePath);
+        this.SetGuestImageSprite();
 
         // Use the guest name of the note to set the name text
-        this.SetNameText(note.Guest.Name);
+        this.SetNameText();
 
         // Set interactable the button if the visit count is greater than 0
-        this.SetInteractable(note.VisitCount > 0);
+        this.SetInteractable();
     }
 
     // Assign on click delegate from notes content to button component
@@ -41,26 +42,28 @@ public class NoteMenuItem : MonoBehaviour
         this.Button.onClick.AddListener(() => callback(this.Note));
     }
 
-    // Set the sprite of the image component
-    private void SetSprite(string imagePath)
+    // Set sprite of guest image based on previous sighting (or lack thereof)
+    private void SetGuestImageSprite()
     {
-        // Create a sprite using the image path of the note
-        Sprite sprite = ImageUtility.CreateSprite(imagePath);
+        // Create a sprite using the guest of this note
+        Sprite sprite = this.Note.Guest.GetGuestSprite(this.Note.HasBeenSeen);
 
         // Set the sprite of the guest image component
-        this.Image.sprite = sprite;
+        this.GuestImage.sprite = sprite;
     }
 
-    // Set the name text using the guest of this note
-    private void SetNameText(string guestName)
+    // Set name text with guest name
+    private void SetNameText()
     {
-        this.NameText.text = guestName;
+        this.NameText.text = this.Note.Guest.Name;
     }
 
-    // Set the interactability of the button
-    private void SetInteractable(bool hasGuestVisited)
+    // Set the interactability of the button component
+    private void SetInteractable()
     {
-        this.Button.interactable = hasGuestVisited;
+        // Allow interaction with button if guest has visited at least once
+        bool interactable = this.Note.VisitCount > 0;
+        this.Button.interactable = interactable;
     }
 
 }

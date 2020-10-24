@@ -5,12 +5,12 @@ using UnityEngine.UI;
 public class MarketMenuItem : MonoBehaviour
 {
     // Image component of this market menu item
-    public Image Image;
+    public Image ItemImage;
 
     // Text component for the item name of this market menu item
     public TextMeshProUGUI NameText;
 
-    // Show sold ribbon when item already exists in user inventory
+    // Show this indicator when the item is already in the user inventory
     public Image SoldRibbon;
 
     // Button component of this market menu item
@@ -26,13 +26,14 @@ public class MarketMenuItem : MonoBehaviour
     // Assign item to this market menu item and fill in details
     public void SetItem(Item item)
     {
+        // Cache this item
         this.Item = item;
 
-        // Use the image path of the item to set the sprite
-        this.SetSprite(item.ImagePath);
+        // Show item image
+        this.SetItemImageSprite();
 
-        // Use the name of the item to set the name text
-        this.SetNameText(item.Name);
+        // Show item name
+        this.SetNameText();
     }
 
     // Set button interactability and show/hide purchase indicator
@@ -51,29 +52,30 @@ public class MarketMenuItem : MonoBehaviour
         this.Button.onClick.AddListener(() => callback(this.Item));
     }
 
-    // Set the sprite of the image component
-    private void SetSprite(string imagePath)
+    // Set sprite of the item image
+    private void SetItemImageSprite()
     {
-        // Create a sprite using the image path of the note
-        Sprite sprite = ImageUtility.CreateSprite(imagePath);
+        // Get the sprite to use for the item image
+        Sprite sprite = this.Item.GetItemSprite();
 
-        // Set the sprite of the image component
-        this.Image.sprite = sprite;
+        // Set the item image sprite
+        this.ItemImage.sprite = sprite;
     }
 
-    // Set the name text using the name of this item
-    private void SetNameText(string itemName)
+    // Set name text with item name
+    private void SetNameText()
     {
-        this.NameText.text = itemName;
+        this.NameText.text = this.Item.Name;
     }
 
-    // Allow button presses if the item has not yet been purchased
+    // Set the interactability of the button component
     private void SetInteractable(bool hasPurchased)
     {
+        // Allow interaction with button if item has not been purchased
         this.Button.interactable = !hasPurchased;
     }
 
-    // Show/hide sold ribbon depending on the purchase status of the item
+    // Indicate when the item has been purchased
     private void ShowSoldRibbon(bool hasPurchased)
     {
         this.SoldRibbon.gameObject.SetActive(hasPurchased);

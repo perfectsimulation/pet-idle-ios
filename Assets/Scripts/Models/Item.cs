@@ -1,16 +1,18 @@
-﻿public class Item
+﻿using UnityEngine;
+
+public class Item
 {
     // Unique ID for this item
-    public string Name;
+    public string Name { get; private set; }
 
     // Price in coins needed to buy this item in the market
-    public int Price;
+    public int Price { get; private set; }
 
     // Path to the image to use for displaying a sprite of this item
-    public string ImagePath;
+    public string ImagePath { get; private set; }
 
     // Probabilities of all potential guests to visit this item
-    public Visitors Visitors;
+    public Visitors Visitors { get; private set; }
 
     /* Default no-arg constructor */
     public Item() { }
@@ -28,24 +30,24 @@
         this.Visitors = visitors;
     }
 
-    /* Construct an item from its name */
+    /* Create an item from a valid item name */
     public Item(string name)
     {
-        Item item = DataInitializer.ConstructItem(name);
+        Item item = DataInitializer.GetItem(name);
         this.Name = item.Name;
         this.Price = item.Price;
         this.ImagePath = item.ImagePath;
         this.Visitors = item.Visitors;
     }
 
-    // Check item equivalency by comparing name strings
+    // Check item equality by checking string equality of their names
     public override bool Equals(object obj)
     {
-        // If the other obj is not an Item, it is not equal
+        // Return false when the argument is not an Item
         Item otherItem = (Item)obj;
         if (otherItem == null) return false;
 
-        // If the other item has the same name, it is equal
+        // Return true when the names of both items match
         return this.Name.Equals(otherItem.Name);
     }
 
@@ -54,10 +56,22 @@
         return base.GetHashCode();
     }
 
-    // Check if the string represents a valid item defined in data initializer
+    // Check whether this string represents a valid item
     public static bool IsValid(string name)
     {
-        return DataInitializer.IsValidItem(name);
+        if (name != null && name != string.Empty)
+        {
+            // Return true when the name is included in valid item names
+            return DataInitializer.IsValidItem(name);
+        }
+
+        return false;
+    }
+
+    // Create sprite for item image
+    public Sprite GetItemSprite()
+    {
+        return ImageUtility.CreateSprite(this.ImagePath);
     }
 
 }
@@ -65,7 +79,7 @@
 // Item property for all potential guest visits and their likelihoods
 public class Visitors
 {
-    public Visit[] Chances;
+    public Visit[] Chances { get; private set; }
 
     public Visitors(Visit[] chances)
     {

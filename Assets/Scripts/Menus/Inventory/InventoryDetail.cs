@@ -4,9 +4,9 @@ using UnityEngine.UI;
 
 public class InventoryDetail : MonoBehaviour
 {
-    public TextMeshProUGUI Title;
-    public Image Image;
-    public TextMeshProUGUI Description;
+    public TextMeshProUGUI NameText;
+    public Image ItemImage;
+    public TextMeshProUGUI DescriptionText;
     public Button BackButton;
     public Button PlaceButton;
 
@@ -38,26 +38,51 @@ public class InventoryDetail : MonoBehaviour
     // Fill in item details from inventory content when menu item is pressed
     public void Hydrate(Item item)
     {
+        // Cache this item
         this.Item = item;
 
-        string title = item.Name;
-        string imagePath = item.ImagePath;
-        // TODO add description field to item
+        // Show item name
+        this.SetNameText();
 
-        this.Title.SetText(title);
-        this.Image.sprite = ImageUtility.CreateSprite(imagePath);
+        // Show item image
+        this.SetItemImageSprite();
+
+        // Show item description
+        this.SetDescriptionText();
     }
 
     // Call the listener of the close button of menu manager
-    public void OnBackButtonPress()
+    public void OnPressBackButton()
     {
         this.OnClose();
     }
 
     // Begin item placement flow from menu manager
-    public void OnPlaceButtonPress()
+    public void OnPressPlaceButton()
     {
         this.PlaceItem(this.Item);
+    }
+
+    // Set name text with item name
+    private void SetNameText()
+    {
+        this.NameText.SetText(this.Item.Name);
+    }
+
+    // Set sprite of item image
+    private void SetItemImageSprite()
+    {
+        // Get the sprite to use for the item image
+        Sprite sprite = this.Item.GetItemSprite();
+
+        // Set the item image sprite
+        this.ItemImage.sprite = sprite;
+    }
+
+    // Set description text
+    private void SetDescriptionText()
+    {
+        // TODO
     }
 
 }

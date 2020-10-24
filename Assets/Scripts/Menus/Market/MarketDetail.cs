@@ -4,9 +4,9 @@ using UnityEngine.UI;
 
 public class MarketDetail : MonoBehaviour
 {
-    public TextMeshProUGUI Title;
-    public Image Image;
-    public TextMeshProUGUI Description;
+    public TextMeshProUGUI NameText;
+    public Image ItemImage;
+    public TextMeshProUGUI DescriptionText;
     public Button BackButton;
     public Button BuyButton;
 
@@ -59,21 +59,24 @@ public class MarketDetail : MonoBehaviour
     // Fill in item details from market content when menu item is pressed
     public void Hydrate(Item item)
     {
+        // Cache this item
         this.Item = item;
 
-        string title = item.Name;
-        string imagePath = item.ImagePath;
-        // TODO add description field to item
+        // Show item name
+        this.SetNameText();
 
-        this.Title.SetText(title);
-        this.Image.sprite = ImageUtility.CreateSprite(imagePath);
+        // Show item image
+        this.SetItemImageSprite();
+
+        // Show item description
+        this.SetDescriptionText();
+
+        // Make sure the buy button is interactable
+        this.SetInteractable();
 
         // Fill in item details within failure panel and success panel
         this.HydrateFailurePanel();
         this.HydrateSuccessPanel();
-
-        // Make sure the buy button is interactable
-        this.BuyButton.interactable = true;
     }
 
     // Activate failure panel
@@ -107,13 +110,13 @@ public class MarketDetail : MonoBehaviour
     }
 
     // Call the listener of the close button of menu manager
-    public void OnBackButtonPress()
+    public void OnPressBackButton()
     {
         this.OnClose();
     }
 
     // Attempt an item purchase by validating eligibility in market content
-    public void OnBuyButtonPress()
+    public void OnPressBuyButton()
     {
         this.ValidatePurchase(this.Item);
     }
@@ -140,6 +143,35 @@ public class MarketDetail : MonoBehaviour
         // Cache button component of success panel
         this.SuccessButton =
             this.SuccessPanel.GetComponentInChildren<Button>();
+    }
+
+    // Set name text with item name
+    private void SetNameText()
+    {
+        this.NameText.SetText(this.Item.Name);
+    }
+
+    // Set sprite of item image
+    private void SetItemImageSprite()
+    {
+        // Get the sprite to use for the item image
+        Sprite sprite = this.Item.GetItemSprite();
+
+        // Set the item image sprite
+        this.ItemImage.sprite = sprite;
+    }
+
+    // Set description text
+    private void SetDescriptionText()
+    {
+        // TODO
+    }
+
+    // Set the interactability of the buy button component
+    private void SetInteractable()
+    {
+        // Allow interaction with buy button
+        this.BuyButton.interactable = true;
     }
 
     // Fill in components of need funds panel with item details
