@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -80,24 +79,33 @@ public class NotesContent : MonoBehaviour
     }
 
     // Update note for this guest
-    public void UpdateNotes(string guestName, Notes notes)
+    public void UpdateNote(Note note)
     {
-        this.Notes = notes;
+        // Assign the new note to notes
+        this.Notes[note.Guest.Name] = note;
 
-        // Get the updated note
-        Note note = this.Notes[guestName];
-
-        // Do not continue if there was an issue getting the note
-        if (note == null) return;
-
-        // Get the note menu item for the updated guest
-        NoteMenuItem noteMenuItem = this.MenuItemClones[guestName];
+        // Get the note menu item that needs updates
+        NoteMenuItem noteMenuItem = this.MenuItemClones[note.Guest.Name];
 
         // Do not continue if the note menu item was not retrieved
         if (noteMenuItem == null) return;
 
         // Update the note menu item for this guest with the updated note
         this.UpdateMenuItem(noteMenuItem, note);
+    }
+
+    // Update notes for all guests
+    public void UpdateNotes(Notes notes)
+    {
+        // Get note array of all notes
+        Note[] noteArray = notes.ToArray();
+
+        // Update each note menu item with the updated note
+        foreach (Note note in noteArray)
+        {
+            this.UpdateNote(note);
+        }
+
     }
 
     // Calculate and set the scroll view height based on layout properties
@@ -136,10 +144,8 @@ public class NotesContent : MonoBehaviour
         NoteMenuItem noteMenuItem;
 
         // Instantiate a note menu item for each note in notes
-        foreach (DictionaryEntry guestNote in this.Notes.GuestNotes)
+        foreach (Note note in this.Notes.ToArray())
         {
-            Note note = (Note)guestNote.Value;
-
             // Instantiate the prefab clone with this as the parent
             menuItem = Instantiate(this.Prefab, this.transform);
 

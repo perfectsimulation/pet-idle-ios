@@ -76,25 +76,16 @@ public class Gift
 {
     public Guest Guest;
     public Item Item;
-    public int FriendshipPoints;
     public int Coins;
+    public int FriendshipReward;
 
-    /* Create a Gift with explicit properties */
-    public Gift(Guest guest, Item item, int friendshipReward, int coins)
+    /* Initialize a brand new Gift on guest departure */
+    public Gift(Guest guest, Item item)
     {
         this.Guest = guest;
         this.Item = item;
-        this.FriendshipPoints = friendshipReward;
-        this.Coins = coins;
-    }
-
-    /* Create Gift from guest departure */
-    public Gift(SlotGuest slotGuest, Item item)
-    {
-        this.Guest = slotGuest.Guest;
-        this.Item = item;
-        this.FriendshipPoints = slotGuest.FriendshipPointReward;
-        this.Coins = slotGuest.CoinDrop;
+        this.Coins = this.SelectGuestCoinDrop();
+        this.FriendshipReward = this.SelectGuestFriendshipReward();
     }
 
     /* Create Gift from save data */
@@ -102,8 +93,32 @@ public class Gift
     {
         this.Guest = new Guest(serializedGift.GuestName);
         this.Item = new Item(serializedGift.ItemName);
-        this.FriendshipPoints = serializedGift.FriendshipPoints;
         this.Coins = serializedGift.Coins;
+        this.FriendshipReward = serializedGift.FriendshipReward;
+    }
+
+    // Select a coin drop for a new gift
+    private int SelectGuestCoinDrop()
+    {
+        // Randomly select a coin drop within the range allowed by the guest
+        int min = this.Guest.MinimumCoinDrop;
+        int max = this.Guest.MaximumCoinDrop;
+
+        // Add one to the max since Random.Range has an exclusive max argument
+        int coinDrop = UnityEngine.Random.Range(min, max + 1);
+        return coinDrop;
+    }
+
+    // Select a friendship reward for a new gift
+    private int SelectGuestFriendshipReward()
+    {
+        // Randomly select a coin drop within the range allowed by the guest
+        int min = this.Guest.MinimumFriendshipReward;
+        int max = this.Guest.MaximumFriendshipReward;
+
+        // Add one to the max since Random.Range has an exclusive max argument
+        int friendshipPoints = UnityEngine.Random.Range(min, max + 1);
+        return friendshipPoints;
     }
 
 }
@@ -113,16 +128,16 @@ public class SerializedGift
 {
     public string GuestName;
     public string ItemName;
-    public int FriendshipPoints;
     public int Coins;
+    public int FriendshipReward;
 
-    /* Create SerializedGift from Gift */
+    /* Serialize a gift */
     public SerializedGift(Gift gift)
     {
         this.GuestName = gift.Guest.Name;
         this.ItemName = gift.Item.Name;
-        this.FriendshipPoints = gift.FriendshipPoints;
         this.Coins = gift.Coins;
+        this.FriendshipReward = gift.FriendshipReward;
     }
 
 }

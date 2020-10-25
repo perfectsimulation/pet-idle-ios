@@ -6,32 +6,31 @@ public class SlotGuest
     public Guest Guest;
     public DateTime ArrivalDateTime;
     public DateTime DepartureDateTime;
-    public int CoinDrop;
-    public int FriendshipPointReward;
-    public Gift Gift;
 
     public SlotGuest() { }
 
     /* Initialize a brand new SlotGuest */
-    public SlotGuest(Guest guest, Item item)
+    public SlotGuest(Guest guest)
     {
         this.Guest = guest;
         this.ArrivalDateTime = this.SelectGuestArrivalDateTime();
         this.DepartureDateTime = this.SelectGuestDepartureDateTime();
-        this.CoinDrop = this.SelectGuestCoinDrop();
-        this.FriendshipPointReward = this.SelectGuestFriendshipPointReward();
-        this.Gift = this.CreateGift(item);
     }
 
     /* Create SlotGuest from save data */
     public SlotGuest(SerializedSlotGuest serializedSlotGuest)
     {
-        this.Guest = new Guest(serializedSlotGuest.GuestName);
-        this.ArrivalDateTime = serializedSlotGuest.ArrivalDateTime;
-        this.DepartureDateTime = serializedSlotGuest.DepartureDateTime;
-        this.CoinDrop = serializedSlotGuest.CoinDrop;
-        this.FriendshipPointReward = serializedSlotGuest.FriendshipPointReward;
-        this.Gift = new Gift(serializedSlotGuest.Gift);
+        // Create a new guest from the guest name string
+        string guestName = serializedSlotGuest.GuestName;
+        this.Guest = new Guest(guestName);
+
+        // Create arrival date time from serialized date time string
+        string arrival = serializedSlotGuest.ArrivalDateTime;
+        this.ArrivalDateTime = Convert.ToDateTime(arrival);
+
+        // Create departure date time from serialized date time string
+        string departure = serializedSlotGuest.DepartureDateTime;
+        this.DepartureDateTime = Convert.ToDateTime(departure);
     }
 
     // Reset assigned guest properties
@@ -40,9 +39,6 @@ public class SlotGuest
         this.Guest = null;
         this.ArrivalDateTime = DateTime.MinValue;
         this.DepartureDateTime = DateTime.MinValue;
-        this.CoinDrop = 0;
-        this.FriendshipPointReward = 0;
-        this.Gift = null;
     }
 
     // Check if the arrival datetime is in the past relative to game start time
@@ -52,7 +48,7 @@ public class SlotGuest
         if (this.Guest == null) return false;
 
         // Return true if the game start time is past the arrival time
-        return (this.ArrivalDateTime <= this.GetGameStartTime());
+        return (this.ArrivalDateTime <= TimeStamp.GameStart);
     }
 
     // Check if the departure datetime is in the past
@@ -62,7 +58,7 @@ public class SlotGuest
         if (this.Guest == null) return false;
 
         // Return true if the game start time is past the departure time
-        return (this.DepartureDateTime <= this.GetGameStartTime());
+        return (this.DepartureDateTime <= TimeStamp.GameStart);
     }
 
     // Check if guest has arrived and has not departed relative to game start time
@@ -101,80 +97,29 @@ public class SlotGuest
         return departure;
     }
 
-    // Select a coin drop for a new guest
-    private int SelectGuestCoinDrop()
-    {
-        // Randomly select a coin drop within the range allowed by the guest
-        int min = this.Guest.MinimumCoinDrop;
-        int max = this.Guest.MaximumCoinDrop;
-
-        // Add one to the max since Random.Range has an exclusive max argument
-        int coinDrop = UnityEngine.Random.Range(min, max + 1);
-        return coinDrop;
-    }
-
-    // Select a friendship point reward for a new guest
-    private int SelectGuestFriendshipPointReward()
-    {
-        // Randomly select a coin drop within the range allowed by the guest
-        int min = this.Guest.MinimumFriendshipPointReward;
-        int max = this.Guest.MaximumFriendshipPointReward;
-
-        // Add one to the max since Random.Range has an exclusive max argument
-        int friendshipPoints = UnityEngine.Random.Range(min, max + 1);
-        return friendshipPoints;
-    }
-
-    // Create the departure gift for this guest
-    private Gift CreateGift(Item item)
-    {
-        Gift gift = new Gift(this, item);
-        return gift;
-    }
-
-    // Get the datetime of the moment the game started
-    private DateTime GetGameStartTime()
-    {
-        // Get elapsed seconds since game started
-        double elapsedSeconds = UnityEngine.Time.realtimeSinceStartup;
-
-        // Subtract elapsed seconds from now to get the datetime of game start
-        DateTime gameStartTime = DateTime.UtcNow.AddSeconds(-1 * elapsedSeconds);
-        return gameStartTime;
-    }
-
 }
 
 [Serializable]
 public class SerializedSlotGuest
 {
     public string GuestName;
-    public SerializedDateTime ArrivalDateTime;
-    public SerializedDateTime DepartureDateTime;
-    public int CoinDrop;
-    public int FriendshipPointReward;
-    public SerializedGift Gift;
+    public string ArrivalDateTime;
+    public string DepartureDateTime;
 
-    /* Create SerializedSlotGuest from SlotGuest */
+    /* Serialize a slot guest */
     public SerializedSlotGuest(SlotGuest slotGuest)
     {
         if (slotGuest.Guest != null)
         {
             this.GuestName = slotGuest.Guest.Name;
-            this.ArrivalDateTime = slotGuest.ArrivalDateTime;
-            this.DepartureDateTime = slotGuest.DepartureDateTime;
-            this.CoinDrop = slotGuest.CoinDrop;
-            this.FriendshipPointReward = slotGuest.FriendshipPointReward;
-            this.Gift = new SerializedGift(slotGuest.Gift);
+            this.ArrivalDateTime = slotGuest.ArrivalDateTime.ToString();
+            this.DepartureDateTime = slotGuest.DepartureDateTime.ToString();
         }
         else
         {
-            this.GuestName = null;
-            this.ArrivalDateTime = DateTime.MinValue;
-            this.DepartureDateTime = DateTime.MinValue;
-            this.CoinDrop = 0;
-            this.FriendshipPointReward = 0;
-            this.Gift = null;
+            this.GuestName = string.Empty;
+            this.ArrivalDateTime = string.Empty;
+            this.DepartureDateTime = string.Empty;
         }
     }
 

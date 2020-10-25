@@ -105,14 +105,20 @@ public class Slot : MonoBehaviour
     // Initialize a newly placed item for this slot
     public void InitializeItem(Item item)
     {
+        // Remove the current item if one already exists
+        this.RemoveItem();
+
+        // Cache a new slot item using this item
         this.SlotItem = new SlotItem(item);
 
         // Set sprite using the image at the streaming asset path of the item
         this.SetSlotSprite(item.ImagePath);
 
-        // Select and initialize a guest to visit the newly placed item
+        // Select a guest to visit the newly placed item
         Guest guest = this.SelectNewGuestDelegate(item);
-        this.InitializeGuest(guest, item);
+
+        // Initialize the new guest
+        this.InitializeGuest(guest);
 
         // Remove place item delegate from the onClick of slot button
         this.SlotButton.onClick.RemoveAllListeners();
@@ -131,6 +137,9 @@ public class Slot : MonoBehaviour
     // Remove the item from this slot along with its guest
     public void RemoveItem()
     {
+        // Do not continue if there is already no item
+        if (this.SlotItem.Item == null) return;
+
         // Removing the item will also automatically cause its guest to leave
         this.RemoveGuest();
 
@@ -145,9 +154,9 @@ public class Slot : MonoBehaviour
     }
 
     // Initialize a newly selected guest for this slot
-    public void InitializeGuest(Guest guest, Item item)
+    public void InitializeGuest(Guest guest)
     {
-        this.SlotGuest = new SlotGuest(guest, item);
+        this.SlotGuest = new SlotGuest(guest);
     }
 
     // Restore saved guest data for this session on app start
@@ -211,9 +220,11 @@ public class Slot : MonoBehaviour
             // Remove the departed guest
             this.RemoveGuest();
 
-            // Select a new guest and trigger the next visit
+            // Select a new guest for the next guest
             Guest nextGuest = this.SelectNewGuestDelegate(this.SlotItem.Item);
-            this.InitializeGuest(nextGuest, this.SlotItem.Item);
+
+            // Trigger the next visit by the new guest
+            this.InitializeGuest(nextGuest);
         }
 
     }
@@ -221,20 +232,33 @@ public class Slot : MonoBehaviour
     // Remove the guest from this slot and save its gift in the game manager
     private void RemoveGuest()
     {
-        // Do not continue if there is already no guest in this slot
+        // Do not continue if there is already no guest
         if (this.SlotGuest.Guest == null) return;
 
         // Reset the slot image to show the item alone
         this.SetSlotSprite(this.SlotItem.Item.ImagePath);
 
-        // Save the gift from the departed guest
-        this.SaveGuestGiftDelegate(this.SlotGuest.Gift);
+        // Create and save a new gift from this guest departure
+        this.CreateGift();
 
         // Tell active biome to remove the departing guest from the guest list
         this.RemoveDepartingGuestDelegate(this.SlotGuest.Guest);
 
         // Remove the slot guest
         this.SlotGuest.RemoveGuest();
+    }
+
+    // Create a new gift and save it in game manager
+    private void CreateGift()
+    {
+        // Do not continue if the guest has not yet arrived
+        if (!this.SlotGuest.IsArrived()) return;
+
+        // Create the new gift from the departing guest and the item it visited
+        Gift gift = new Gift(this.SlotGuest.Guest, this.SlotItem.Item);
+
+        // Save the gift in game manager
+        this.SaveGuestGiftDelegate(gift);
     }
 
     // Indicate eligible slot during item placement or photo capture
@@ -259,17 +283,13 @@ public class Slot : MonoBehaviour
     // Set the sprite of the slot image to show the item-guest pair interaction
     private void SetInteractionSprite()
     {
-        // Construct the name of the image file to locate in streaming assets
-        string interactionFileName = string.Format(
-            "Images/Interactions/{0}-{1}.png",
-            this.SlotGuest.Guest.Name.ToLower(),
-            this.SlotItem.Item.Name.ToLower());
-
-        // Get the path to the streaming asset for this interaction image
-        string interactionFilePath = Paths.StreamingAssetFile(interactionFileName);
+        // Get the path to this interaction image asset
+        string imageAsset = Paths.InteractionImageFile(
+            this.SlotGuest.Guest.Name,
+            this.SlotItem.Item.Name);
 
         // Set the sprite of the slot to show the image at this path
-        this.SetSlotSprite(interactionFilePath);
+        this.SetSlotSprite(imageAsset);
     }
 
     // Set the sprite of the slot image to show the image at this path

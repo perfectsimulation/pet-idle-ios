@@ -214,9 +214,11 @@ public class ActiveBiome : MonoBehaviour
                 // There is an item, but no guest in the slot
                 else
                 {
-                    // Initialize a new guest for this slot
+                    // Get the next guest to visit
                     Guest guest = this.SelectGuestToVisit(item);
-                    this.Slots[i].InitializeGuest(guest, item);
+
+                    // Initialize the new guest in this slot
+                    this.Slots[i].InitializeGuest(guest);
                 }
             }
 
@@ -224,6 +226,7 @@ public class ActiveBiome : MonoBehaviour
             else
             {
                 this.Slots[i].Hide();
+
                 // Can skip to next slot if there is no item
                 continue;
             }

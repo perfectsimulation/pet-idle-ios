@@ -45,11 +45,8 @@ public class GameManager : MonoBehaviour
         // Give the active biome slots a callback to save gifts
         this.MenuManager.SetupSaveGiftDelegate(this.SaveGift);
 
-        // Give the menu manager a callback to save claimed coins from gifts
-        this.MenuManager.SetupClaimCoinsDelegate(this.SaveCoins);
-
-        // Give the menu manager a callback to save claimed friendship points
-        this.MenuManager.SetupClaimFriendshipDelegate(this.SaveFriendship);
+        // Give the menu manager a callback to claim gifts
+        this.MenuManager.SetupClaimGiftsDelegate(this.ClaimGifts);
 
         // Give the photo preview of photo capture a callback to save photos
         this.MenuManager.SetupSavePhotoDelegate(this.SavePhoto);
@@ -105,13 +102,13 @@ public class GameManager : MonoBehaviour
         // Automatically update visit count when guest departs
         this.User.Notes.UpdateVisitCount(slotGuest);
 
-        // Update notes in notes content
-        this.MenuManager.UpdateNotes(slotGuest.Guest.Name, this.User.Notes);
+        // Update note in notes content
+        this.MenuManager.UpdateNote(slotGuest.Guest.Name, this.User.Notes);
 
         Persistence.SaveUser(this.User);
     }
 
-    // Delegate called when guest departs to update notes and save the new gift
+    // Delegate called when guest departs to update note and save the new gift
     public void SaveGift(Gift gift)
     {
         // Add the new gift to the user gifts
@@ -120,19 +117,29 @@ public class GameManager : MonoBehaviour
         // Give the new gift to the gifts content
         this.MenuManager.AddGift(gift);
 
-        // Update notes in notes content
-        this.MenuManager.UpdateNotes(gift.Guest.Name, this.User.Notes);
-
         Persistence.SaveUser(this.User);
     }
 
-    // Delegate called when a gift is claimed to update guest friendship
-    public void SaveFriendship(string guestName, int friendshipPoints)
+    // Delegate called when gifts are claimed to save all rewards
+    public void ClaimGifts(Gifts gifts)
     {
-        this.User.Notes.UpdateFriendship(guestName, friendshipPoints);
+        // Add coin reward to user coin balance
+        this.User.Coins += gifts.GetTotalCoins();
+
+        // Add friendship rewards to user notes
+        this.User.Notes.UpdateFriendships(gifts);
+
+        // Clear all claimed gifts
+        this.User.Gifts.Clear();
+
+        // Give the updated coin balance to the menus using it
+        this.MenuManager.HydrateCoins(this.User.Coins);
 
         // Update notes in notes content
-        this.MenuManager.UpdateNotes(guestName, this.User.Notes);
+        this.MenuManager.UpdateNotes(this.User.Notes);
+
+        // Update gifts in gifts content
+        this.MenuManager.HydrateGifts(this.User.Gifts);
 
         Persistence.SaveUser(this.User);
     }
@@ -142,8 +149,8 @@ public class GameManager : MonoBehaviour
     {
         this.User.Notes.AddPhoto(guestName, photo);
 
-        // Update notes in notes content
-        this.MenuManager.UpdateNotes(guestName, this.User.Notes);
+        // Update note in notes content
+        this.MenuManager.UpdateNote(guestName, this.User.Notes);
 
         Persistence.SaveUser(this.User);
         Persistence.SavePhoto(guestName, photo);
@@ -157,8 +164,8 @@ public class GameManager : MonoBehaviour
         // Remove the photo from note in user data
         this.User.Notes[guestName].Photos.Remove(photo);
 
-        // Update notes in notes content
-        this.MenuManager.UpdateNotes(guestName, this.User.Notes);
+        // Update note in notes content
+        this.MenuManager.UpdateNote(guestName, this.User.Notes);
 
         Persistence.SaveUser(this.User);
     }

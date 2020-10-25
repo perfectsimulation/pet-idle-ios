@@ -77,7 +77,7 @@ public class GiftMenuItem : MonoBehaviour
     private void SetFriendshipText()
     {
         // Create string for friendship text
-        string text = string.Format("+ {0}", this.Gift.FriendshipPoints);
+        string text = string.Format("+ {0}", this.Gift.FriendshipReward);
 
         // Set text of the friendship text component
         this.FriendshipText.text = text;

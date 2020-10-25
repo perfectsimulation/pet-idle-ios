@@ -52,6 +52,28 @@ public class Notes
         {
             return (Note)this.GuestNotes[guestName];
         }
+
+        set
+        {
+            this.GuestNotes[guestName] = value;
+        }
+
+    }
+
+    // Get a note array of all notes from values of ordered dictionary
+    public Note[] ToArray()
+    {
+        // Get values of ordered dictionary
+        ICollection values = this.GuestNotes.Values;
+
+        // Initialize a note array to fill with all note values
+        Note[] notes = new Note[this.Count];
+
+        // Copy all note values from ordered dictionary into the note array
+        values.CopyTo(notes, 0);
+
+        // Return array of all notes
+        return notes;
     }
 
     // Assign photos after loading them in game manager
@@ -98,14 +120,22 @@ public class Notes
         note.IncrementVisitCount();
     }
 
-    // Update the friendship points of this guest
-    public void UpdateFriendship(string guestName, int friendshipPoints)
+    // Update the friendships of these guests with gift rewards
+    public void UpdateFriendships(Gifts gifts)
     {
-        // Get the note for the guest
-        Note note = this[guestName];
+        // Process each friendship reward of gifts
+        foreach (Gift gift in gifts.GiftList)
+        {
+            // Get the note for the guest of this gift
+            Note note = this[gift.Guest.Name];
 
-        // Increase the friendship points for this guest
-        note.AddFriendshipPoints(friendshipPoints);
+            // Skip if there was an issue getting the note
+            if (note == null) continue;
+
+            // Claim the friendship reward and add the points to the note
+            note.AddFriendshipPoints(gift.FriendshipReward);
+        }
+
     }
 
     // Add a photo to the note of this guest
@@ -124,21 +154,16 @@ public class Notes
         // Initialize the list of guests
         List<string> seenGuestNames = new List<string>();
 
-        // Get arrays of the keys and values of guest notes
-        ICollection keys = this.GuestNotes.Keys;
-        ICollection values = this.GuestNotes.Values;
-        string[] guestNames = new string[this.GuestNotes.Count];
-        Note[] notes = new Note[this.GuestNotes.Count];
-        keys.CopyTo(guestNames, 0);
-        values.CopyTo(notes, 0);
+        // Get array with each note in ordered dictionary
+        Note[] notes = this.ToArray();
 
-        for (int i = 0; i < this.GuestNotes.Count; i++)
+        // Go through each note to check if its guest has been seen
+        for (int i = 0; i < notes.Length; i++)
         {
-            // Check the note to see if the guest has been seen
             if (notes[i].HasBeenSeen)
             {
                 // Add the seen guest to the list
-                seenGuestNames.Add(guestNames[i]);
+                seenGuestNames.Add(notes[i].Guest.Name);
             }
         }
 

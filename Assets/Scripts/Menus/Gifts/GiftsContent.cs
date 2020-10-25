@@ -29,18 +29,10 @@ public class GiftsContent : MonoBehaviour
     // The gifts assigned by game manager
     private Gifts Gifts;
 
-    // Value of coins from all outstanding gifts combined
-    private int UnclaimedCoinCredit;
-
-    // Save coins from game manager when gifts are claimed
+    // Claim gifts from game manager
     [HideInInspector]
-    public delegate void SaveCoinsDelegate(int coins);
-    private SaveCoinsDelegate SaveCoins;
-
-    // Save friendship points from game manager when gifts are claimed
-    [HideInInspector]
-    public delegate void SaveFriendshipDelegate(string guestName, int points);
-    private SaveFriendshipDelegate SaveFriendship;
+    public delegate void ClaimGiftsDelegate(Gifts gifts);
+    private ClaimGiftsDelegate ClaimGifts;
 
     void Awake()
     {
@@ -52,16 +44,10 @@ public class GiftsContent : MonoBehaviour
         this.MenuItemClones = new List<GiftMenuItem>();
     }
 
-    // Assign save coins delegate from game manager
-    public void DelegateSaveCoins(SaveCoinsDelegate callback)
+    // Assign claim gifts delegate from game manager
+    public void DelegateClaimGifts(ClaimGiftsDelegate callback)
     {
-        this.SaveCoins = callback;
-    }
-
-    // Assign save friendship delegate from game manager
-    public void DelegateSaveFriendship(SaveFriendshipDelegate callback)
-    {
-        this.SaveFriendship = callback;
+        this.ClaimGifts = callback;
     }
 
     // Assign coins from game manager
@@ -88,9 +74,6 @@ public class GiftsContent : MonoBehaviour
     {
         this.Gifts = gifts;
 
-        // Reset unclaimed coin credit
-        this.UnclaimedCoinCredit = this.Gifts.GetTotalCoins();
-
         // Size the scroll view to accommodate all gift menu items
         this.PrepareScrollViewForLayout();
 
@@ -101,9 +84,6 @@ public class GiftsContent : MonoBehaviour
     // Add gift to gifts and create a new menu item for it
     public void AddGift(Gift gift)
     {
-        // Reset unclaimed coin credit
-        this.UnclaimedCoinCredit = this.Gifts.GetTotalCoins();
-
         // Size the scroll view to accommodate all gift menu items
         this.PrepareScrollViewForLayout();
 
@@ -117,17 +97,8 @@ public class GiftsContent : MonoBehaviour
         // Do not continue if there are no gifts to collect
         if (this.Gifts.Count == 0) return;
 
-        // Save coins to user balance from game manager
-        this.SaveCoins(this.UnclaimedCoinCredit);
-
-        // Reset unclaimed coin credit
-        this.UnclaimedCoinCredit = 0;
-
-        // Save friendship point rewards of each guest from game manager
-        this.UpdateFriendships();
-
-        // Clear all claimed gifts
-        this.Gifts.Clear();
+        // Claim and save rewards of all gifts in game manager
+        this.ClaimGifts(this.Gifts);
 
         // Remove the gift menu items now that the gifts are all claimed
         this.DestroyMenuItems();
@@ -221,17 +192,6 @@ public class GiftsContent : MonoBehaviour
 
             // Set the guest image sprite according to updated seen guest list
             giftMenuItem.SetGuestImage(this.HasSeenGuest(guestName));
-        }
-
-    }
-
-    // Save friendship rewards from game manager
-    private void UpdateFriendships()
-    {
-        // Save friendship reward for each gift
-        foreach (Gift gift in this.Gifts.GiftList)
-        {
-            this.SaveFriendship(gift.Guest.Name, gift.FriendshipPoints);
         }
 
     }

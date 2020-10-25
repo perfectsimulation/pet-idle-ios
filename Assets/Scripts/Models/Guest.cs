@@ -31,10 +31,10 @@ public class Guest
     public int MaximumCoinDrop { get; private set; }
 
     // Minimum friendship points awarded to user upon completion of guest visit
-    public int MinimumFriendshipPointReward { get; private set; }
+    public int MinimumFriendshipReward { get; private set; }
 
     // Maximum friendship points awarded to user upon completion of guest visit
-    public int MaximumFriendshipPointReward { get; private set; }
+    public int MaximumFriendshipReward { get; private set; }
 
     // Heart level associated with accumulated friendship points
     private enum HeartLevel
@@ -70,8 +70,8 @@ public class Guest
         this.LatestDepartureInMinutes = departureRange[1];
         this.MinimumCoinDrop = coinDropRange[0];
         this.MaximumCoinDrop = coinDropRange[1];
-        this.MinimumFriendshipPointReward = friendshipRewardRange[0];
-        this.MaximumFriendshipPointReward = friendshipRewardRange[1];
+        this.MinimumFriendshipReward = friendshipRewardRange[0];
+        this.MaximumFriendshipReward = friendshipRewardRange[1];
     }
 
     /* Create a guest from a valid guest name */
@@ -87,8 +87,8 @@ public class Guest
         this.LatestDepartureInMinutes = guest.LatestDepartureInMinutes;
         this.MinimumCoinDrop = guest.MinimumCoinDrop;
         this.MaximumCoinDrop = guest.MaximumCoinDrop;
-        this.MinimumFriendshipPointReward = guest.MinimumFriendshipPointReward;
-        this.MaximumFriendshipPointReward = guest.MaximumFriendshipPointReward;
+        this.MinimumFriendshipReward = guest.MinimumFriendshipReward;
+        this.MaximumFriendshipReward = guest.MaximumFriendshipReward;
     }
 
     // Check guest equality by checking string equality of their names

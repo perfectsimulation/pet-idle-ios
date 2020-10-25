@@ -164,16 +164,10 @@ public class MenuManager : MonoBehaviour
         this.ActiveBiome.SetupSaveGiftDelegate(callback);
     }
 
-    // Assign save coins delegate from game manager to gifts content
-    public void SetupClaimCoinsDelegate(GiftsContent.SaveCoinsDelegate callback)
+    // Assign claim gifts delegate from game manager to gifts content
+    public void SetupClaimGiftsDelegate(GiftsContent.ClaimGiftsDelegate callback)
     {
-        this.GiftsContent.DelegateSaveCoins(callback);
-    }
-
-    // Assign save friendship delegate from game manager to gifts content
-    public void SetupClaimFriendshipDelegate(GiftsContent.SaveFriendshipDelegate callback)
-    {
-        this.GiftsContent.DelegateSaveFriendship(callback);
+        this.GiftsContent.DelegateClaimGifts(callback);
     }
 
     // Assign save photo delegate from game manager to photos content
@@ -206,12 +200,18 @@ public class MenuManager : MonoBehaviour
         this.GiftsContent.AddGift(gift);
     }
 
-    // Update the notes in notes content
-    public void UpdateNotes(string guestName, Notes notes)
+    // Update one note in notes content
+    public void UpdateNote(string guestName, Notes notes)
     {
-        this.NotesContent.UpdateNotes(guestName, notes);
+        this.NotesContent.UpdateNote(notes[guestName]);
         this.PhotosContent.HydratePhotos(notes[guestName].Photos);
         this.GiftsContent.HydrateSeenGuests(notes.GetSeenGuestNames());
+    }
+
+    // Update notes in notes content after friendship updates in game manager
+    public void UpdateNotes(Notes notes)
+    {
+        this.NotesContent.UpdateNotes(notes);
     }
 
     // Display the main menu panel and close button
