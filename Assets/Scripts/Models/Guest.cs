@@ -119,23 +119,33 @@ public class Guest
         return false;
     }
 
-    // Create sprite for guest image
+    // Create sprite of guest
     public Sprite GetGuestSprite(bool hasBeenSeen)
     {
-        // Get the image path to create a sprite for this guest
+        // Get the image path to the guest image
         string imagePath = this.GetGuestImagePath(hasBeenSeen);
 
-        // Use the image path to create a sprite for this guest
+        // Use the image path to create a sprite of this guest
         return ImageUtility.CreateSprite(imagePath);
     }
 
-    // Create sprite for the heart level for these friendship points
+    // Create sprite of the heart level for these friendship points
     public static Sprite GetHeartLevelSprite(int friendshipPoints)
     {
         // Get the path to the heart level image
         string imagePath = GetHeartImagePath(friendshipPoints);
 
-        // Use the image path to create a sprite for this heart level
+        // Use the image path to create a sprite of this heart level
+        return ImageUtility.CreateSprite(imagePath);
+    }
+
+    // Create sprite of the interaction between this guest and this item
+    public Sprite GetInteractionSprite(Item item)
+    {
+        // Get the path to this interaction image
+        string imagePath = Paths.InteractionImageFile(this.Name, item.Name);
+
+        // Use the image path to create a sprite of this interaction
         return ImageUtility.CreateSprite(imagePath);
     }
 

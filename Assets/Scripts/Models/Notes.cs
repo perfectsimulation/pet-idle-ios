@@ -105,16 +105,16 @@ public class Notes
     }
 
     // Increment the visit count of this guest when it departs
-    public void UpdateVisitCount(SlotGuest slotGuest)
+    public void UpdateVisitCount(Visit visit)
     {
         // Get the note for this guest
-        Note note = this[slotGuest.Guest.Name];
+        Note note = this[visit.Guest.Name];
 
         // Do not continue if there was an issue getting the note
         if (note == null) return;
 
         // Check if this is the first encounter with this guest
-        this.CheckForFirstEncounter(note, slotGuest);
+        this.CheckForFirstEncounter(note, visit);
 
         // Increase the visit count for this guest
         note.IncrementVisitCount();
@@ -171,10 +171,10 @@ public class Notes
     }
 
     // Record first encounter with the guest if it is seen for the first time
-    private void CheckForFirstEncounter(Note note, SlotGuest slotGuest)
+    private void CheckForFirstEncounter(Note note, Visit visit)
     {
         // Check if guest is currently in the active biome for the first time
-        if (!note.HasBeenSeen && slotGuest.IsVisiting())
+        if (!note.HasBeenSeen && visit.IsVisiting())
         {
             // Record the first encounter of this guest
             note.RecordFirstEncounter();

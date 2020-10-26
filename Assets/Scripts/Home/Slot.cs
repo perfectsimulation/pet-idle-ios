@@ -1,94 +1,209 @@
-﻿using IOUtility;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class Slot : MonoBehaviour
 {
-    public SlotItem SlotItem;
-    public SlotGuest SlotGuest;
+    public Item Item;
+    public Visit Visit;
     public Image SlotImage;
     public GameObject ValidSelectionIndicator;
 
     // The slot button component
     private Button SlotButton;
 
-    // Delegate to trigger a new guest upon guest departure
+    // Trigger a new visit from active biome
     [HideInInspector]
-    public delegate Guest SelectGuestDelegate(Item item);
-    private SelectGuestDelegate SelectNewGuestDelegate;
+    public delegate void TriggerVisitDelegate(Slot slot);
+    private TriggerVisitDelegate TriggerVisit;
 
-    // Delegate to save a guest visit
+    // Save a visit from game manager
     [HideInInspector]
-    public delegate void SaveVisitDelegate(SlotGuest slotGuest);
-    private SaveVisitDelegate SaveGuestVisitDelegate;
+    public delegate void SaveVisitDelegate(Visit visit);
+    private SaveVisitDelegate SaveVisit;
 
-    // Delegate to save the new gift created upon guest departure
+    // Save gift from game manager upon guest departure
     [HideInInspector]
     public delegate void SaveGiftDelegate(Gift gift);
-    private SaveGiftDelegate SaveGuestGiftDelegate;
+    private SaveGiftDelegate SaveGift;
 
-    // Delegate to remove a departing guest from the active biome guest list
+    // Remove a departing guest from the active biome visiting guest list
     [HideInInspector]
-    public delegate void RemoveGuestDelegate(Guest guest);
-    private RemoveGuestDelegate RemoveDepartingGuestDelegate;
+    public delegate void RecordDepartureDelegate(string guestName);
+    private RecordDepartureDelegate RecordDeparture;
 
-    // Delegate for onClick of slot button to place an item in this slot
+    // Place an item in this slot from active biome
     [HideInInspector]
     public delegate void PlaceItemDelegate(Slot slot);
 
-    // Delegate for onClick of slot button to select this slot for photo capture
+    // Select this slot for photo capture from menu manager
     [HideInInspector]
-    public delegate void CapturePhotoDelegate(Slot slot);
+    public delegate void SelectForPhotoDelegate(Slot slot);
 
     void Awake()
     {
-        this.SlotItem = new SlotItem();
-        this.SlotGuest = new SlotGuest();
+        this.Visit = new Visit();
         this.SlotButton = this.gameObject.GetComponent<Button>();
     }
 
     // Remove the sprite of this slot
     public void Hide()
     {
-        this.RemoveSlotSprite();
+        this.RemoveSprite();
     }
 
     // Assign save visit delegate from active biome
-    public void SetupSaveVisitDelegate(SaveVisitDelegate callback)
+    public void DelegateSaveVisit(SaveVisitDelegate callback)
     {
-        this.SaveGuestVisitDelegate = callback;
+        this.SaveVisit = callback;
     }
 
     // Assign save gift delegate from active biome
-    public void SetupSaveGiftDelegate(SaveGiftDelegate callback)
+    public void DelegateSaveGift(SaveGiftDelegate callback)
     {
-        this.SaveGuestGiftDelegate = callback;
+        this.SaveGift = callback;
     }
 
-    // Assign select guest delegate from active biome
-    public void SetupSelectGuestDelegate(SelectGuestDelegate callback)
+    // Assign trigger visit delegate from active biome
+    public void DelegateTriggerVisit(TriggerVisitDelegate callback)
     {
-        this.SelectNewGuestDelegate = callback;
+        this.TriggerVisit = callback;
     }
 
-    // Assign remove guest delegate from active biome
-    public void SetupRemoveGuestDelegate(RemoveGuestDelegate callback)
+    // Assign record departure delegate from active biome
+    public void DelegateRecordDeparture(RecordDepartureDelegate callback)
     {
-        this.RemoveDepartingGuestDelegate = callback;
+        this.RecordDeparture = callback;
     }
 
-    // Assign place item delegate to slot button from active biome
-    public void SetupPlaceItemDelegate(PlaceItemDelegate callback)
+    // Assign place item delegate from active biome to slot button
+    public void DelegatePlaceItem(PlaceItemDelegate callback)
     {
         this.SlotButton.onClick.RemoveAllListeners();
         this.SlotButton.onClick.AddListener(delegate { callback(this); });
     }
 
-    // Assign capture photo delegate to slot button from active biome
-    public void SetupCapturePhotoDelegate(CapturePhotoDelegate callback)
+    // Assign select for photo delegate from active biome for photo capture
+    public void DelegateSelectForPhoto(SelectForPhotoDelegate callback)
     {
         this.SlotButton.onClick.RemoveAllListeners();
         this.SlotButton.onClick.AddListener(delegate { callback(this); });
+    }
+
+    // Initialize a newly placed item for this slot
+    public void InitializeItem(Item item)
+    {
+        // Remove the current item if one already exists
+        this.RemoveItem();
+
+        // Cache the new item
+        this.Item = item;
+
+        // Show the new item
+        this.SetSprite(item.GetItemSprite());
+
+        // Trigger a new visit for this newly placed item
+        this.TriggerVisit(this);
+
+        // Remove place item delegate from the onClick of slot button
+        this.SlotButton.onClick.RemoveAllListeners();
+    }
+
+    // Initialize a visit with the newly selected guest for this slot
+    public void InitializeVisit(Guest guest)
+    {
+        this.Visit = new Visit(guest);
+    }
+
+    // Restore saved item state for this session on app start
+    public void RestoreItem(string itemName)
+    {
+        // Create and cache an item from the item name
+        this.Item = new Item(itemName);
+
+        // Show the restored item
+        this.SetSprite(this.Item.GetItemSprite());
+    }
+
+    // Restore saved visit state for this session on app start
+    public void RestoreVisit(SerializedSlot serializedSlot)
+    {
+        // Restore visit state from serialized slot
+        this.Visit = new Visit(serializedSlot);
+
+        // Check the status of the visit
+        this.CheckVisit();
+    }
+
+    // Remove the item from this slot along with its guest
+    public void RemoveItem()
+    {
+        // Do not continue if there is already no item
+        if (this.Item == null) return;
+
+        // Remove guest immediately and automatically
+        this.RemoveGuest();
+
+        // Clear cache of item
+        this.Item = null;
+
+        // Hide the now empty slot
+        this.Hide();
+    }
+
+    // Check if slot has a valid item
+    public bool HasItem()
+    {
+        // Return false when the item property is null
+        if (this.Item == null)
+        {
+            return false;
+        }
+
+        // Return true when the item is valid
+        return Item.IsValid(this.Item.Name);
+    }
+
+    // Check if slot has a valid guest
+    public bool HasGuest()
+    {
+        // Return false when the guest property of visit is null
+        if (this.Visit.Guest == null)
+        {
+            return false;
+        }
+
+        // Return true when the guest is valid
+        return Guest.IsValid(this.Visit.Guest.Name);
+    }
+
+    // Show indicator for item placement
+    public void ValidateItemPlacementEligibility()
+    {
+        // All slots are eligible for item placement by default
+        // TODO maybe implement multi-slot items?
+        this.SlotButton.interactable = true;
+
+        // Indicate this slot as a valid selection
+        this.ShowValidSelection();
+    }
+
+    // Show indicator for photo capture if guest is currently visiting
+    public void ValidatePhotoCaptureEligibility()
+    {
+        // Disable the slot button before eligibility is validated
+        this.SlotButton.interactable = false;
+
+        // Do not continue if there is no guest assigned to the slot
+        if (this.Visit.Guest == null) return;
+
+        // Do not continue if the guest is not currently visiting
+        if (!this.Visit.IsVisiting()) return;
+
+        // Make sure the eligible slot is interactable
+        this.SlotButton.interactable = true;
+
+        // Indicate this slot as a valid selection
+        this.ShowValidSelection();
     }
 
     // Call from active biome to cancel item placement or photo capture
@@ -102,163 +217,68 @@ public class Slot : MonoBehaviour
         this.SlotButton.interactable = true;
     }
 
-    // Initialize a newly placed item for this slot
-    public void InitializeItem(Item item)
-    {
-        // Remove the current item if one already exists
-        this.RemoveItem();
-
-        // Cache a new slot item using this item
-        this.SlotItem = new SlotItem(item);
-
-        // Set sprite using the image at the streaming asset path of the item
-        this.SetSlotSprite(item.ImagePath);
-
-        // Select a guest to visit the newly placed item
-        Guest guest = this.SelectNewGuestDelegate(item);
-
-        // Initialize the new guest
-        this.InitializeGuest(guest);
-
-        // Remove place item delegate from the onClick of slot button
-        this.SlotButton.onClick.RemoveAllListeners();
-    }
-
-    // Assign an item to the slot item of this slot
-    public void RestoreSlotItem(Item item)
-    {
-        // Create an item from the serialized item
-        this.SlotItem = new SlotItem(item);
-
-        // Set sprite using the image at the streaming asset path of the item
-        this.SetSlotSprite(item.ImagePath);
-    }
-
-    // Remove the item from this slot along with its guest
-    public void RemoveItem()
-    {
-        // Do not continue if there is already no item
-        if (this.SlotItem.Item == null) return;
-
-        // Removing the item will also automatically cause its guest to leave
-        this.RemoveGuest();
-
-        // Reset the image sprite
-        this.RemoveSlotSprite();
-
-        // Remove the slot item
-        this.SlotItem.RemoveItem();
-
-        // Hide the now empty slot
-        this.Hide();
-    }
-
-    // Initialize a newly selected guest for this slot
-    public void InitializeGuest(Guest guest)
-    {
-        this.SlotGuest = new SlotGuest(guest);
-    }
-
-    // Restore saved guest data for this session on app start
-    public void SetGuestFromSaveData(SerializedSlotGuest serializedSlotGuest)
-    {
-        this.SlotGuest = new SlotGuest(serializedSlotGuest);
-        this.CheckGuestVisit();
-    }
-
-    // Show indicator for item placement
-    public void ValidateItemPlacementEligibility()
-    {
-        // All slots are eligible for item placement by default
-        // TODO maybe implement multi-slot items?
-        this.SlotButton.interactable = true;
-        this.ShowValidSelection();
-    }
-
-    // Show indicator for photo capture if guest is currently visiting
-    public void ValidatePhotoCaptureEligibility()
-    {
-        // Disable the slot button before eligibility is validated
-        this.SlotButton.interactable = false;
-
-        // Do not continue if there is no guest assigned to the slot
-        if (this.SlotGuest.Guest == null) return;
-
-        // Do not continue if the guest is not currently visible
-        if (!this.SlotGuest.IsArrived()) return;
-
-        // Make sure the eligible slot is interactable
-        this.SlotButton.interactable = true;
-
-        // Show slot since the guest is currently visiting
-        this.ShowValidSelection();
-    }
-
-    // Only called on app start to add newly arrived guests and remove departed guests
-    private void CheckGuestVisit()
+    // Add newly arrived guests and remove departed guests on app start
+    private void CheckVisit()
     {
         // Do not continue if there is no guest
-        if (this.SlotGuest.Guest == null) return;
+        if (this.Visit.Guest == null) return;
 
         // Save the visit if the guest has already arrived
-        if (this.SlotGuest.IsArrived())
+        if (this.Visit.IsArrived())
         {
             // Tell the game manager to save the guest visit
-            this.SaveGuestVisitDelegate(this.SlotGuest);
+            this.SaveVisit(this.Visit);
         }
 
         // Check if there is currently a guest in the active biome
-        if (this.SlotGuest.IsVisiting())
+        if (this.Visit.IsVisiting())
         {
-            // Show item-guest interaction
-            this.SetInteractionSprite();
+            // Show the interaction of guest and item
+            this.SetSprite(this.Visit.Guest.GetInteractionSprite(this.Item));
         }
 
         // Remove the guest if it has departed
-        else if (this.SlotGuest.IsDeparted())
+        else if (this.Visit.IsDeparted())
         {
             // Remove the departed guest
             this.RemoveGuest();
 
-            // Select a new guest for the next guest
-            Guest nextGuest = this.SelectNewGuestDelegate(this.SlotItem.Item);
+            // Reset the slot image to show the item only
+            this.SetSprite(this.Item.GetItemSprite());
 
-            // Trigger the next visit by the new guest
-            this.InitializeGuest(nextGuest);
+            // Trigger a new visit
+            this.TriggerVisit(this);
         }
 
     }
 
-    // Remove the guest from this slot and save its gift in the game manager
+    // Remove the guest from this slot and save its gift in game manager
     private void RemoveGuest()
     {
         // Do not continue if there is already no guest
-        if (this.SlotGuest.Guest == null) return;
-
-        // Reset the slot image to show the item alone
-        this.SetSlotSprite(this.SlotItem.Item.ImagePath);
+        if (this.Visit.Guest == null) return;
 
         // Create and save a new gift from this guest departure
         this.CreateGift();
 
         // Tell active biome to remove the departing guest from the guest list
-        this.RemoveDepartingGuestDelegate(this.SlotGuest.Guest);
+        this.RecordDeparture(this.Visit.Guest.Name);
 
-        // Remove the slot guest
-        this.SlotGuest.RemoveGuest();
+        // Reset the visit properties to await new visit details
+        this.Visit.Clear();
     }
 
     // Create a new gift and save it in game manager
     private void CreateGift()
     {
         // Do not continue if the guest has not yet arrived
-        if (!this.SlotGuest.IsArrived()) return;
+        if (!this.Visit.IsArrived()) return;
 
         // Create the new gift from the departing guest and the item it visited
-        Gift gift = new Gift(this.SlotGuest.Guest, this.SlotItem.Item);
+        Gift gift = new Gift(this.Visit.Guest, this.Item);
 
         // Save the gift in game manager
-        this.SaveGuestGiftDelegate(gift);
+        this.SaveGift(gift);
     }
 
     // Indicate eligible slot during item placement or photo capture
@@ -280,28 +300,16 @@ public class Slot : MonoBehaviour
         // TODO add onClick listener to open guest summary if it is visiting
     }
 
-    // Set the sprite of the slot image to show the item-guest pair interaction
-    private void SetInteractionSprite()
-    {
-        // Get the path to this interaction image asset
-        string imageAsset = Paths.InteractionImageFile(
-            this.SlotGuest.Guest.Name,
-            this.SlotItem.Item.Name);
-
-        // Set the sprite of the slot to show the image at this path
-        this.SetSlotSprite(imageAsset);
-    }
-
-    // Set the sprite of the slot image to show the image at this path
-    private void SetSlotSprite(string imagePath)
+    // Set the sprite of the slot image
+    private void SetSprite(Sprite sprite)
     {
         // Make sure the slot image is fully opaque
         this.SlotImage.color = Color.white;
-        this.SlotImage.sprite = ImageUtility.CreateSprite(imagePath);
+        this.SlotImage.sprite = sprite;
     }
 
     // Remove the sprite of the slot image and make it fully transparent
-    private void RemoveSlotSprite()
+    private void RemoveSprite()
     {
         this.SlotImage.color = Color.clear;
         this.SlotImage.sprite = null;
@@ -313,19 +321,48 @@ public class Slot : MonoBehaviour
 public class SerializedSlot
 {
     public string ItemName;
-    public SerializedSlotGuest SlotGuest;
+    public string GuestName;
+    public string VisitArrivalDateTime;
+    public string VisitDepartureDateTime;
 
     public SerializedSlot() { }
 
     /* Serialize a slot */
     public SerializedSlot(Slot slot)
     {
-        if (slot.SlotItem.Item != null)
+        // Initialize values for all serialized slot properties
+        this.ItemName = string.Empty;
+        this.GuestName = string.Empty;
+        this.VisitArrivalDateTime = string.Empty;
+        this.VisitDepartureDateTime = string.Empty;
+
+        // Assign item name if the slot has an item
+        if (slot.Item != null)
         {
-            this.ItemName = slot.SlotItem.Item.Name;
+            this.ItemName = slot.Item.Name;
         }
 
-        this.SlotGuest = new SerializedSlotGuest(slot.SlotGuest);
+        // Assign visit properties if the slot has a guest
+        if (slot.Visit.Guest != null)
+        {
+            this.GuestName = slot.Visit.Guest.Name;
+            this.VisitArrivalDateTime = slot.Visit.Arrival.ToString();
+            this.VisitDepartureDateTime = slot.Visit.Departure.ToString();
+        }
+    }
+
+    // Check if serialized slot has a valid item
+    public bool HasItem()
+    {
+        // Return true when the item is valid
+        return Item.IsValid(this.ItemName);
+    }
+
+    // Check if serialized slot has a valid guest
+    public bool HasGuest()
+    {
+        // Return true when the guest is valid
+        return Guest.IsValid(this.GuestName);
     }
 
 }

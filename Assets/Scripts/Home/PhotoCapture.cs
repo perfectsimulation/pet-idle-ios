@@ -22,7 +22,7 @@ public class PhotoCapture : MonoBehaviour
     // Delegate to open photo preview from menu manager
     [HideInInspector]
     public delegate void OpenPhotoPreviewDelegate();
-    private OpenPhotoPreviewDelegate ShowPhotoPreviewDelegate;
+    private OpenPhotoPreviewDelegate OpenPhotoPreview;
 
     void Awake()
     {
@@ -55,43 +55,43 @@ public class PhotoCapture : MonoBehaviour
     }
 
     // Assign photo preview component from menu manager
-    public void SetupPhotoPreview(PhotoPreview photoPreview)
+    public void AssignPhotoPreview(PhotoPreview photoPreview)
     {
         this.PhotoPreview = photoPreview;
     }
 
     // Assign open photo preview delegate from menu manager
-    public void SetupOpenPhotoPreviewDelegate(OpenPhotoPreviewDelegate callback)
+    public void DelegateOpenPhotoPreview(OpenPhotoPreviewDelegate callback)
     {
-        this.ShowPhotoPreviewDelegate = callback;
+        this.OpenPhotoPreview = callback;
     }
 
-    // Give photo preview the guest data to display
+    // Assign the guest to photo preview
     public void SetGuest(Guest guest)
     {
         this.PhotoPreview.SetGuest(guest);
     }
 
-    // Remove guest from photo preview
+    // Remove the guest from photo preview
     public void RemoveGuest()
     {
         this.PhotoPreview.RemoveGuest();
     }
 
-    // Assign save photo delegate to photo preview from menu manager
-    public void SetupSavePhotoDelegate(PhotoPreview.SavePhotoDelegate callback)
+    // Assign save photo delegate from menu manager to photo preview
+    public void DelegateSavePhoto(PhotoPreview.SavePhotoDelegate callback)
     {
-        this.PhotoPreview.SetupSavePhotoDelegate(callback);
+        this.PhotoPreview.DelegateSavePhoto(callback);
     }
 
-    // Assign on close delegate to the photo preview from menu manager
-    public void SetupOnClosePreviewDelegate(PhotoPreview.CloseDelegate callback)
+    // Assign on close delegate from menu manager to the photo preview
+    public void DelegateOnClosePreview(PhotoPreview.OnCloseDelegate callback)
     {
-        this.PhotoPreview.SetupOnCloseDelegate(callback);
+        this.PhotoPreview.DelegateOnClose(callback);
     }
 
     // Trigger a photo capture during the next frame update
-    private void OnCaptureButtonPress()
+    private void OnPressCaptureButton()
     {
         StartCoroutine(this.CapturePhoto());
     }
@@ -136,13 +136,13 @@ public class PhotoCapture : MonoBehaviour
         this.PhotoPreview.CreatePhoto(photoTexture);
 
         // Open photo preview to view the captured image
-        this.OpenPhotoPreview();
+        this.OpenPreview();
     }
 
     // Open photo preview after photo creation from onClick of capture button
-    private void OpenPhotoPreview()
+    private void OpenPreview()
     {
-        this.ShowPhotoPreviewDelegate();
+        this.OpenPhotoPreview();
     }
 
     // Set parent and onClick to the draggable component of the capture button
@@ -159,7 +159,7 @@ public class PhotoCapture : MonoBehaviour
         draggableButton.SetDraggableParent(this.Frame);
 
         // Assign onClick delegate to the draggable button component
-        draggableButton.SetupOnClickDelegate(this.OnCaptureButtonPress);
+        draggableButton.DelegateOnClick(this.OnPressCaptureButton);
     }
 
 }

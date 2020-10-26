@@ -547,7 +547,7 @@ public static class DataInitializer
             itemName.ToString(),
             GetItemPrice(itemName),
             GetItemImagePath(itemName),
-            GetItemVisitors(itemName));
+            GetItemEncounter(itemName));
     }
 
     /* Get item price from item name */
@@ -605,178 +605,178 @@ public static class DataInitializer
         return Paths.ItemImageFile(itemName.ToString());
     }
 
-    /* Get item visitors from item name */
-    private static Visitors GetItemVisitors(ItemName itemName)
+    /* Get item encounter from item name */
+    private static Encounter GetItemEncounter(ItemName itemName)
     {
         switch (itemName)
         {
             // Ball
             case ItemName.Ball:
-                return new Visitors(new Visit[]
+                return new Encounter(new Prospect[]
                     {
-                        new Visit(Hamlet, 0.1f),
-                        new Visit(Gizmo, 0.2f),
-                        new Visit(Sammy, 0.3f),
-                        new Visit(Pip, 0.4f),
-                        new Visit(Daisy, 0.5f),
-                        new Visit(Biscuit, 0.6f),
-                        new Visit(Bear, 0.7f),
-                        new Visit(Muffin, 0.8f),
-                        new Visit(Nugget, 0.9f),
-                        new Visit(Kujo, 1.0f),
+                        new Prospect(Hamlet, 0.1f),
+                        new Prospect(Gizmo, 0.2f),
+                        new Prospect(Sammy, 0.3f),
+                        new Prospect(Pip, 0.4f),
+                        new Prospect(Daisy, 0.5f),
+                        new Prospect(Biscuit, 0.6f),
+                        new Prospect(Bear, 0.7f),
+                        new Prospect(Muffin, 0.8f),
+                        new Prospect(Nugget, 0.9f),
+                        new Prospect(Kujo, 1.0f),
                     }
                 );
 
             // Basket
             case ItemName.Basket:
-                return new Visitors(new Visit[]
+                return new Encounter(new Prospect[]
                     {
-                        new Visit(Pip, 0.1f),
-                        new Visit(Gizmo, 0.2f),
-                        new Visit(Biscuit, 0.3f),
-                        new Visit(Bear, 0.4f),
-                        new Visit(Sammy, 0.5f),
-                        new Visit(Kujo, 0.6f),
-                        new Visit(Daisy, 0.7f),
-                        new Visit(Nugget, 0.8f),
-                        new Visit(Muffin, 0.9f),
-                        new Visit(Hamlet, 1.0f),
+                        new Prospect(Pip, 0.1f),
+                        new Prospect(Gizmo, 0.2f),
+                        new Prospect(Biscuit, 0.3f),
+                        new Prospect(Bear, 0.4f),
+                        new Prospect(Sammy, 0.5f),
+                        new Prospect(Kujo, 0.6f),
+                        new Prospect(Daisy, 0.7f),
+                        new Prospect(Nugget, 0.8f),
+                        new Prospect(Muffin, 0.9f),
+                        new Prospect(Hamlet, 1.0f),
                     }
                 );
 
             // Bathtub
             case ItemName.Bathtub:
-                return new Visitors(new Visit[]
+                return new Encounter(new Prospect[]
                     {
-                        new Visit(Gizmo, 0.1f),
-                        new Visit(Kujo, 0.2f),
-                        new Visit(Nugget, 0.3f),
-                        new Visit(Biscuit, 0.4f),
-                        new Visit(Muffin, 0.5f),
-                        new Visit(Sammy, 0.6f),
-                        new Visit(Pip, 0.7f),
-                        new Visit(Bear, 0.8f),
-                        new Visit(Hamlet, 0.9f),
-                        new Visit(Daisy, 1.0f),
+                        new Prospect(Gizmo, 0.1f),
+                        new Prospect(Kujo, 0.2f),
+                        new Prospect(Nugget, 0.3f),
+                        new Prospect(Biscuit, 0.4f),
+                        new Prospect(Muffin, 0.5f),
+                        new Prospect(Sammy, 0.6f),
+                        new Prospect(Pip, 0.7f),
+                        new Prospect(Bear, 0.8f),
+                        new Prospect(Hamlet, 0.9f),
+                        new Prospect(Daisy, 1.0f),
                     }
                 );
 
             // Car
             case ItemName.Car:
-                return new Visitors(new Visit[]
+                return new Encounter(new Prospect[]
                     {
-                        new Visit(Nugget, 0.1f),
-                        new Visit(Daisy, 0.2f),
-                        new Visit(Bear, 0.3f),
-                        new Visit(Sammy, 0.4f),
-                        new Visit(Biscuit, 0.5f),
-                        new Visit(Muffin, 0.6f),
-                        new Visit(Pip, 0.7f),
-                        new Visit(Gizmo, 0.8f),
-                        new Visit(Kujo, 0.9f),
-                        new Visit(Hamlet, 1.0f),
+                        new Prospect(Nugget, 0.1f),
+                        new Prospect(Daisy, 0.2f),
+                        new Prospect(Bear, 0.3f),
+                        new Prospect(Sammy, 0.4f),
+                        new Prospect(Biscuit, 0.5f),
+                        new Prospect(Muffin, 0.6f),
+                        new Prospect(Pip, 0.7f),
+                        new Prospect(Gizmo, 0.8f),
+                        new Prospect(Kujo, 0.9f),
+                        new Prospect(Hamlet, 1.0f),
                     }
                 );
 
             // Globe
             case ItemName.Globe:
-                return new Visitors(new Visit[]
+                return new Encounter(new Prospect[]
                     {
-                        new Visit(Muffin, 0.1f),
-                        new Visit(Hamlet, 0.2f),
-                        new Visit(Kujo, 0.3f),
-                        new Visit(Bear, 0.4f),
-                        new Visit(Daisy, 0.5f),
-                        new Visit(Pip, 0.6f),
-                        new Visit(Biscuit, 0.7f),
-                        new Visit(Sammy, 1.0f),
-                        new Visit(Nugget, 0.8f),
-                        new Visit(Gizmo, 0.9f),
+                        new Prospect(Muffin, 0.1f),
+                        new Prospect(Hamlet, 0.2f),
+                        new Prospect(Kujo, 0.3f),
+                        new Prospect(Bear, 0.4f),
+                        new Prospect(Daisy, 0.5f),
+                        new Prospect(Pip, 0.6f),
+                        new Prospect(Biscuit, 0.7f),
+                        new Prospect(Sammy, 1.0f),
+                        new Prospect(Nugget, 0.8f),
+                        new Prospect(Gizmo, 0.9f),
                     }
                 );
 
             // Igloo
             case ItemName.Igloo:
-                return new Visitors(new Visit[]
+                return new Encounter(new Prospect[]
                     {
-                        new Visit(Sammy, 0.1f),
-                        new Visit(Hamlet, 0.2f),
-                        new Visit(Gizmo, 0.3f),
-                        new Visit(Biscuit, 0.4f),
-                        new Visit(Pip, 0.5f),
-                        new Visit(Kujo, 0.6f),
-                        new Visit(Muffin, 0.7f),
-                        new Visit(Daisy, 0.8f),
-                        new Visit(Bear, 0.9f),
-                        new Visit(Nugget, 1.0f),
+                        new Prospect(Sammy, 0.1f),
+                        new Prospect(Hamlet, 0.2f),
+                        new Prospect(Gizmo, 0.3f),
+                        new Prospect(Biscuit, 0.4f),
+                        new Prospect(Pip, 0.5f),
+                        new Prospect(Kujo, 0.6f),
+                        new Prospect(Muffin, 0.7f),
+                        new Prospect(Daisy, 0.8f),
+                        new Prospect(Bear, 0.9f),
+                        new Prospect(Nugget, 1.0f),
                     }
                 );
 
             // Wheel
             case ItemName.Wheel:
-                return new Visitors(new Visit[]
+                return new Encounter(new Prospect[]
                     {
-                        new Visit(Muffin, 0.1f),
-                        new Visit(Gizmo, 0.2f),
-                        new Visit(Nugget, 0.3f),
-                        new Visit(Biscuit, 0.4f),
-                        new Visit(Daisy, 0.5f),
-                        new Visit(Bear, 0.6f),
-                        new Visit(Hamlet, 0.7f),
-                        new Visit(Pip, 0.8f),
-                        new Visit(Sammy, 0.9f),
-                        new Visit(Kujo, 1.0f),
+                        new Prospect(Muffin, 0.1f),
+                        new Prospect(Gizmo, 0.2f),
+                        new Prospect(Nugget, 0.3f),
+                        new Prospect(Biscuit, 0.4f),
+                        new Prospect(Daisy, 0.5f),
+                        new Prospect(Bear, 0.6f),
+                        new Prospect(Hamlet, 0.7f),
+                        new Prospect(Pip, 0.8f),
+                        new Prospect(Sammy, 0.9f),
+                        new Prospect(Kujo, 1.0f),
                     }
                 );
 
             // Cheese
             case ItemName.Cheese:
-                return new Visitors(new Visit[]
+                return new Encounter(new Prospect[]
                     {
-                        new Visit(Gizmo, 0.1f),
-                        new Visit(Muffin, 0.2f),
-                        new Visit(Pip, 0.3f),
-                        new Visit(Biscuit, 0.4f),
-                        new Visit(Hamlet, 0.5f),
-                        new Visit(Nugget, 0.6f),
-                        new Visit(Daisy, 0.7f),
-                        new Visit(Sammy, 0.8f),
-                        new Visit(Kujo, 0.9f),
-                        new Visit(Bear, 1.0f),
+                        new Prospect(Gizmo, 0.1f),
+                        new Prospect(Muffin, 0.2f),
+                        new Prospect(Pip, 0.3f),
+                        new Prospect(Biscuit, 0.4f),
+                        new Prospect(Hamlet, 0.5f),
+                        new Prospect(Nugget, 0.6f),
+                        new Prospect(Daisy, 0.7f),
+                        new Prospect(Sammy, 0.8f),
+                        new Prospect(Kujo, 0.9f),
+                        new Prospect(Bear, 1.0f),
                     }
                 );
 
             // Peanut
             case ItemName.Peanut:
-                return new Visitors(new Visit[]
+                return new Encounter(new Prospect[]
                     {
-                        new Visit(Kujo, 0.1f),
-                        new Visit(Nugget, 0.2f),
-                        new Visit(Pip, 0.3f),
-                        new Visit(Daisy, 0.4f),
-                        new Visit(Sammy, 0.5f),
-                        new Visit(Hamlet, 0.6f),
-                        new Visit(Gizmo, 0.7f),
-                        new Visit(Bear, 0.8f),
-                        new Visit(Biscuit, 0.9f),
-                        new Visit(Muffin, 1.0f),
+                        new Prospect(Kujo, 0.1f),
+                        new Prospect(Nugget, 0.2f),
+                        new Prospect(Pip, 0.3f),
+                        new Prospect(Daisy, 0.4f),
+                        new Prospect(Sammy, 0.5f),
+                        new Prospect(Hamlet, 0.6f),
+                        new Prospect(Gizmo, 0.7f),
+                        new Prospect(Bear, 0.8f),
+                        new Prospect(Biscuit, 0.9f),
+                        new Prospect(Muffin, 1.0f),
                     }
                 );
 
             // Default
             default:
-                return new Visitors(new Visit[]
+                return new Encounter(new Prospect[]
                     {
-                        new Visit(Kujo, 0.1f),
-                        new Visit(Pip, 0.2f),
-                        new Visit(Bear, 0.3f),
-                        new Visit(Nugget, 0.4f),
-                        new Visit(Sammy, 0.5f),
-                        new Visit(Gizmo, 0.6f),
-                        new Visit(Hamlet, 0.7f),
-                        new Visit(Biscuit, 0.8f),
-                        new Visit(Muffin, 0.9f),
-                        new Visit(Daisy, 1.0f),
+                        new Prospect(Kujo, 0.1f),
+                        new Prospect(Pip, 0.2f),
+                        new Prospect(Bear, 0.3f),
+                        new Prospect(Nugget, 0.4f),
+                        new Prospect(Sammy, 0.5f),
+                        new Prospect(Gizmo, 0.6f),
+                        new Prospect(Hamlet, 0.7f),
+                        new Prospect(Biscuit, 0.8f),
+                        new Prospect(Muffin, 0.9f),
+                        new Prospect(Daisy, 1.0f),
                     }
                 );
 

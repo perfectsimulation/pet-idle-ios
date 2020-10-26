@@ -39,7 +39,7 @@ public class MenuManager : MonoBehaviour
         this.FocusActiveBiome();
 
         // Assign focus biome delegate to active biome
-        this.ActiveBiome.SetupFocusBiomeDelegate(this.FocusActiveBiome);
+        this.ActiveBiome.DelegateFocusBiome(this.FocusActiveBiome);
 
         // Assign inventory detail to inventory content
         this.InventoryContent.AssignInventoryDetail(this.InventoryDetail);
@@ -89,17 +89,17 @@ public class MenuManager : MonoBehaviour
         // Assign on close delegate to photo detail
         this.PhotosContent.DelegateOnCloseDetail(this.FocusPhotosMenu);
 
-        // Assign set photo slot delegate to active biome
-        this.ActiveBiome.SetupSetPhotoSlotDelegate(this.FocusPhotoCapture);
+        // Assign select slot for photo delegate to active biome
+        this.ActiveBiome.DelegateSelectSlotForPhoto(this.FocusPhotoCapture);
 
         // Assign photo preview to photo capture
-        this.PhotoCapture.SetupPhotoPreview(this.PhotoPreview);
+        this.PhotoCapture.AssignPhotoPreview(this.PhotoPreview);
 
         // Assign open photo preview delegate to photo capture
-        this.PhotoCapture.SetupOpenPhotoPreviewDelegate(this.FocusPhotoPreview);
+        this.PhotoCapture.DelegateOpenPhotoPreview(this.FocusPhotoPreview);
 
         // Assign on close delegate to photo preview
-        this.PhotoCapture.SetupOnClosePreviewDelegate(this.RetakePhoto);
+        this.PhotoCapture.DelegateOnClosePreview(this.RetakePhoto);
     }
 
     // Assign coins from game manager to menus that use them
@@ -141,43 +141,43 @@ public class MenuManager : MonoBehaviour
     }
 
     // Assign purchase item delegate from game manager to market content
-    public void SetupPurchaseItemDelegate(MarketContent.PurchaseItemDelegate callback)
+    public void DelegatePurchaseItem(MarketContent.PurchaseDelegate callback)
     {
-        this.MarketContent.DelegatePurchaseItem(callback);
+        this.MarketContent.DelegatePurchase(callback);
     }
 
     // Assign save biome delegate from game manager to active biome
-    public void SetupSaveBiomeDelegate(ActiveBiome.SaveBiomeDelegate callback)
+    public void DelegateSaveBiome(ActiveBiome.SaveBiomeDelegate callback)
     {
-        this.ActiveBiome.SetupSaveBiomeDelegate(callback);
+        this.ActiveBiome.DelegateSaveBiome(callback);
     }
 
     // Assign save guest visit delegate from game manager to active biome
-    public void SetupSaveVisitDelegate(Slot.SaveVisitDelegate callback)
+    public void DelegateSaveVisit(Slot.SaveVisitDelegate callback)
     {
-        this.ActiveBiome.SetupSaveVisitDelegate(callback);
+        this.ActiveBiome.DelegateSaveVisit(callback);
     }
 
     // Assign save gift delegate from game manager to active biome
-    public void SetupSaveGiftDelegate(Slot.SaveGiftDelegate callback)
+    public void DelegateSaveGift(Slot.SaveGiftDelegate callback)
     {
-        this.ActiveBiome.SetupSaveGiftDelegate(callback);
+        this.ActiveBiome.DelegateSaveGift(callback);
     }
 
     // Assign claim gifts delegate from game manager to gifts content
-    public void SetupClaimGiftsDelegate(GiftsContent.ClaimGiftsDelegate callback)
+    public void DelegateClaimGifts(GiftsContent.ClaimGiftsDelegate callback)
     {
         this.GiftsContent.DelegateClaimGifts(callback);
     }
 
     // Assign save photo delegate from game manager to photos content
-    public void SetupSavePhotoDelegate(PhotoPreview.SavePhotoDelegate callback)
+    public void DelegateSavePhoto(PhotoPreview.SavePhotoDelegate callback)
     {
-        this.PhotoCapture.SetupSavePhotoDelegate(callback);
+        this.PhotoCapture.DelegateSavePhoto(callback);
     }
 
     // Assign delete photo delegate from game manager to photo detatil
-    public void SetupDeletePhotoDelegate(PhotoDetail.DeletePhotoDelegate callback)
+    public void DelegateDeletePhoto(PhotoDetail.DeletePhotoDelegate callback)
     {
         this.PhotosContent.DelegateDeletePhoto(callback);
     }
@@ -215,37 +215,37 @@ public class MenuManager : MonoBehaviour
     }
 
     // Display the main menu panel and close button
-    public void OnMainMenuButtonPress()
+    public void OnPressMainMenuButton()
     {
         this.FocusMainMenu();
     }
 
     // Display the inventory menu panel and hide the main menu panel
-    public void OnInventoryMenuButtonPress()
+    public void OnPressInventoryMenuButton()
     {
         this.FocusInventoryMenu();
     }
 
     // Display the market menu panel and hide the main menu panel
-    public void OnMarketMenuButtonPress()
+    public void OnPressMarketMenuButton()
     {
         this.FocusMarketMenu();
     }
 
     // Display the notes menu panel and hide the main menu panel
-    public void OnNotesMenuButtonPress()
+    public void OnPressNotesMenuButton()
     {
         this.FocusNotesMenu();
     }
 
     // Display the gifts menu panel and hide the main menu panel
-    public void OnGiftsMenuButtonPress()
+    public void OnPressGiftsMenuButton()
     {
         this.FocusGiftsMenu();
     }
 
     // Begin photo capture flow starting from active biome slot selection
-    public void OnCameraMenuButtonPress()
+    public void OnPressCameraMenuButton()
     {
         // Begin photo capture process
         this.BeginPhotoCaptureFlow();
@@ -478,7 +478,7 @@ public class MenuManager : MonoBehaviour
         this.ActiveBiome.EndSlotSelection();
 
         // Give the guest to photo preview
-        this.PhotoCapture.SetGuest(slot.SlotGuest.Guest);
+        this.PhotoCapture.SetGuest(slot.Visit.Guest);
 
         // Align the photo capture frame with the selected slot
         this.PhotoCapture.Align(slot.transform);
@@ -640,12 +640,13 @@ public class MenuManager : MonoBehaviour
         this.TapOutToCloseButton.onClick.RemoveAllListeners();
     }
 
-    // Scroll inventory, market, notes, and gifts menus to the top
+    // Scroll inventory, market, notes, photos, and gifts menus to the top
     private void ScrollMenusToTop()
     {
         this.ScrollToTop(this.InventoryMenuPanel);
         this.ScrollToTop(this.MarketMenuPanel);
         this.ScrollToTop(this.NotesMenuPanel);
+        this.ScrollToTop(this.PhotosMenuPanel);
         this.ScrollToTop(this.GiftsMenuPanel);
     }
 
@@ -653,7 +654,8 @@ public class MenuManager : MonoBehaviour
     private void ScrollToTop(GameObject scrollableMenu)
     {
         // Get the scroll rect from the menu or its children
-        ScrollRect scrollRect = scrollableMenu.GetComponentInChildren<ScrollRect>();
+        ScrollRect scrollRect =
+            scrollableMenu.GetComponentInChildren<ScrollRect>();
 
         // Do not continue if a scroll rect was not found
         if (scrollRect == null) return;

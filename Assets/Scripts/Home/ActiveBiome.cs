@@ -6,85 +6,101 @@ public class ActiveBiome : MonoBehaviour
     // Slots on the active biome
     public Slot[] Slots;
 
+    // Ensure unique guests in biome by keeping track of visiting guest names
+    private List<string> VisitingGuestList;
+
     // Item selected from inventory awaiting slot placement
-    private Item ItemToPlaceInActiveBiome;
+    private Item ItemPendingPlacement;
 
-    // Keep track of guests currently visiting in the active biome
-    private List<Guest> VisitingGuestList;
-
-    // Delegate to save user data with an updated active biome state
+    // Save user data from game manager with an updated active biome state
     [HideInInspector]
     public delegate void SaveBiomeDelegate(SerializedActiveBiome updatedBiome);
-    private SaveBiomeDelegate SaveUpdatedActiveBiomeDelegate;
+    private SaveBiomeDelegate SaveBiome;
 
-    // Delegate to focus the active biome from the menu manager
+    // Focus the active biome from menu manager
     [HideInInspector]
     public delegate void FocusBiomeDelegate();
-    private FocusBiomeDelegate FocusActiveBiomeDelegate;
+    private FocusBiomeDelegate FocusBiome;
 
-    // Delegate to send the selected slot for photo capture
+    // Select slot from menu manager for photo capture
     [HideInInspector]
-    public delegate void SetPhotoSlotDelegate(Slot slot);
-    private SetPhotoSlotDelegate SelectPhotoSlotDelegate;
+    public delegate void SelectSlotForPhotoDelegate(Slot slot);
+    private SelectSlotForPhotoDelegate SelectSlotForPhoto;
 
     // Assign save active biome state delegate from game manager
-    public void SetupSaveBiomeDelegate(SaveBiomeDelegate callback)
+    public void DelegateSaveBiome(SaveBiomeDelegate callback)
     {
-        this.SaveUpdatedActiveBiomeDelegate = callback;
+        this.SaveBiome = callback;
     }
 
     // Assign each slot a save visit delegate from game manager
-    public void SetupSaveVisitDelegate(Slot.SaveVisitDelegate callback)
+    public void DelegateSaveVisit(Slot.SaveVisitDelegate callback)
     {
         foreach (Slot slot in this.Slots)
         {
-            slot.SetupSaveVisitDelegate(callback);
+            slot.DelegateSaveVisit(callback);
         }
 
     }
 
     // Assign each slot a save gift delegate from game manager
-    public void SetupSaveGiftDelegate(Slot.SaveGiftDelegate callback)
+    public void DelegateSaveGift(Slot.SaveGiftDelegate callback)
     {
         foreach (Slot slot in this.Slots)
         {
-            slot.SetupSaveGiftDelegate(callback);
+            slot.DelegateSaveGift(callback);
         }
 
     }
 
-    // Restore biome state from saved data on app start
+    // Restore biome state from saved biome state on app start
     public void RestoreState(SerializedSlot[] serializedSlots)
     {
-        // Initialize the list of visiting guests
-        this.VisitingGuestList = new List<Guest>();
+        // Do not continue if slot counts do not match
+        if (this.Slots.Length != serializedSlots.Length) return;
 
-        // Layout items and guests into slots using save data
-        this.LayoutSavedSlots(serializedSlots);
+        // Initialize the list of visiting guest names
+        this.VisitingGuestList = new List<string>();
+
+        // Restore state of each slot and prepare it for gameplay
+        for (int i = 0; i < this.Slots.Length; i++)
+        {
+            // Pass the slot a delegate to trigger new visits
+            this.Slots[i].DelegateTriggerVisit(this.TriggerVisit);
+
+            // Pass the slot a delegate to remove guests from visiting list
+            this.Slots[i].DelegateRecordDeparture(this.RemoveGuest);
+
+            // Restore item and guest of this slot from serialized slot
+            this.RestoreSlot(this.Slots[i], serializedSlots[i]);
+        }
+
+        // Tell game manager to save restored biome state
+        this.SaveBiome(new SerializedActiveBiome(this));
     }
 
-    // Assign focus active biome delegate from game manager
-    public void SetupFocusBiomeDelegate(FocusBiomeDelegate callback)
+    // Assign focus active biome delegate from menu manager
+    public void DelegateFocusBiome(FocusBiomeDelegate callback)
     {
-        this.FocusActiveBiomeDelegate = callback;
+        this.FocusBiome = callback;
     }
 
-    // Assign set photo slot delegate from menu manager for photo capture
-    public void SetupSetPhotoSlotDelegate(SetPhotoSlotDelegate callback)
+    // Assign select slot for photo delegate from menu manager
+    public void DelegateSelectSlotForPhoto(SelectSlotForPhotoDelegate callback)
     {
-        this.SelectPhotoSlotDelegate = callback;
+        this.SelectSlotForPhoto = callback;
     }
 
     // Begin item placement flow upon item selection in inventory content
     public void PrepareItemPlacement(Item item)
     {
         // Cache the selected item awaiting placement
-        this.ItemToPlaceInActiveBiome = item;
+        this.ItemPendingPlacement = item;
 
         // Show item placement indicator images for all the slots
         foreach (Slot slot in this.Slots)
         {
-            slot.SetupPlaceItemDelegate(this.PlaceItemInSlot);
+            slot.DelegatePlaceItem(this.PlaceItemInSlot);
             slot.ValidateItemPlacementEligibility();
         }
 
@@ -93,9 +109,10 @@ public class ActiveBiome : MonoBehaviour
     // End item placement flow in active biome
     public void CancelItemPlacement()
     {
-        // Clear selected item cache
-        this.ItemToPlaceInActiveBiome = null;
+        // Clear cache of item pending placement
+        this.ItemPendingPlacement = null;
 
+        // End slot selection
         this.EndSlotSelection();
     }
 
@@ -105,7 +122,7 @@ public class ActiveBiome : MonoBehaviour
         // Validate eligibility for photo capture in each slot
         foreach (Slot slot in this.Slots)
         {
-            slot.SetupCapturePhotoDelegate(this.CapturePhoto);
+            slot.DelegateSelectForPhoto(this.SelectForPhoto);
             slot.ValidatePhotoCaptureEligibility();
         }
 
@@ -114,13 +131,14 @@ public class ActiveBiome : MonoBehaviour
     // End photo capture flow in active biome
     public void CancelPhotoCapture()
     {
+        // End slot selection
         this.EndSlotSelection();
     }
 
     // End slot selection flow
     public void EndSlotSelection()
     {
-        // Hide valid slot indicator and clear button listeners for each slot
+        // Hide valid slot indicator and remove button listeners for each slot
         foreach (Slot slot in this.Slots)
         {
             slot.EndSlotSelection();
@@ -128,30 +146,94 @@ public class ActiveBiome : MonoBehaviour
 
     }
 
-    // Delegate called from slot button to slot an item
+    // Restore slot state from serialized slot save data on app start
+    private void RestoreSlot(Slot slot, SerializedSlot serializedSlot)
+    {
+        // Do not continue if there is no item to restore
+        if (!serializedSlot.HasItem())
+        {
+            // Make slot transparent
+            slot.Hide();
+
+            // Do not continue since nothing remains to restore for this slot
+            return;
+        }
+
+        // Restore the item state of this slot
+        slot.RestoreItem(serializedSlot.ItemName);
+
+        // Restore visit if the serialized slot has a valid guest
+        if (serializedSlot.HasGuest())
+        {
+            // Add the restored guest name to visiting guest list
+            this.AddGuest(serializedSlot.GuestName);
+
+            // Restore the visit state of this slot
+            slot.RestoreVisit(serializedSlot);
+        }
+        else
+        {
+            // Trigger a new visit for the slot with its restored item
+            this.TriggerVisit(slot);
+        }
+
+    }
+
+    // Trigger a randomly selected visit in this slot
+    private void TriggerVisit(Slot slot)
+    {
+        // Do not continue if there is no item in this slot
+        if (!slot.HasItem()) return;
+
+        // Pick a random number in range [0, 1] as the likelihood of this visit
+        float visitChance = Random.value;
+
+        // Select a prospect from the encounter property of the slot item
+        foreach (Prospect prospect in slot.Item.Encounter.Prospects)
+        {
+            // Select first prospect with greater chance than this visit chance
+            if (visitChance < prospect.Chance)
+            {
+                // Check if the prospect guest is already queued for a visit
+                if (this.VisitingGuestList.Contains(prospect.Guest.Name))
+                {
+                    // Skip guests already queued to visit
+                    continue;
+                }
+
+                // Select this guest to initialize a visit in this slot
+                slot.InitializeVisit(prospect.Guest);
+
+                // Queue the newly selected guest to visit the active biome
+                this.AddGuest(prospect.Guest.Name);
+
+                // Tell game manager to save upcoming visit to biome state
+                this.SaveBiome(new SerializedActiveBiome(this));
+
+                // Stop evaluating prospects once new visit is confirmed
+                return;
+            }
+        }
+
+    }
+
+    // Call from slot to assign the item pending placement to itself
     private void PlaceItemInSlot(Slot selectedSlot)
     {
         // Do not continue if no item is awaiting slot placement
-        if (this.ItemToPlaceInActiveBiome == null) return;
+        if (this.ItemPendingPlacement == null) return;
 
-        // Check if item is already placed in a slot
-        int oldSlotIndex = this.GetIndexOfSlotContainingItem(this.ItemToPlaceInActiveBiome);
+        // Remove item from its current slot before placing it in the new one
+        this.RemoveItem(this.ItemPendingPlacement);
 
-        // If the item is already placed, oldSlotIndex will be non-negative
-        if (oldSlotIndex >= 0)
-        {
-            // Remove the item from its current slot before placing it in a new one
-            this.Slots[oldSlotIndex].RemoveItem();
-        }
+        // Pass the slot a delegate to trigger new visits
+        selectedSlot.DelegateTriggerVisit(this.TriggerVisit);
 
-        // Pass the slot a delegate to select new guests
-        selectedSlot.SetupSelectGuestDelegate(this.SelectGuestToVisit);
-
-        // Pass the slot a delegate to remove departing guests
-        selectedSlot.SetupRemoveGuestDelegate(this.RemoveGuest);
+        // Pass the slot a delegate to remove guests from visiting guest list
+        selectedSlot.DelegateRecordDeparture(this.RemoveGuest);
 
         // Initialize the item in the newly selected slot
-        selectedSlot.InitializeItem(this.ItemToPlaceInActiveBiome);
+        selectedSlot.InitializeItem(this.ItemPendingPlacement);
 
         // End item placement flow for each slot
         foreach (Slot slot in this.Slots)
@@ -159,137 +241,68 @@ public class ActiveBiome : MonoBehaviour
             slot.EndSlotSelection();
         }
 
-        // Clear selected item cache to ensure only one slot placement per item
-        this.ItemToPlaceInActiveBiome = null;
+        // Clear cache of item pending placement to prevent duplicate placement
+        this.ItemPendingPlacement = null;
 
-        // Call delegate from menu manager to show menu button and hide close button
-        this.FocusActiveBiomeDelegate();
+        // Show menu button and hide close button from menu manager
+        this.FocusBiome();
 
-        // Call delegate from game manager to save user with updated slot data
-        this.SaveUpdatedActiveBiomeDelegate(new SerializedActiveBiome(this));
+        // Tell game manager to save biome state with newly placed item
+        this.SaveBiome(new SerializedActiveBiome(this));
     }
 
-    // Delegate called from slot button to capture photo of this guest
-    private void CapturePhoto(Slot slot)
+    // Call from slot to assign itself to menu manager for photo capture
+    private void SelectForPhoto(Slot slot)
     {
-        // Send selected guest to menu manager to open the photo preview
-        this.SelectPhotoSlotDelegate(slot);
+        // Send guest of this slot to menu manager
+        this.SelectSlotForPhoto(slot);
     }
 
-    // Restore slots of active biome state from saved slot data
-    private void LayoutSavedSlots(SerializedSlot[] serializedSlots)
+    // Add the guest to list of visiting guests
+    private void AddGuest(string guestName)
     {
-        // Do not continue if the array lengths of slots and serialized slots do not match
-        if (this.Slots.Length != serializedSlots.Length) return;
+        this.VisitingGuestList.Add(guestName);
+    }
 
-        // Hydrate slots with serialized slot data one by one
+    // Find and remove this item from any slot in this biome
+    private void RemoveItem(Item item)
+    {
+        // Get the index of the slot with this item
+        int slotIndex = this.GetIndexOfSlotWithItem(item);
+
+        // Do not continue if no slots currently have this item
+        if (slotIndex == -1) return;
+
+        // Remove this item from the slot
+        this.Slots[slotIndex].RemoveItem();
+    }
+
+    // Remove the guest from list of visiting guests
+    private void RemoveGuest(string guestName)
+    {
+        this.VisitingGuestList.Remove(guestName);
+    }
+
+    // Get index of slot with this item, or -1 if no slot has this item
+    private int GetIndexOfSlotWithItem(Item item)
+    {
+        // Check for item equality for each slot
         for (int i = 0; i < this.Slots.Length; i++)
         {
-            // If the serialized slot has an item, assign it to the corresponding slot
-            if (serializedSlots[i].ItemName != null &&
-                serializedSlots[i].ItemName != string.Empty &&
-                Item.IsValid(serializedSlots[i].ItemName))
+            // Skip if this slot has no item
+            if (this.Slots[i].Item == null)
             {
-                // Create an item from this serialized item
-                Item item = new Item(serializedSlots[i].ItemName);
-
-                // Pass the slot a delegate to retrigger new guests
-                this.Slots[i].SetupSelectGuestDelegate(this.SelectGuestToVisit);
-
-                // Pass the slot a delegate to remove departing guests
-                this.Slots[i].SetupRemoveGuestDelegate(this.RemoveGuest);
-
-                // Assign the item to the slot
-                this.Slots[i].RestoreSlotItem(item);
-
-                // If the serialized slot has a guest, assign it to the corresponding slot
-                if (serializedSlots[i].SlotGuest.GuestName != null &&
-                    serializedSlots[i].SlotGuest.GuestName != string.Empty &&
-                    Guest.IsValid(serializedSlots[i].SlotGuest.GuestName))
-                {
-                    // Assign the guest to the slot
-                    this.Slots[i].SetGuestFromSaveData(serializedSlots[i].SlotGuest);
-                }
-
-                // There is an item, but no guest in the slot
-                else
-                {
-                    // Get the next guest to visit
-                    Guest guest = this.SelectGuestToVisit(item);
-
-                    // Initialize the new guest in this slot
-                    this.Slots[i].InitializeGuest(guest);
-                }
-            }
-
-            // There is no item, so make the slot transparent
-            else
-            {
-                this.Slots[i].Hide();
-
-                // Can skip to next slot if there is no item
                 continue;
             }
 
-        }
-
-        // Call delegate from game manager to save user with updated slot data
-        this.SaveUpdatedActiveBiomeDelegate(new SerializedActiveBiome(this));
-    }
-
-    // Randomly select a guest to visit the slot of this item based on item visit chances
-    private Guest SelectGuestToVisit(Item item)
-    {
-        // Randomly generate a number between 0 and 1
-        float guestChance = Random.value;
-        Guest selectedGuest = new Guest();
-
-        // Select a guest by chance from the visitors of the item
-        foreach (Visit visit in item.Visitors.Chances)
-        {
-            // If the random number is lower than the visit chance, select that Guest
-            if (guestChance < visit.Chance)
+            // Return this slot index if the items match
+            if (this.Slots[i].Item.Equals(item))
             {
-                // Check if the guest is already currently visiting the active biome
-                if (this.VisitingGuestList.Contains(visit.Guest))
-                {
-                    // Skip this guest if it is already visiting a different slot
-                    continue;
-                }
-
-                // Select this guest to visit this slot
-                selectedGuest = visit.Guest;
-
-                break;
+                return i;
             }
-
         }
 
-        // Call delegate from game manager to save user with updated slot data
-        this.SaveUpdatedActiveBiomeDelegate(new SerializedActiveBiome(this));
-        return selectedGuest;
-    }
-
-    // Remove the departing guest from the list of visiting guests
-    private void RemoveGuest(Guest guest)
-    {
-        this.VisitingGuestList.Remove(guest);
-    }
-
-    // Get the index of the slot that contains the item, or -1 if item is not found
-    private int GetIndexOfSlotContainingItem(Item item)
-    {
-        // Go through each slot and check if the item matches the slot item
-        for (int i = 0; i < this.Slots.Length; i++)
-        {
-            // If there is no item in the slot, skip to the next one
-            if (this.Slots[i].SlotItem.Item == null) continue;
-
-            // If the item matches the slot item, return the index of that slot
-            if (this.Slots[i].SlotItem.Item.Equals(item)) return i;
-        }
-
-        // No match in the slots, so item is not currently placed
+        // Return -1 to indicate no slot contains this item
         return -1;
     }
 
@@ -300,7 +313,7 @@ public class SerializedActiveBiome
 {
     public SerializedSlot[] Slots;
 
-    /* Create a new active biome for a new user */
+    /* Initialize a brand new SerializedActiveBiome for a new user */
     public SerializedActiveBiome()
     {
         // TODO maybe set a variable in Biome for number of slots

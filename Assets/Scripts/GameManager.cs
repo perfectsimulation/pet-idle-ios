@@ -2,10 +2,7 @@
 
 public class GameManager : MonoBehaviour
 {
-    // Menu manager
     public MenuManager MenuManager;
-
-    // User
     private User User;
 
     // Load all game data
@@ -34,25 +31,25 @@ public class GameManager : MonoBehaviour
         this.MenuManager.HydrateGifts(this.User.Gifts);
 
         // Give the menu manager a callback to save item purchases
-        this.MenuManager.SetupPurchaseItemDelegate(this.SaveItemPurchase);
+        this.MenuManager.DelegatePurchaseItem(this.SaveItemPurchase);
 
         // Give the active biome a callback to save updates to active biome
-        this.MenuManager.SetupSaveBiomeDelegate(this.SaveActiveBiome);
+        this.MenuManager.DelegateSaveBiome(this.SaveActiveBiome);
 
         // Give the active biome slots a callback to save gifts
-        this.MenuManager.SetupSaveVisitDelegate(this.SaveGuestVisit);
+        this.MenuManager.DelegateSaveVisit(this.SaveGuestVisit);
 
         // Give the active biome slots a callback to save gifts
-        this.MenuManager.SetupSaveGiftDelegate(this.SaveGift);
+        this.MenuManager.DelegateSaveGift(this.SaveGift);
 
         // Give the menu manager a callback to claim gifts
-        this.MenuManager.SetupClaimGiftsDelegate(this.ClaimGifts);
+        this.MenuManager.DelegateClaimGifts(this.ClaimGifts);
 
         // Give the photo preview of photo capture a callback to save photos
-        this.MenuManager.SetupSavePhotoDelegate(this.SavePhoto);
+        this.MenuManager.DelegateSavePhoto(this.SavePhoto);
 
         // Give the photo detail of photos content a callback to delete photos
-        this.MenuManager.SetupDeletePhotoDelegate(this.DeletePhoto);
+        this.MenuManager.DelegateDeletePhoto(this.DeletePhoto);
 
         // Give the biome state of user data to the active biome
         this.MenuManager.RestoreBiomeState(this.User.BiomeState);
@@ -97,13 +94,13 @@ public class GameManager : MonoBehaviour
     }
 
     // Delegate called when guest visits the active biome
-    public void SaveGuestVisit(SlotGuest slotGuest)
+    public void SaveGuestVisit(Visit visit)
     {
         // Automatically update visit count when guest departs
-        this.User.Notes.UpdateVisitCount(slotGuest);
+        this.User.Notes.UpdateVisitCount(visit);
 
         // Update note in notes content
-        this.MenuManager.UpdateNote(slotGuest.Guest.Name, this.User.Notes);
+        this.MenuManager.UpdateNote(visit.Guest.Name, this.User.Notes);
 
         Persistence.SaveUser(this.User);
     }

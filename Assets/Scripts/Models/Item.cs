@@ -12,7 +12,7 @@ public class Item
     public string ImagePath { get; private set; }
 
     // Probabilities of all potential guests to visit this item
-    public Visitors Visitors { get; private set; }
+    public Encounter Encounter { get; private set; }
 
     /* Default no-arg constructor */
     public Item() { }
@@ -22,12 +22,12 @@ public class Item
         string name,
         int price,
         string imagePath,
-        Visitors visitors)
+        Encounter encounter)
     {
         this.Name = name;
         this.Price = price;
         this.ImagePath = imagePath;
-        this.Visitors = visitors;
+        this.Encounter = encounter;
     }
 
     /* Create an item from a valid item name */
@@ -37,7 +37,7 @@ public class Item
         this.Name = item.Name;
         this.Price = item.Price;
         this.ImagePath = item.ImagePath;
-        this.Visitors = item.Visitors;
+        this.Encounter = item.Encounter;
     }
 
     // Check item equality by checking string equality of their names
@@ -68,7 +68,7 @@ public class Item
         return false;
     }
 
-    // Create sprite for item image
+    // Create sprite of item
     public Sprite GetItemSprite()
     {
         return ImageUtility.CreateSprite(this.ImagePath);
@@ -77,24 +77,24 @@ public class Item
 }
 
 // Item property for all potential guest visits and their likelihoods
-public class Visitors
+public class Encounter
 {
-    public Visit[] Chances { get; private set; }
+    public Prospect[] Prospects { get; private set; }
 
-    public Visitors(Visit[] chances)
+    public Encounter(Prospect[] prospects)
     {
-        this.Chances = chances;
+        this.Prospects = prospects;
     }
 
 }
 
 // Chance of a visit by guest
-public class Visit
+public class Prospect
 {
     public Guest Guest { get; private set; }
     public float Chance { get; private set; }
 
-    public Visit(Guest guest, float chance)
+    public Prospect(Guest guest, float chance)
     {
         this.Guest = guest;
         this.Chance = chance;

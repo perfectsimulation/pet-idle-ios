@@ -22,15 +22,15 @@ public class PhotoPreview : MonoBehaviour
     // The photo created from the texture generated from photo capture
     private Photo Photo;
 
-    // Delegate to save photo to user data in game manager
+    // Delegate to save photo from game manager
     [HideInInspector]
     public delegate void SavePhotoDelegate(string guestName, Photo photo);
-    private SavePhotoDelegate SaveCapturedPhotoDelegate;
+    private SavePhotoDelegate SavePhoto;
 
-    // Delegate to close the photo preview from the menu manager
+    // Delegate to close the photo preview from menu manager
     [HideInInspector]
-    public delegate void CloseDelegate();
-    private CloseDelegate OnCloseDelegate;
+    public delegate void OnCloseDelegate();
+    private OnCloseDelegate OnClose;
 
     // Set the guest to whom the saved photo will belong
     public void SetGuest(Guest guest)
@@ -46,15 +46,15 @@ public class PhotoPreview : MonoBehaviour
     }
 
     // Assign save photo delegate from menu manager
-    public void SetupSavePhotoDelegate(SavePhotoDelegate callback)
+    public void DelegateSavePhoto(SavePhotoDelegate callback)
     {
-        this.SaveCapturedPhotoDelegate = callback;
+        this.SavePhoto = callback;
     }
 
     // Assign on close delegate from menu manager
-    public void SetupOnCloseDelegate(CloseDelegate callback)
+    public void DelegateOnClose(OnCloseDelegate callback)
     {
-        this.OnCloseDelegate = callback;
+        this.OnClose = callback;
     }
 
     // Create the photo from the newly generated texture
@@ -68,22 +68,22 @@ public class PhotoPreview : MonoBehaviour
     }
 
     // Save the captured photo to user data from game manager
-    public void OnKeepButtonPress()
+    public void OnPressKeepButton()
     {
         // Call delegate to save the photo of this guest in game manager
-        this.SaveCapturedPhotoDelegate(this.Guest.Name, this.Photo);
+        this.SavePhoto(this.Guest.Name, this.Photo);
 
         // Close the photo preview
-        this.OnCloseDelegate();
+        this.OnClose();
     }
 
     // Close the photo preview without saving the captured photo
-    public void OnRetakeButtonPress()
+    public void OnPressRetakeButton()
     {
-        this.OnCloseDelegate();
+        this.OnClose();
     }
 
-    // Set the text of the confirmation message of this preview modal
+    // Set the text of the confirmation message of this photo preview
     private void SetSaveText()
     {
         string text = "Save photo in your note on " + this.Guest.Name + "?";

@@ -9,12 +9,12 @@ public class DraggableButton : Draggable
     // Delegate to call onClick of the button to which this script is attached
     [HideInInspector]
     public delegate void OnClickDelegate();
-    private OnClickDelegate TriggerOnClickDelegate;
+    private OnClickDelegate OnClick;
 
     // Assign delegate for touches without drag events
-    public void SetupOnClickDelegate(OnClickDelegate callback)
+    public void DelegateOnClick(OnClickDelegate callback)
     {
-        this.TriggerOnClickDelegate = callback;
+        this.OnClick = callback;
     }
 
     // Call OnPointerDown base method
@@ -29,7 +29,7 @@ public class DraggableButton : Draggable
         // Do not call onClick if drag events took place
         if (!this.DidDrag)
         {
-            this.TriggerOnClickDelegate();
+            this.OnClick();
         }
 
         // Reset DidDrag when touch ends

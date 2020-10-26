@@ -37,8 +37,8 @@ public class MarketContent : MonoBehaviour
 
     // Purchase item from game manager
     [HideInInspector]
-    public delegate void PurchaseItemDelegate(Item item);
-    private PurchaseItemDelegate PurchaseItem;
+    public delegate void PurchaseDelegate(Item item);
+    private PurchaseDelegate Purchase;
 
     // Open purchase failure panel from menu manager
     [HideInInspector]
@@ -70,10 +70,10 @@ public class MarketContent : MonoBehaviour
     }
 
     // Assign purchase item delegate from game manager
-    public void DelegatePurchaseItem(PurchaseItemDelegate callback)
+    public void DelegatePurchase(PurchaseDelegate callback)
     {
         // Callback to game manager after purchase validation in market detail
-        this.PurchaseItem = callback;
+        this.Purchase = callback;
 
         // Assign validate purchase delegate to market detail
         this.MarketDetail.DelegateValidatePurchase(this.ValidatePurchase);
@@ -208,7 +208,7 @@ public class MarketContent : MonoBehaviour
         if (this.UserCoins > item.Price)
         {
             // Callback to game manager to purchase the item
-            this.PurchaseItem(item);
+            this.Purchase(item);
 
             // Open the purchase success panel in the market detail
             this.OnPurchaseSuccess();

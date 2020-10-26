@@ -861,7 +861,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 18852524}
-        m_MethodName: OnInventoryMenuButtonPress
+        m_MethodName: OnPressInventoryMenuButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1569,7 +1569,7 @@ PrefabInstance:
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
@@ -1930,7 +1930,7 @@ PrefabInstance:
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
@@ -3756,7 +3756,7 @@ PrefabInstance:
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
@@ -4306,7 +4306,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 18852524}
-        m_MethodName: OnMainMenuButtonPress
+        m_MethodName: OnPressMainMenuButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5240,7 +5240,7 @@ PrefabInstance:
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
@@ -5480,7 +5480,7 @@ PrefabInstance:
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
@@ -5982,7 +5982,7 @@ PrefabInstance:
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -2341065627555328165, guid: 7cd62a27e4b714f7a989ab0acfaba07f,
         type: 3}
@@ -6342,7 +6342,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 874089418}
-        m_MethodName: OnKeepButtonPress
+        m_MethodName: OnPressKeepButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7090,7 +7090,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 18852524}
-        m_MethodName: OnGiftsMenuButtonPress
+        m_MethodName: OnPressGiftsMenuButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8216,7 +8216,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 18852524}
-        m_MethodName: OnCameraMenuButtonPress
+        m_MethodName: OnPressCameraMenuButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8745,7 +8745,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 947745071}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -10280,7 +10280,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 18852524}
-        m_MethodName: OnNotesMenuButtonPress
+        m_MethodName: OnPressNotesMenuButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10691,7 +10691,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 874089418}
-        m_MethodName: OnRetakeButtonPress
+        m_MethodName: OnPressRetakeButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10976,7 +10976,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 18852524}
-        m_MethodName: OnMarketMenuButtonPress
+        m_MethodName: OnPressMarketMenuButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

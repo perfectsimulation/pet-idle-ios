@@ -109,7 +109,7 @@ public class Photo
         ImageConversion.LoadImage(this.Texture, bytes);
     }
 
-    // Create sprite for this photo
+    // Create sprite of this photo
     public Sprite GetSprite()
     {
         return ImageUtility.CreateSprite(this.Texture);
