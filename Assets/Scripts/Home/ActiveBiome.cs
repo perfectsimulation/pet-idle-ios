@@ -3,7 +3,10 @@ using UnityEngine;
 
 public class ActiveBiome : MonoBehaviour
 {
-    // Slots on the active biome
+    // Meal in the active biome
+    public Meal Meal;
+
+    // Slots in the active biome
     public Slot[] Slots;
 
     // Ensure unique guests in biome by keeping track of visiting guest names
@@ -54,10 +57,13 @@ public class ActiveBiome : MonoBehaviour
     }
 
     // Restore biome state from saved biome state on app start
-    public void RestoreState(SerializedSlot[] serializedSlots)
+    public void RestoreState(SerializedActiveBiome biomeState)
     {
         // Do not continue if slot counts do not match
-        if (this.Slots.Length != serializedSlots.Length) return;
+        if (this.Slots.Length != biomeState.Slots.Length) return;
+
+        // Restore meal
+        this.Meal.RestoreMeal(biomeState.FoodName, new Visit[0]);
 
         // Initialize the list of visiting guest names
         this.VisitingGuestList = new List<string>();
@@ -72,7 +78,7 @@ public class ActiveBiome : MonoBehaviour
             this.Slots[i].DelegateRecordDeparture(this.RemoveGuest);
 
             // Restore item and guest of this slot from serialized slot
-            this.RestoreSlot(this.Slots[i], serializedSlots[i]);
+            this.RestoreSlot(this.Slots[i], biomeState.Slots[i]);
         }
 
         // Tell game manager to save restored biome state
@@ -89,6 +95,12 @@ public class ActiveBiome : MonoBehaviour
     public void DelegateSelectSlotForPhoto(SelectSlotForPhotoDelegate callback)
     {
         this.SelectSlotForPhoto = callback;
+    }
+
+    // Assign place food delegate to meal
+    public void DelegatePlaceFood()
+    {
+        // TODO
     }
 
     // Begin item placement flow upon item selection in inventory content
@@ -247,6 +259,8 @@ public class ActiveBiome : MonoBehaviour
         // Show menu button and hide close button from menu manager
         this.FocusBiome();
 
+        // TODO refresh meal visit schedule
+
         // Tell game manager to save biome state with newly placed item
         this.SaveBiome(new SerializedActiveBiome(this));
     }
@@ -275,6 +289,8 @@ public class ActiveBiome : MonoBehaviour
 
         // Remove this item from the slot
         this.Slots[slotIndex].RemoveItem();
+
+        // Remove all visits with this item
     }
 
     // Remove the guest from list of visiting guests
@@ -311,12 +327,15 @@ public class ActiveBiome : MonoBehaviour
 [System.Serializable]
 public class SerializedActiveBiome
 {
+    public string FoodName;
     public SerializedSlot[] Slots;
 
     /* Initialize a brand new SerializedActiveBiome for a new user */
     public SerializedActiveBiome()
     {
-        // TODO maybe set a variable in Biome for number of slots
+        // TODO remove meal test case
+        this.FoodName = "Fruits";
+        // TODO use Biome model for number of slots
         this.Slots = new SerializedSlot[6];
     }
 
@@ -324,7 +343,8 @@ public class SerializedActiveBiome
     public SerializedActiveBiome(ActiveBiome activeBiome)
     {
         // Each Slot needs to be converted to a SerializedSlot
-        SerializedSlot[] serializedSlots = new SerializedSlot[activeBiome.Slots.Length];
+        SerializedSlot[] serializedSlots =
+            new SerializedSlot[activeBiome.Slots.Length];
 
         // Serialize the slot and add it to the serialized slot array
         for (int i = 0; i < serializedSlots.Length; i++)
@@ -332,6 +352,7 @@ public class SerializedActiveBiome
             serializedSlots[i] = new SerializedSlot(activeBiome.Slots[i]);
         }
 
+        this.FoodName = activeBiome.Meal.Food.Name;
         this.Slots = serializedSlots;
     }
 

@@ -26,16 +26,16 @@ public static class DataInitializer
     };
 
     /* Guests */
-    public static readonly Guest Bear = ConstructGuest(GuestName.Bear);
-    public static readonly Guest Biscuit = ConstructGuest(GuestName.Biscuit);
-    public static readonly Guest Daisy = ConstructGuest(GuestName.Daisy);
-    public static readonly Guest Gizmo = ConstructGuest(GuestName.Gizmo);
-    public static readonly Guest Hamlet = ConstructGuest(GuestName.Hamlet);
-    public static readonly Guest Kujo = ConstructGuest(GuestName.Kujo);
-    public static readonly Guest Muffin = ConstructGuest(GuestName.Muffin);
-    public static readonly Guest Nugget = ConstructGuest(GuestName.Nugget);
-    public static readonly Guest Pip = ConstructGuest(GuestName.Pip);
-    public static readonly Guest Sammy = ConstructGuest(GuestName.Sammy);
+    private static readonly Guest Bear = ConstructGuest(GuestName.Bear);
+    private static readonly Guest Biscuit = ConstructGuest(GuestName.Biscuit);
+    private static readonly Guest Daisy = ConstructGuest(GuestName.Daisy);
+    private static readonly Guest Gizmo = ConstructGuest(GuestName.Gizmo);
+    private static readonly Guest Hamlet = ConstructGuest(GuestName.Hamlet);
+    private static readonly Guest Kujo = ConstructGuest(GuestName.Kujo);
+    private static readonly Guest Muffin = ConstructGuest(GuestName.Muffin);
+    private static readonly Guest Nugget = ConstructGuest(GuestName.Nugget);
+    private static readonly Guest Pip = ConstructGuest(GuestName.Pip);
+    private static readonly Guest Sammy = ConstructGuest(GuestName.Sammy);
 
     /* Array of all guests in the game */
     public static readonly Guest[] AllGuests = new Guest[]
@@ -433,15 +433,15 @@ public static class DataInitializer
     };
 
     /* Items */
-    public static readonly Item Ball = ConstructItem(ItemName.Ball);
-    public static readonly Item Basket = ConstructItem(ItemName.Basket);
-    public static readonly Item Bathtub = ConstructItem(ItemName.Bathtub);
-    public static readonly Item Car = ConstructItem(ItemName.Car);
-    public static readonly Item Globe = ConstructItem(ItemName.Globe);
-    public static readonly Item Igloo = ConstructItem(ItemName.Igloo);
-    public static readonly Item Wheel = ConstructItem(ItemName.Wheel);
-    public static readonly Item Cheese = ConstructItem(ItemName.Cheese);
-    public static readonly Item Peanut = ConstructItem(ItemName.Peanut);
+    private static readonly Item Ball = ConstructItem(ItemName.Ball);
+    private static readonly Item Basket = ConstructItem(ItemName.Basket);
+    private static readonly Item Bathtub = ConstructItem(ItemName.Bathtub);
+    private static readonly Item Car = ConstructItem(ItemName.Car);
+    private static readonly Item Globe = ConstructItem(ItemName.Globe);
+    private static readonly Item Igloo = ConstructItem(ItemName.Igloo);
+    private static readonly Item Wheel = ConstructItem(ItemName.Wheel);
+    private static readonly Item Cheese = ConstructItem(ItemName.Cheese);
+    private static readonly Item Peanut = ConstructItem(ItemName.Peanut);
 
     /* Array of all items in the game */
     public static readonly Item[] AllItems = new Item[]
@@ -782,6 +782,157 @@ public static class DataInitializer
 
         }
 
+    }
+
+    //  ______              _
+    //  |  ___|            | |
+    //  | |_ ___   ___   __| |
+    //  |  _/ _ \ / _ \ / _` |
+    //  | || (_) | (_) | (_| |
+    //  \_| \___/ \___/ \__,_|
+
+    /* Food name enum used to construct foods during game session */
+    private enum FoodName
+    {
+        Pellets,
+        Salad,
+        Fruits
+    }
+
+    /* Foods */
+    private static readonly Food Pellets = ConstructFood(FoodName.Pellets);
+    private static readonly Food Salad = ConstructFood(FoodName.Salad);
+    private static readonly Food Fruits = ConstructFood(FoodName.Fruits);
+
+    /* Array of all foods in the game */
+    public static readonly Food[] AllFoods = new Food[]
+    {
+        Pellets,
+        Salad,
+        Fruits
+    };
+
+    /* Check if string represents a valid food name */
+    public static bool IsValidFood(string name)
+    {
+        // Get enum from food name string
+        FoodName foodName =
+            (FoodName)Enum.Parse(typeof(FoodName), name, true);
+
+        // Check if food name is an enum of FoodName
+        return Enum.IsDefined(typeof(FoodName), foodName);
+    }
+
+    /* Get food from food name string */
+    public static Food GetFood(string name)
+    {
+        // Initialize default food
+        Food food = new Food();
+
+        // Return default food if the food name is not valid
+        if (!IsValidFood(name))
+        {
+            return food;
+        }
+
+        // Get enum from food name string
+        FoodName foodName =
+            (FoodName)Enum.Parse(typeof(FoodName), name, true);
+
+        // Return the food corresponding to the food name
+        switch (foodName)
+        {
+            // Pellets
+            case FoodName.Pellets:
+                return Pellets;
+
+            // Salad
+            case FoodName.Salad:
+                return Salad;
+
+            // Fruits
+            case FoodName.Fruits:
+                return Fruits;
+
+            // Default
+            default:
+                return food;
+
+        }
+
+    }
+
+    /* Construct food from food name by assigning static food properties */
+    private static Food ConstructFood(FoodName foodName)
+    {
+        return new Food(
+            foodName.ToString(),
+            GetFoodPrice(foodName),
+            GetFoodDuration(foodName),
+            GetFoodFreshImagePath(foodName),
+            GetFoodEmptyImagePath(foodName));
+    }
+
+    /* Get food price from food name */
+    private static int GetFoodPrice(FoodName foodName)
+    {
+        switch (foodName)
+        {
+            // Pellets
+            case FoodName.Pellets:
+                return 0;
+
+            // Salad
+            case FoodName.Salad:
+                return 4;
+
+            // Fruits
+            case FoodName.Fruits:
+                return 6;
+
+            // Default
+            default:
+                return 0;
+
+        }
+
+    }
+
+    /* Get food duration from food name */
+    private static int GetFoodDuration(FoodName foodName)
+    {
+        switch (foodName)
+        {
+            // Pellets
+            case FoodName.Pellets:
+                return 8;
+
+            // Salad
+            case FoodName.Salad:
+                return 4;
+
+            // Fruits
+            case FoodName.Fruits:
+                return 3;
+
+            // Default
+            default:
+                return 0;
+
+        }
+
+    }
+
+    /* Get food fresh image path from food name */
+    private static string GetFoodFreshImagePath(FoodName foodName)
+    {
+        return Paths.FoodFreshImageFile(foodName.ToString());
+    }
+
+    /* Get food empty image path from food name */
+    private static string GetFoodEmptyImagePath(FoodName foodName)
+    {
+        return Paths.FoodEmptyImageFile(foodName.ToString());
     }
 
 }

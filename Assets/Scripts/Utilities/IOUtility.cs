@@ -82,6 +82,23 @@ namespace IOUtility
             return Path.Combine(StreamingFriendshipDirectory, fileName);
         }
 
+        /* Get the path to the food fresh image streaming asset */
+        public static string FoodFreshImageFile(string foodName)
+        {
+            string fileName = string.Format("{0}.png", foodName.ToLower());
+            return Path.Combine(StreamingFoodDirectory, fileName);
+        }
+
+        /* Get the path to the food empty image streaming asset */
+        public static string FoodEmptyImageFile(string foodName)
+        {
+            string fileName = string.Format(
+                "{0}-empty.png",
+                foodName.ToLower());
+
+            return Path.Combine(StreamingFoodDirectory, fileName);
+        }
+
         /* Get the path to the streaming asset */
         public static string StreamingAssetFile(string assetPath)
         {
@@ -121,6 +138,15 @@ namespace IOUtility
             get
             {
                 return Path.Combine(StreamingAssetPath, "Images/Friendship");
+            }
+        }
+
+        /* Food image streaming asset directory location */
+        private static string StreamingFoodDirectory
+        {
+            get
+            {
+                return Path.Combine(StreamingAssetPath, "Images/Food");
             }
         }
 

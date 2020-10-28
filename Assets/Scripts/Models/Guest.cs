@@ -3,14 +3,11 @@ using UnityEngine;
 
 public class Guest
 {
-    // Name of this guest
+    // Unique ID and display name for this guest
     public string Name { get; private set; }
 
     // Nature of this guest
     public string Nature { get; private set; }
-
-    // Persistence path of guest png asset
-    public string ImagePath { get; private set; }
 
     // Minutes before earliest arrival to active biome
     public float EarliestArrivalInMinutes { get; private set; }
@@ -35,6 +32,9 @@ public class Guest
 
     // Maximum friendship points awarded to user upon completion of guest visit
     public int MaximumFriendshipReward { get; private set; }
+
+    // Path to the image to use for displaying a sprite of this guest
+    private readonly string ImagePath;
 
     // Heart level associated with accumulated friendship points
     private enum HeartLevel

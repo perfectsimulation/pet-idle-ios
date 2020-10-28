@@ -2,17 +2,17 @@
 
 public class Item
 {
-    // Unique ID for this item
+    // Unique ID and display name for this item
     public string Name { get; private set; }
 
     // Price in coins needed to buy this item in the market
     public int Price { get; private set; }
 
-    // Path to the image to use for displaying a sprite of this item
-    public string ImagePath { get; private set; }
-
     // Probabilities of all potential guests to visit this item
     public Encounter Encounter { get; private set; }
+
+    // Path to the image to use for displaying a sprite of this item
+    private readonly string ImagePath;
 
     /* Default no-arg constructor */
     public Item() { }
@@ -26,8 +26,8 @@ public class Item
     {
         this.Name = name;
         this.Price = price;
-        this.ImagePath = imagePath;
         this.Encounter = encounter;
+        this.ImagePath = imagePath;
     }
 
     /* Create an item from a valid item name */
@@ -36,8 +36,8 @@ public class Item
         Item item = DataInitializer.GetItem(name);
         this.Name = item.Name;
         this.Price = item.Price;
-        this.ImagePath = item.ImagePath;
         this.Encounter = item.Encounter;
+        this.ImagePath = item.ImagePath;
     }
 
     // Check item equality by checking string equality of their names

@@ -185,7 +185,7 @@ public class MenuManager : MonoBehaviour
     // Assign biome state from game manager to active biome
     public void RestoreBiomeState(SerializedActiveBiome biomeState)
     {
-        this.ActiveBiome.RestoreState(biomeState.Slots);
+        this.ActiveBiome.RestoreState(biomeState);
     }
 
     // Add a newly purchased item to inventory content
