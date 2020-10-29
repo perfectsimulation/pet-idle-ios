@@ -62,8 +62,8 @@ public class ActiveBiome : MonoBehaviour
         // Do not continue if slot counts do not match
         if (this.Slots.Length != biomeState.Slots.Length) return;
 
-        // Restore meal
-        this.Meal.RestoreMeal(biomeState.FoodName, new Visit[0]);
+        // Restore mealTODO
+        //this.Meal.RestoreMeal(biomeState.FoodName, biomeState.Visits);
 
         // Initialize the list of visiting guest names
         this.VisitingGuestList = new List<string>();
@@ -80,6 +80,10 @@ public class ActiveBiome : MonoBehaviour
             // Restore item and guest of this slot from serialized slot
             this.RestoreSlot(this.Slots[i], biomeState.Slots[i]);
         }
+
+        // TODO move this init to trigger during session only
+        // remove test case
+        this.Meal.InitializeMeal(biomeState.FoodName, this.Slots);
 
         // Tell game manager to save restored biome state
         this.SaveBiome(new SerializedActiveBiome(this));
@@ -186,7 +190,7 @@ public class ActiveBiome : MonoBehaviour
         else
         {
             // Trigger a new visit for the slot with its restored item
-            this.TriggerVisit(slot);
+            //this.TriggerVisit(slot);
         }
 
     }
@@ -194,38 +198,39 @@ public class ActiveBiome : MonoBehaviour
     // Trigger a randomly selected visit in this slot
     private void TriggerVisit(Slot slot)
     {
-        // Do not continue if there is no item in this slot
-        if (!slot.HasItem()) return;
+        // TODO
+        //// Do not continue if there is no item in this slot
+        //if (!slot.HasItem()) return;
 
-        // Pick a random number in range [0, 1] as the likelihood of this visit
-        float visitChance = Random.value;
+        //// Pick a random number in range [0, 1] as the likelihood of this visit
+        //float visitChance = Random.value;
 
-        // Select a prospect from the encounter property of the slot item
-        foreach (Prospect prospect in slot.Item.Encounter.Prospects)
-        {
-            // Select first prospect with greater chance than this visit chance
-            if (visitChance < prospect.Chance)
-            {
-                // Check if the prospect guest is already queued for a visit
-                if (this.VisitingGuestList.Contains(prospect.Guest.Name))
-                {
-                    // Skip guests already queued to visit
-                    continue;
-                }
+        //// Select a prospect from the encounter property of the slot item
+        //foreach (Prospect prospect in slot.Item.Encounter.Prospects)
+        //{
+        //    // Select first prospect with greater chance than this visit chance
+        //    if (visitChance < prospect.Chance)
+        //    {
+        //        // Check if the prospect guest is already queued for a visit
+        //        if (this.VisitingGuestList.Contains(prospect.Guest.Name))
+        //        {
+        //            // Skip guests already queued to visit
+        //            continue;
+        //        }
 
-                // Select this guest to initialize a visit in this slot
-                slot.InitializeVisit(prospect.Guest);
+        //        // Select this guest to initialize a visit in this slot
+        //        slot.InitializeVisit(prospect.Guest);
 
-                // Queue the newly selected guest to visit the active biome
-                this.AddGuest(prospect.Guest.Name);
+        //        // Queue the newly selected guest to visit the active biome
+        //        this.AddGuest(prospect.Guest.Name);
 
-                // Tell game manager to save upcoming visit to biome state
-                this.SaveBiome(new SerializedActiveBiome(this));
+        //        // Tell game manager to save upcoming visit to biome state
+        //        this.SaveBiome(new SerializedActiveBiome(this));
 
-                // Stop evaluating prospects once new visit is confirmed
-                return;
-            }
-        }
+        //        // Stop evaluating prospects once new visit is confirmed
+        //        return;
+        //    }
+        //}
 
     }
 
@@ -329,6 +334,7 @@ public class SerializedActiveBiome
 {
     public string FoodName;
     public SerializedSlot[] Slots;
+    public SerializedVisit[] Visits;
 
     /* Initialize a brand new SerializedActiveBiome for a new user */
     public SerializedActiveBiome()
@@ -337,23 +343,15 @@ public class SerializedActiveBiome
         this.FoodName = "Fruits";
         // TODO use Biome model for number of slots
         this.Slots = new SerializedSlot[6];
+        this.Visits = new SerializedVisit[0];
     }
 
     /* Serialize an active biome */
     public SerializedActiveBiome(ActiveBiome activeBiome)
     {
-        // Each Slot needs to be converted to a SerializedSlot
-        SerializedSlot[] serializedSlots =
-            new SerializedSlot[activeBiome.Slots.Length];
-
-        // Serialize the slot and add it to the serialized slot array
-        for (int i = 0; i < serializedSlots.Length; i++)
-        {
-            serializedSlots[i] = new SerializedSlot(activeBiome.Slots[i]);
-        }
-
         this.FoodName = activeBiome.Meal.Food.Name;
-        this.Slots = serializedSlots;
+        this.Slots = Slot.Serialize(activeBiome.Slots);
+        this.Visits = Visit.Serialize(activeBiome.Meal.VisitSchedule.Visits);
     }
 
 }

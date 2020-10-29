@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,25 +28,25 @@ public class Meal : MonoBehaviour
     }
 
     // Initialize a brand new meal with fresh food
-    public void InitializeMeal(string foodName)
+    public void InitializeMeal(string foodName, Slot[] slots)
     {
         // Create and cache this food
         this.Food = new Food(foodName);
 
         // Initialize a new visit schedule for this new meal
-        this.VisitSchedule = new VisitSchedule(this.Food);
+        this.VisitSchedule = new VisitSchedule(this.Food, slots);
 
         // Show the fresh image sprite in food image
         this.SetFoodImageSprite(this.Food.GetFreshFoodSprite());
     }
 
     // Restore state of meal from save data
-    public void RestoreMeal(string foodName, Visit[] visits)
+    public void RestoreMeal(string foodName, SerializedVisit[] visits)
     {
         // Create and cache this food
         this.Food = new Food(foodName);
 
-        // Restore visit schedule from serialized visits array
+        // Restore visit schedule from serialized visit array
         this.VisitSchedule = new VisitSchedule(visits);
 
         // TODO use time utility to update remaining duration
@@ -64,25 +63,6 @@ public class Meal : MonoBehaviour
     private void SetFoodImageSprite(Sprite sprite)
     {
         this.FoodImage.sprite = sprite;
-    }
-
-}
-
-public class VisitSchedule
-{
-    public List<Visit> Visits;
-
-    /* Default no-arg constructor */
-    public VisitSchedule() { }
-
-    public VisitSchedule(Food food)
-    {
-        // TODO
-    }
-
-    public VisitSchedule(Visit[] visits)
-    {
-        this.Visits = Serializer.ArrayToList(visits);
     }
 
 }

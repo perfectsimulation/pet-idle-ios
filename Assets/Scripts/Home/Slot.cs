@@ -111,7 +111,8 @@ public class Slot : MonoBehaviour
     // Initialize a visit with the newly selected guest for this slot
     public void InitializeVisit(Guest guest)
     {
-        this.Visit = new Visit(guest);
+        // TODO
+        //this.Visit = new Visit(guest);
     }
 
     // Restore saved item state for this session on app start
@@ -128,7 +129,7 @@ public class Slot : MonoBehaviour
     public void RestoreVisit(SerializedSlot serializedSlot)
     {
         // Restore visit state from serialized slot
-        this.Visit = new Visit(serializedSlot);
+        //this.Visit = new Visit(serializedSlot);
 
         // Check the status of the visit
         this.CheckVisit();
@@ -215,6 +216,22 @@ public class Slot : MonoBehaviour
         // Reset slot button onClick listener TODO show guest summary
         this.SlotButton.onClick.RemoveAllListeners();
         this.SlotButton.interactable = true;
+    }
+
+    // Convert array of slots to array of serialized slots
+    public static SerializedSlot[] Serialize(Slot[] slots)
+    {
+        // Initialize a serialized slot array
+        SerializedSlot[] serializedSlots = new SerializedSlot[slots.Length];
+
+        // Each Slot needs to be converted to a SerializedSlot
+        for (int i = 0; i < slots.Length; i++)
+        {
+            // Serialize the slot and add it to the serialized slot array
+            serializedSlots[i] = new SerializedSlot(slots[i]);
+        }
+
+        return serializedSlots;
     }
 
     // Add newly arrived guests and remove departed guests on app start

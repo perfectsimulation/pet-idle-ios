@@ -86,4 +86,10 @@ public class Food
         return ImageUtility.CreateSprite(this.EmptyImagePath);
     }
 
+    // Get encounters per hour for this item
+    public int GetEncountersPerHour(Item item)
+    {
+        return DataInitializer.GetItemEncountersPerFoodHour(this, item);
+    }
+
 }

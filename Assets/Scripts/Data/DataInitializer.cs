@@ -862,6 +862,177 @@ public static class DataInitializer
 
     }
 
+    /* Get item encounters per hour for this food */
+    public static int GetItemEncountersPerFoodHour(Food food, Item item)
+    {
+        // Return 0 if the food name is not valid
+        if (!IsValidFood(food.Name))
+        {
+            return 0;
+        }
+
+        // Get enum from food name string
+        FoodName foodName =
+            (FoodName)Enum.Parse(typeof(FoodName), food.Name, true);
+
+        // Return 0 if the item name is not valid
+        if (!IsValidItem(item.Name))
+        {
+            return 0;
+        }
+
+        // Get enum from item name string
+        ItemName itemName =
+            (ItemName)Enum.Parse(typeof(ItemName), item.Name, true);
+
+        // Get number of encounters for this food and for this item
+        switch (foodName)
+        {
+            // Pellets
+            case FoodName.Pellets:
+                switch (itemName)
+                {
+                    // Ball
+                    case ItemName.Ball:
+                        return 1;
+
+                    // Basket
+                    case ItemName.Basket:
+                        return 2;
+
+                    // Bathtub
+                    case ItemName.Bathtub:
+                        return 1;
+
+                    // Car
+                    case ItemName.Car:
+                        return 1;
+
+                    // Globe
+                    case ItemName.Globe:
+                        return 1;
+
+                    // Igloo
+                    case ItemName.Igloo:
+                        return 2;
+
+                    // Wheel
+                    case ItemName.Wheel:
+                        return 2;
+
+                    // Cheese
+                    case ItemName.Cheese:
+                        return 1;
+
+                    // Peanut
+                    case ItemName.Peanut:
+                        return 1;
+
+                    // Default
+                    default:
+                        return 0;
+
+                }
+
+            // Salad
+            case FoodName.Salad:
+                switch (itemName)
+                {
+                    // Ball
+                    case ItemName.Ball:
+                        return 2;
+
+                    // Basket
+                    case ItemName.Basket:
+                        return 4;
+
+                    // Bathtub
+                    case ItemName.Bathtub:
+                        return 2;
+
+                    // Car
+                    case ItemName.Car:
+                        return 3;
+
+                    // Globe
+                    case ItemName.Globe:
+                        return 4;
+
+                    // Igloo
+                    case ItemName.Igloo:
+                        return 3;
+
+                    // Wheel
+                    case ItemName.Wheel:
+                        return 2;
+
+                    // Cheese
+                    case ItemName.Cheese:
+                        return 1;
+
+                    // Peanut
+                    case ItemName.Peanut:
+                        return 1;
+
+                    // Default
+                    default:
+                        return 0;
+
+                }
+
+            // Fruits
+            case FoodName.Fruits:
+                switch (itemName)
+                {
+                    // Ball
+                    case ItemName.Ball:
+                        return 3;
+
+                    // Basket
+                    case ItemName.Basket:
+                        return 3;
+
+                    // Bathtub
+                    case ItemName.Bathtub:
+                        return 6;
+
+                    // Car
+                    case ItemName.Car:
+                        return 6;
+
+                    // Globe
+                    case ItemName.Globe:
+                        return 4;
+
+                    // Igloo
+                    case ItemName.Igloo:
+                        return 7;
+
+                    // Wheel
+                    case ItemName.Wheel:
+                        return 3;
+
+                    // Cheese
+                    case ItemName.Cheese:
+                        return 1;
+
+                    // Peanut
+                    case ItemName.Peanut:
+                        return 1;
+
+                    // Default
+                    default:
+                        return 0;
+
+                }
+
+            // Default
+            default:
+                return 0;
+        }
+
+    }
+
     /* Construct food from food name by assigning static food properties */
     private static Food ConstructFood(FoodName foodName)
     {
