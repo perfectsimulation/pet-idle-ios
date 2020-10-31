@@ -55,7 +55,7 @@ public static class DataInitializer
     /* Check if string represents a valid guest name */
     public static bool IsValidGuest(string name)
     {
-        // Get enum from guest name string
+        // Get guest name enum from guest name string
         GuestName guestName =
             (GuestName)Enum.Parse(typeof(GuestName), name, true);
 
@@ -540,6 +540,493 @@ public static class DataInitializer
 
     }
 
+    /* Get guest affinity for item */
+    public static int GetGuestAffinityForItem(Item item, Guest guest)
+    {
+        // Return 0 if the item is not valid
+        if (!IsValidItem(item.Name)) return 0;
+
+        // Return 0 if the guest is not valid
+        if (!IsValidGuest(guest.Name)) return 0;
+
+        // Get item name enum from item name string
+        ItemName itemName =
+            (ItemName)Enum.Parse(typeof(ItemName), item.Name, true);
+
+        // Get guest name enum from guest name string
+        GuestName guestName =
+            (GuestName)Enum.Parse(typeof(GuestName), guest.Name, true);
+
+        // Get the affinity of this guest for this item
+        switch (guestName)
+        {
+            // Bear
+            case GuestName.Bear:
+                switch (itemName)
+                {
+                    // Ball
+                    case ItemName.Ball:
+                        return 0;
+
+                    // Basket
+                    case ItemName.Basket:
+                        return 1;
+
+                    // Bathtub
+                    case ItemName.Bathtub:
+                        return 2;
+
+                    // Car
+                    case ItemName.Car:
+                        return 3;
+
+                    // Globe
+                    case ItemName.Globe:
+                        return 4;
+
+                    // Igloo
+                    case ItemName.Igloo:
+                        return 5;
+
+                    // Wheel
+                    case ItemName.Wheel:
+                        return 6;
+
+                    // Cheese
+                    case ItemName.Cheese:
+                        return 7;
+
+                    // Peanut
+                    case ItemName.Peanut:
+                        return 8;
+
+                    // Default
+                    default:
+                        return 0;
+
+                }
+
+            // Biscuit
+            case GuestName.Biscuit:
+                switch (itemName)
+                {
+                    // Ball
+                    case ItemName.Ball:
+                        return 1;
+
+                    // Basket
+                    case ItemName.Basket:
+                        return 5;
+
+                    // Bathtub
+                    case ItemName.Bathtub:
+                        return 4;
+
+                    // Car
+                    case ItemName.Car:
+                        return 8;
+
+                    // Globe
+                    case ItemName.Globe:
+                        return 2;
+
+                    // Igloo
+                    case ItemName.Igloo:
+                        return 7;
+
+                    // Wheel
+                    case ItemName.Wheel:
+                        return 0;
+
+                    // Cheese
+                    case ItemName.Cheese:
+                        return 3;
+
+                    // Peanut
+                    case ItemName.Peanut:
+                        return 6;
+
+                    // Default
+                    default:
+                        return 0;
+
+                }
+
+            // Daisy
+            case GuestName.Daisy:
+                switch (itemName)
+                {
+                    // Ball
+                    case ItemName.Ball:
+                        return 2;
+
+                    // Basket
+                    case ItemName.Basket:
+                        return 6;
+
+                    // Bathtub
+                    case ItemName.Bathtub:
+                        return 4;
+
+                    // Car
+                    case ItemName.Car:
+                        return 1;
+
+                    // Globe
+                    case ItemName.Globe:
+                        return 8;
+
+                    // Igloo
+                    case ItemName.Igloo:
+                        return 0;
+
+                    // Wheel
+                    case ItemName.Wheel:
+                        return 7;
+
+                    // Cheese
+                    case ItemName.Cheese:
+                        return 3;
+
+                    // Peanut
+                    case ItemName.Peanut:
+                        return 5;
+
+                    // Default
+                    default:
+                        return 0;
+
+                }
+
+            // Gizmo
+            case GuestName.Gizmo:
+                switch (itemName)
+                {
+                    // Ball
+                    case ItemName.Ball:
+                        return 5;
+
+                    // Basket
+                    case ItemName.Basket:
+                        return 3;
+
+                    // Bathtub
+                    case ItemName.Bathtub:
+                        return 2;
+
+                    // Car
+                    case ItemName.Car:
+                        return 1;
+
+                    // Globe
+                    case ItemName.Globe:
+                        return 6;
+
+                    // Igloo
+                    case ItemName.Igloo:
+                        return 7;
+
+                    // Wheel
+                    case ItemName.Wheel:
+                        return 8;
+
+                    // Cheese
+                    case ItemName.Cheese:
+                        return 0;
+
+                    // Peanut
+                    case ItemName.Peanut:
+                        return 4;
+
+                    // Default
+                    default:
+                        return 0;
+
+                }
+
+            // Hamlet
+            case GuestName.Hamlet:
+                switch (itemName)
+                {
+                    // Ball
+                    case ItemName.Ball:
+                        return 3;
+
+                    // Basket
+                    case ItemName.Basket:
+                        return 2;
+
+                    // Bathtub
+                    case ItemName.Bathtub:
+                        return 4;
+
+                    // Car
+                    case ItemName.Car:
+                        return 7;
+
+                    // Globe
+                    case ItemName.Globe:
+                        return 0;
+
+                    // Igloo
+                    case ItemName.Igloo:
+                        return 6;
+
+                    // Wheel
+                    case ItemName.Wheel:
+                        return 8;
+
+                    // Cheese
+                    case ItemName.Cheese:
+                        return 1;
+
+                    // Peanut
+                    case ItemName.Peanut:
+                        return 5;
+
+                    // Default
+                    default:
+                        return 0;
+
+                }
+
+            // Kujo
+            case GuestName.Kujo:
+                switch (itemName)
+                {
+                    // Ball
+                    case ItemName.Ball:
+                        return 3;
+
+                    // Basket
+                    case ItemName.Basket:
+                        return 8;
+
+                    // Bathtub
+                    case ItemName.Bathtub:
+                        return 1;
+
+                    // Car
+                    case ItemName.Car:
+                        return 0;
+
+                    // Globe
+                    case ItemName.Globe:
+                        return 2;
+
+                    // Igloo
+                    case ItemName.Igloo:
+                        return 6;
+
+                    // Wheel
+                    case ItemName.Wheel:
+                        return 5;
+
+                    // Cheese
+                    case ItemName.Cheese:
+                        return 4;
+
+                    // Peanut
+                    case ItemName.Peanut:
+                        return 7;
+
+                    // Default
+                    default:
+                        return 0;
+
+                }
+
+            // Muffin
+            case GuestName.Muffin:
+                switch (itemName)
+                {
+                    // Ball
+                    case ItemName.Ball:
+                        return 8;
+
+                    // Basket
+                    case ItemName.Basket:
+                        return 7;
+
+                    // Bathtub
+                    case ItemName.Bathtub:
+                        return 6;
+
+                    // Car
+                    case ItemName.Car:
+                        return 5;
+
+                    // Globe
+                    case ItemName.Globe:
+                        return 4;
+
+                    // Igloo
+                    case ItemName.Igloo:
+                        return 3;
+
+                    // Wheel
+                    case ItemName.Wheel:
+                        return 2;
+
+                    // Cheese
+                    case ItemName.Cheese:
+                        return 1;
+
+                    // Peanut
+                    case ItemName.Peanut:
+                        return 0;
+
+                    // Default
+                    default:
+                        return 0;
+
+                }
+
+            // Nugget
+            case GuestName.Nugget:
+                switch (itemName)
+                {
+                    // Ball
+                    case ItemName.Ball:
+                        return 8;
+
+                    // Basket
+                    case ItemName.Basket:
+                        return 5;
+
+                    // Bathtub
+                    case ItemName.Bathtub:
+                        return 7;
+
+                    // Car
+                    case ItemName.Car:
+                        return 1;
+
+                    // Globe
+                    case ItemName.Globe:
+                        return 0;
+
+                    // Igloo
+                    case ItemName.Igloo:
+                        return 6;
+
+                    // Wheel
+                    case ItemName.Wheel:
+                        return 4;
+
+                    // Cheese
+                    case ItemName.Cheese:
+                        return 3;
+
+                    // Peanut
+                    case ItemName.Peanut:
+                        return 2;
+
+                    // Default
+                    default:
+                        return 0;
+
+                }
+
+            // Pip
+            case GuestName.Pip:
+                switch (itemName)
+                {
+                    // Ball
+                    case ItemName.Ball:
+                        return 4;
+
+                    // Basket
+                    case ItemName.Basket:
+                        return 2;
+
+                    // Bathtub
+                    case ItemName.Bathtub:
+                        return 6;
+
+                    // Car
+                    case ItemName.Car:
+                        return 1;
+
+                    // Globe
+                    case ItemName.Globe:
+                        return 7;
+
+                    // Igloo
+                    case ItemName.Igloo:
+                        return 0;
+
+                    // Wheel
+                    case ItemName.Wheel:
+                        return 8;
+
+                    // Cheese
+                    case ItemName.Cheese:
+                        return 3;
+
+                    // Peanut
+                    case ItemName.Peanut:
+                        return 5;
+
+                    // Default
+                    default:
+                        return 0;
+
+                }
+
+            // Sammy
+            case GuestName.Sammy:
+                switch (itemName)
+                {
+                    // Ball
+                    case ItemName.Ball:
+                        return 6;
+
+                    // Basket
+                    case ItemName.Basket:
+                        return 8;
+
+                    // Bathtub
+                    case ItemName.Bathtub:
+                        return 0;
+
+                    // Car
+                    case ItemName.Car:
+                        return 4;
+
+                    // Globe
+                    case ItemName.Globe:
+                        return 5;
+
+                    // Igloo
+                    case ItemName.Igloo:
+                        return 1;
+
+                    // Wheel
+                    case ItemName.Wheel:
+                        return 3;
+
+                    // Cheese
+                    case ItemName.Cheese:
+                        return 2;
+
+                    // Peanut
+                    case ItemName.Peanut:
+                        return 7;
+
+                    // Default
+                    default:
+                        return 0;
+
+                }
+
+            // Default
+            default:
+                return 0;
+        }
+
+    }
+
     /* Construct item from item name by assigning static item properties */
     private static Item ConstructItem(ItemName itemName)
     {
@@ -862,8 +1349,8 @@ public static class DataInitializer
 
     }
 
-    /* Get item encounters per hour for this food */
-    public static int GetItemEncountersPerFoodHour(Food food, Item item)
+    /* Get maximum number of visits for this item per hour of this food */
+    public static int GetItemVisitsPerFoodHour(Food food, Item item)
     {
         // Return 0 if the food name is not valid
         if (!IsValidFood(food.Name))

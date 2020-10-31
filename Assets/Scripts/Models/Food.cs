@@ -9,7 +9,7 @@ public class Food
     public int Price { get; private set; }
 
     // Time in hours for this food to turn from fresh to empty
-    public int Duration;
+    public int Duration { get; private set; }
 
     // Path to the image to use for displaying a sprite of this fresh food
     private readonly string FreshImagePath;
@@ -86,10 +86,10 @@ public class Food
         return ImageUtility.CreateSprite(this.EmptyImagePath);
     }
 
-    // Get encounters per hour for this item
-    public int GetEncountersPerHour(Item item)
+    // Get maximum number of visits per hour for this item
+    public int GetMaximumVisitsPerHour(Item item)
     {
-        return DataInitializer.GetItemEncountersPerFoodHour(this, item);
+        return DataInitializer.GetItemVisitsPerFoodHour(this, item);
     }
 
 }

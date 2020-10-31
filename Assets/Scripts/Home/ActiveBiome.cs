@@ -199,39 +199,6 @@ public class ActiveBiome : MonoBehaviour
     private void TriggerVisit(Slot slot)
     {
         // TODO
-        //// Do not continue if there is no item in this slot
-        //if (!slot.HasItem()) return;
-
-        //// Pick a random number in range [0, 1] as the likelihood of this visit
-        //float visitChance = Random.value;
-
-        //// Select a prospect from the encounter property of the slot item
-        //foreach (Prospect prospect in slot.Item.Encounter.Prospects)
-        //{
-        //    // Select first prospect with greater chance than this visit chance
-        //    if (visitChance < prospect.Chance)
-        //    {
-        //        // Check if the prospect guest is already queued for a visit
-        //        if (this.VisitingGuestList.Contains(prospect.Guest.Name))
-        //        {
-        //            // Skip guests already queued to visit
-        //            continue;
-        //        }
-
-        //        // Select this guest to initialize a visit in this slot
-        //        slot.InitializeVisit(prospect.Guest);
-
-        //        // Queue the newly selected guest to visit the active biome
-        //        this.AddGuest(prospect.Guest.Name);
-
-        //        // Tell game manager to save upcoming visit to biome state
-        //        this.SaveBiome(new SerializedActiveBiome(this));
-
-        //        // Stop evaluating prospects once new visit is confirmed
-        //        return;
-        //    }
-        //}
-
     }
 
     // Call from slot to assign the item pending placement to itself
@@ -351,7 +318,7 @@ public class SerializedActiveBiome
     {
         this.FoodName = activeBiome.Meal.Food.Name;
         this.Slots = Slot.Serialize(activeBiome.Slots);
-        this.Visits = Visit.Serialize(activeBiome.Meal.VisitSchedule.Visits);
+        // TODO serialize visit schedule
     }
 
 }

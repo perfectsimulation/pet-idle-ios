@@ -74,6 +74,12 @@ public class Item
         return ImageUtility.CreateSprite(this.ImagePath);
     }
 
+    // Get affinity for this item by this guest
+    public int GetGuestAffinity(Guest guest)
+    {
+        return DataInitializer.GetGuestAffinityForItem(this, guest);
+    }
+
 }
 
 // Item property for all potential guest visits and their likelihoods
