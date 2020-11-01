@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TimeUtility;
 
 public class Visit
@@ -125,12 +126,12 @@ public class VisitSchedule
     private readonly Food Food;
 
     // Keep track of all guests selected to visit in this schedule
-    private List<Guest> Guests;
+    private readonly List<Guest> Guests;
 
     /* Default no-arg constructor */
     public VisitSchedule() { }
 
-    /* Initialize a brand new VisitSchedule when fresh food is added to biome */
+    /* Initialize a brand new VisitSchedule */
     public VisitSchedule(Food food, Slot[] slots)
     {
         // Initialize dictionary of visits by item name
@@ -165,10 +166,29 @@ public class VisitSchedule
             // Generate a list of visits for each item
             itemVisits = this.GenerateVisits(item);
 
-            // Add a dictionary entry for this visit list by item name
+            // Add a dictionary entry for this schedule by item name
             this.Visits.Add(item.Name, itemVisits);
         }
 
+        // Remove overlapping visits for each guest to finalize schedule
+        this.ArbitrateOverlappingVisits();
+
+        // TODO remove debug logs
+        string visits;
+        string v;
+        foreach (KeyValuePair<string, List<Visit>> entry in this.Visits)
+        {
+            visits = string.Format("{0}:\n", entry.Key);
+            foreach (Visit visit in entry.Value)
+            {
+                v = string.Format("{0} {1} {2}\n",
+                    visit.Guest.Name.ToString(),
+                    visit.Arrival.ToString(),
+                    visit.Departure.ToString());
+                visits += v;
+            }
+            UnityEngine.Debug.Log(visits);
+        }
     }
 
     /* Create a VisitSchedule from save data */
@@ -202,6 +222,9 @@ public class VisitSchedule
             // Add an hour to the start time for the next set of hourly visits
             startTime = startTime.AddHours(1);
         }
+
+        // Sort visits in ascending order by arrival time
+        visits.Sort((x, y) => x.Arrival.CompareTo(y.Arrival));
 
         return visits;
     }
@@ -322,20 +345,22 @@ public class VisitSchedule
         return departure;
     }
 
-    // Arbitrate overlapping visits with the same guest across all items
-    private void ArbitrateItemVisits()
+    // Arbitrate all overlapping visits
+    private void ArbitrateOverlappingVisits()
     {
         // Cache a reference for a list of visits by guest
         List<Visit> guestVisits;
 
-        // Select between overlapping visits by item affinity of guest
+        // Remove overlapping visits for each guest
         foreach (Guest guest in this.Guests)
         {
-            // Get list of all visits by this guest
+            // Get list of visits by each guest across all items
             guestVisits = this.GetVisitsByGuest(guest);
+
+            // Remove overlapping visits for this guest
+            this.TrimVisitOverlap(guestVisits);
         }
 
-        // Remove visit with lower item affinity for this guest
     }
 
     // Get a list of all visits across all items with this guest
@@ -362,35 +387,119 @@ public class VisitSchedule
         return guestVisits;
     }
 
-    // Select visit with highest affinity item out of visits with common guest
-    private Visit SelectVisitByItemAffinity(List<Visit> guestVisits)
+    // Remove overlapping visits recursively while minimizing visit removals
+    private List<Visit> TrimVisitOverlap(List<Visit> visits, int maxDepth = 99)
+    {
+        // Cache visits as an array to use for iteration
+        Visit[] guestVisits = visits.ToArray();
+
+        // Get overlap counts for this visit array
+        int[] overlapCounts = this.GetVisitOverlapCounts(guestVisits);
+
+        // Cache the maximum overlap count
+        int maxOverlapCount = overlapCounts.Max();
+
+        // Check if there were no overlaps for any visit
+        if (maxOverlapCount == 0)
+        {
+            // Return the visit list unchanged when no overlaps exist
+            return visits;
+        }
+
+        // Initialize a list for visits with max overlaps
+        List<Visit> maxOverlapVisits = new List<Visit>();
+
+        // Compare the overlap count of each visit to the max overlap count
+        for (int i = 0; i < guestVisits.Length; i++)
+        {
+            // Skip visits with fewer overlaps than the max
+            if (overlapCounts[i] < maxOverlapCount) continue;
+
+            // Add visit to list of max overlap visits
+            maxOverlapVisits.Add(guestVisits[i]);
+        }
+
+        // Select the max overlap visit with the lowest item affinity
+        Visit leastPreferred = this.SelectLowestAffinityVisit(maxOverlapVisits);
+
+        // Remove this least preferred visit from the original list
+        visits.Remove(leastPreferred);
+
+        // Decrement next recursion depth to avoid overflow if error occurs
+        maxDepth--;
+
+        // Recurse on the remaining visits when max depth has not been reached
+        if (maxDepth > 0)
+        {
+            // Continue to remove overlaps within these guest visits
+            return this.TrimVisitOverlap(visits, maxDepth);
+        }
+
+        return visits;
+    }
+
+    // Get corresponding array of overlap counts for this visit array
+    private int[] GetVisitOverlapCounts(Visit[] visits)
+    {
+        // Initialize an array to count overlaps of each visit
+        int[] overlapCounts = new int[visits.Length];
+
+        // Check each visit for an overlap with any other visit
+        for (int i = 0; i < visits.Length; i++)
+        {
+            // Compare each unique pair of visits exactly once
+            for (int j = 0; j < visits.Length; j++)
+            {
+                // Exclude comparison of visit with itself
+                if (i == j) continue;
+
+                // Skip mirrored comparisons, e.g. pair (x,y) = pair (y,x)
+                if (i > j) continue;
+
+                // Check for an overlap within this pair of visits
+                if (TimeInterval.HasOverlap(
+                    visits[i].Arrival, visits[i].Departure,
+                    visits[j].Arrival, visits[j].Departure))
+                {
+                    // Increment count for both indexes when overlap exists
+                    overlapCounts[i]++;
+                    overlapCounts[j]++;
+                }
+            }
+
+        }
+
+        return overlapCounts;
+    }
+
+    // Select visit with lowest item affinity out of visits with common guest
+    private Visit SelectLowestAffinityVisit(List<Visit> guestVisits)
     {
         // Initialize a default visit
         Visit selectedVisit = new Visit();
 
-        // Cache references to select item with highest guest affinity
-        int highestAffinity = 0;
+        // Cache references to select item with lowest affinity by this guest
+        int lowestAffinity = int.MaxValue;
         int affinity;
 
-        // Select the visit with the item that has the highest guest affinity
+        // Select the visit with the item that has the lowest affinity
         foreach (Visit visit in guestVisits)
         {
-            // Cache the guest affinity for this item
+            // Cache the affinity for this item
             affinity = visit.Item.GetGuestAffinity(visit.Guest);
 
-            // Skip visit if its affinity is less than the highest found so far
-            if (affinity < highestAffinity) continue;
+            // Skip visit if its affinity is more than the lowest found so far
+            if (affinity > lowestAffinity) continue;
 
-            // Record visit with highest affinity found so far
+            // Record visit with lowest affinity found so far
             selectedVisit = visit;
 
-            // Update highest affinity found so far
-            highestAffinity = visit.Item.GetGuestAffinity(visit.Guest);
+            // Update lowest affinity found so far
+            lowestAffinity = affinity;
         }
 
         return selectedVisit;
     }
-
 
 }
 

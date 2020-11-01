@@ -62,7 +62,7 @@ public class ActiveBiome : MonoBehaviour
         // Do not continue if slot counts do not match
         if (this.Slots.Length != biomeState.Slots.Length) return;
 
-        // Restore mealTODO
+        // Restore meal and its visit scheduleTODO
         //this.Meal.RestoreMeal(biomeState.FoodName, biomeState.Visits);
 
         // Initialize the list of visiting guest names
@@ -81,7 +81,7 @@ public class ActiveBiome : MonoBehaviour
             this.RestoreSlot(this.Slots[i], biomeState.Slots[i]);
         }
 
-        // TODO move this init to trigger during session only
+        // TODO move this init to trigger on app quit/pause only
         // remove test case
         this.Meal.InitializeMeal(biomeState.FoodName, this.Slots);
 

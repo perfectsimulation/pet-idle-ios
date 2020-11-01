@@ -46,7 +46,7 @@ public class Meal : MonoBehaviour
     // Restore state of meal from save data
     public void RestoreMeal(string foodName, SerializedVisit[] visits)
     {
-        // Create and cache this food
+        // Create and cache this food from food name string
         this.Food = new Food(foodName);
 
         // Restore visit schedule from serialized visit array
