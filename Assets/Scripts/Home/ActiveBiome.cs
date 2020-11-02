@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class ActiveBiome : MonoBehaviour
 {
-    // Meal in the active biome
+    // Meal containing schedule of all pending visits for this biome state
     public Meal Meal;
 
-    // Slots in the active biome
+    // Slots containing all items and guests of this biome state
     public Slot[] Slots;
 
     // Ensure unique guests in biome by keeping track of visiting guest names
@@ -62,9 +62,6 @@ public class ActiveBiome : MonoBehaviour
         // Do not continue if slot counts do not match
         if (this.Slots.Length != biomeState.Slots.Length) return;
 
-        // Restore meal and its visit scheduleTODO
-        //this.Meal.RestoreMeal(biomeState.FoodName, biomeState.Visits);
-
         // Initialize the list of visiting guest names
         this.VisitingGuestList = new List<string>();
 
@@ -81,9 +78,12 @@ public class ActiveBiome : MonoBehaviour
             this.RestoreSlot(this.Slots[i], biomeState.Slots[i]);
         }
 
+        // Restore meal and its visit schedule after restoring state of slots
+        this.Meal.RestoreMeal(biomeState, this.Slots);
+
         // TODO move this init to trigger on app quit/pause only
         // remove test case
-        this.Meal.InitializeMeal(biomeState.FoodName, this.Slots);
+        //this.Meal.InitializeMeal(biomeState.FoodName, this.Slots);
 
         // Tell game manager to save restored biome state
         this.SaveBiome(new SerializedActiveBiome(this));
@@ -262,7 +262,7 @@ public class ActiveBiome : MonoBehaviour
         // Remove this item from the slot
         this.Slots[slotIndex].RemoveItem();
 
-        // Remove all visits with this item
+        // Remove all visits with this itemTODO
     }
 
     // Remove the guest from list of visiting guests
@@ -318,7 +318,7 @@ public class SerializedActiveBiome
     {
         this.FoodName = activeBiome.Meal.Food.Name;
         this.Slots = Slot.Serialize(activeBiome.Slots);
-        // TODO serialize visit schedule
+        this.Visits = VisitSchedule.Serialize(activeBiome.Meal.VisitSchedule);
     }
 
 }

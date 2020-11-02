@@ -192,9 +192,88 @@ public class VisitSchedule
     }
 
     /* Create a VisitSchedule from save data */
-    public VisitSchedule(SerializedVisit[] visits)
+    public VisitSchedule(SerializedActiveBiome biomeState, Slot[] slots)
     {
-        // TODO
+        // Initialize dictionary of visits by item name
+        this.Visits = new Dictionary<string, List<Visit>>();
+
+        // Cache this food
+        this.Food = new Food(biomeState.FoodName);
+
+        // Initialize list of guests to visit over this visit schedule
+        this.Guests = new List<Guest>();
+
+        // Loop through slots to restore keys of visits dictionary
+        foreach (Slot slot in slots)
+        {
+            // Skip this slot if it has no item
+            if (!slot.HasItem()) continue;
+
+            // Initialize dictionary entry with this item name as the key
+            this.Visits.Add(slot.Item.Name, new List<Visit>());
+        }
+
+        // Cache a reference to reuse for restoring each visit
+        Visit visit;
+
+        // Loop through serialized visits to restore values of visits dictionary
+        foreach (SerializedVisit serializedVisit in biomeState.Visits)
+        {
+            // Reconstruct each visit from save data
+            visit = new Visit(serializedVisit);
+
+            // Do not continue if the saved item is not in the biome state
+            if (!this.Visits.Keys.Contains(visit.Item.Name)) continue;
+
+            // Add the newly restored visit to the dictionary
+            this.Visits[visit.Item.Name].Add(visit);
+        }
+
+        // TODO remove debug logs
+        string visits;
+        string v;
+        foreach (KeyValuePair<string, List<Visit>> entry in this.Visits)
+        {
+            visits = string.Format("{0}:\n", entry.Key);
+            foreach (Visit val in entry.Value)
+            {
+                v = string.Format("{0} {1} {2}\n",
+                    val.Guest.Name.ToString(),
+                    val.Arrival.ToString(),
+                    val.Departure.ToString());
+                visits += v;
+            }
+            UnityEngine.Debug.Log(visits);
+        }
+
+    }
+
+    // Serialize visit schedule into array of serialized visits
+    public static SerializedVisit[] Serialize(VisitSchedule visitSchedule)
+    {
+        // Initialize a list of serialized visits for each visit in schedule
+        List<SerializedVisit> serializedVisits = new List<SerializedVisit>();
+
+        // Cache a reference for making each serialized visit
+        SerializedVisit serializedVisit;
+
+        // Loop through the list of visits for each item
+        foreach (List<Visit> itemVisits in visitSchedule.Visits.Values)
+        {
+            // Loop through each visit in the list of item visits
+            foreach (Visit visit in itemVisits)
+            {
+                // Create a serialized visit from the item visit
+                serializedVisit = new SerializedVisit(visit);
+
+                // Add the new serialized visit to list of serialized visits
+                serializedVisits.Add(serializedVisit);
+            }
+
+        }
+
+        // Convert the list of serialized visits to an array
+        return serializedVisits.ToArray();
     }
 
     // Generate all visits for this item over this entire food duration
