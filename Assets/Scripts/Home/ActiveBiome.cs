@@ -9,9 +9,6 @@ public class ActiveBiome : MonoBehaviour
     // Slots containing all items and guests of this biome state
     public Slot[] Slots;
 
-    // Ensure unique guests in biome by keeping track of visiting guest names
-    private List<string> VisitingGuestList;
-
     // Item selected from inventory awaiting slot placement
     private Item ItemPendingPlacement;
 
@@ -62,24 +59,15 @@ public class ActiveBiome : MonoBehaviour
         // Do not continue if slot counts do not match
         if (this.Slots.Length != biomeState.Slots.Length) return;
 
-        // Initialize the list of visiting guest names
-        this.VisitingGuestList = new List<string>();
+        // Restore meal and its visit schedule
+        this.Meal.RestoreMeal(biomeState);
 
         // Restore state of each slot and prepare it for gameplay
         for (int i = 0; i < this.Slots.Length; i++)
         {
-            // Pass the slot a delegate to trigger new visits
-            this.Slots[i].DelegateTriggerVisit(this.TriggerVisit);
-
-            // Pass the slot a delegate to remove guests from visiting list
-            this.Slots[i].DelegateRecordDeparture(this.RemoveGuest);
-
             // Restore item and guest of this slot from serialized slot
             this.RestoreSlot(this.Slots[i], biomeState.Slots[i]);
         }
-
-        // Restore meal and its visit schedule after restoring state of slots
-        this.Meal.RestoreMeal(biomeState, this.Slots);
 
         // TODO move this init to trigger on app quit/pause only
         // remove test case
@@ -101,10 +89,10 @@ public class ActiveBiome : MonoBehaviour
         this.SelectSlotForPhoto = callback;
     }
 
-    // Assign place food delegate to meal
+    // TODO Assign place food delegate to meal
     public void DelegatePlaceFood()
     {
-        // TODO
+        //this.Meal.DelegatePlaceFood();
     }
 
     // Begin item placement flow upon item selection in inventory content
@@ -166,39 +154,16 @@ public class ActiveBiome : MonoBehaviour
     private void RestoreSlot(Slot slot, SerializedSlot serializedSlot)
     {
         // Do not continue if there is no item to restore
-        if (!serializedSlot.HasItem())
-        {
-            // Make slot transparent
-            slot.Hide();
-
-            // Do not continue since nothing remains to restore for this slot
-            return;
-        }
+        if (!serializedSlot.HasItem()) return;
 
         // Restore the item state of this slot
         slot.RestoreItem(serializedSlot.ItemName);
 
-        // Restore visit if the serialized slot has a valid guest
-        if (serializedSlot.HasGuest())
-        {
-            // Add the restored guest name to visiting guest list
-            this.AddGuest(serializedSlot.GuestName);
+        // Do not continue if there is no guest to restore
+        if (!serializedSlot.HasGuest()) return;
 
-            // Restore the visit state of this slot
-            slot.RestoreVisit(serializedSlot);
-        }
-        else
-        {
-            // Trigger a new visit for the slot with its restored item
-            //this.TriggerVisit(slot);
-        }
-
-    }
-
-    // Trigger a randomly selected visit in this slot
-    private void TriggerVisit(Slot slot)
-    {
-        // TODO
+        // Restore the visit state of this slot
+        slot.RestoreVisit(serializedSlot);
     }
 
     // Call from slot to assign the item pending placement to itself
@@ -209,12 +174,6 @@ public class ActiveBiome : MonoBehaviour
 
         // Remove item from its current slot before placing it in the new one
         this.RemoveItem(this.ItemPendingPlacement);
-
-        // Pass the slot a delegate to trigger new visits
-        selectedSlot.DelegateTriggerVisit(this.TriggerVisit);
-
-        // Pass the slot a delegate to remove guests from visiting guest list
-        selectedSlot.DelegateRecordDeparture(this.RemoveGuest);
 
         // Initialize the item in the newly selected slot
         selectedSlot.InitializeItem(this.ItemPendingPlacement);
@@ -231,8 +190,6 @@ public class ActiveBiome : MonoBehaviour
         // Show menu button and hide close button from menu manager
         this.FocusBiome();
 
-        // TODO refresh meal visit schedule
-
         // Tell game manager to save biome state with newly placed item
         this.SaveBiome(new SerializedActiveBiome(this));
     }
@@ -242,12 +199,6 @@ public class ActiveBiome : MonoBehaviour
     {
         // Send guest of this slot to menu manager
         this.SelectSlotForPhoto(slot);
-    }
-
-    // Add the guest to list of visiting guests
-    private void AddGuest(string guestName)
-    {
-        this.VisitingGuestList.Add(guestName);
     }
 
     // Find and remove this item from any slot in this biome
@@ -261,14 +212,6 @@ public class ActiveBiome : MonoBehaviour
 
         // Remove this item from the slot
         this.Slots[slotIndex].RemoveItem();
-
-        // Remove all visits with this itemTODO
-    }
-
-    // Remove the guest from list of visiting guests
-    private void RemoveGuest(string guestName)
-    {
-        this.VisitingGuestList.Remove(guestName);
     }
 
     // Get index of slot with this item, or -1 if no slot has this item
@@ -308,7 +251,6 @@ public class SerializedActiveBiome
     {
         // TODO remove meal test case
         this.FoodName = "Fruits";
-        // TODO use Biome model for number of slots
         this.Slots = new SerializedSlot[6];
         this.Visits = new SerializedVisit[0];
     }

@@ -11,11 +11,6 @@ public class Slot : MonoBehaviour
     // The slot button component
     private Button SlotButton;
 
-    // Trigger a new visit from active biome
-    [HideInInspector]
-    public delegate void TriggerVisitDelegate(Slot slot);
-    private TriggerVisitDelegate TriggerVisit;
-
     // Save a visit from game manager
     [HideInInspector]
     public delegate void SaveVisitDelegate(Visit visit);
@@ -25,11 +20,6 @@ public class Slot : MonoBehaviour
     [HideInInspector]
     public delegate void SaveGiftDelegate(Gift gift);
     private SaveGiftDelegate SaveGift;
-
-    // Remove a departing guest from the active biome visiting guest list
-    [HideInInspector]
-    public delegate void RecordDepartureDelegate(string guestName);
-    private RecordDepartureDelegate RecordDeparture;
 
     // Place an item in this slot from active biome
     [HideInInspector]
@@ -45,9 +35,9 @@ public class Slot : MonoBehaviour
         this.SlotButton = this.gameObject.GetComponent<Button>();
     }
 
-    // Remove the sprite of this slot
-    public void Hide()
+    void Start()
     {
+        // Remove the sprite of this slot
         this.RemoveSprite();
     }
 
@@ -61,18 +51,6 @@ public class Slot : MonoBehaviour
     public void DelegateSaveGift(SaveGiftDelegate callback)
     {
         this.SaveGift = callback;
-    }
-
-    // Assign trigger visit delegate from active biome
-    public void DelegateTriggerVisit(TriggerVisitDelegate callback)
-    {
-        this.TriggerVisit = callback;
-    }
-
-    // Assign record departure delegate from active biome
-    public void DelegateRecordDeparture(RecordDepartureDelegate callback)
-    {
-        this.RecordDeparture = callback;
     }
 
     // Assign place item delegate from active biome to slot button
@@ -100,9 +78,6 @@ public class Slot : MonoBehaviour
 
         // Show the new item
         this.SetSprite(item.GetItemSprite());
-
-        // Trigger a new visit for this newly placed item
-        this.TriggerVisit(this);
 
         // Remove place item delegate from the onClick of slot button
         this.SlotButton.onClick.RemoveAllListeners();
@@ -148,7 +123,7 @@ public class Slot : MonoBehaviour
         this.Item = null;
 
         // Hide the now empty slot
-        this.Hide();
+        this.RemoveSprite();
     }
 
     // Check if slot has a valid item
@@ -181,7 +156,6 @@ public class Slot : MonoBehaviour
     public void ValidateItemPlacementEligibility()
     {
         // All slots are eligible for item placement by default
-        // TODO maybe implement multi-slot items?
         this.SlotButton.interactable = true;
 
         // Indicate this slot as a valid selection
@@ -213,7 +187,7 @@ public class Slot : MonoBehaviour
         // Hide eligible slot indicator
         this.HideValidSelection();
 
-        // Reset slot button onClick listener TODO show guest summary
+        // Reset slot button onClick listener
         this.SlotButton.onClick.RemoveAllListeners();
         this.SlotButton.interactable = true;
     }
@@ -262,9 +236,6 @@ public class Slot : MonoBehaviour
 
             // Reset the slot image to show the item only
             this.SetSprite(this.Item.GetItemSprite());
-
-            // Trigger a new visit
-            this.TriggerVisit(this);
         }
 
     }
@@ -277,9 +248,6 @@ public class Slot : MonoBehaviour
 
         // Create and save a new gift from this guest departure
         this.CreateGift();
-
-        // Tell active biome to remove the departing guest from the guest list
-        this.RecordDeparture(this.Visit.Guest.Name);
 
         // Reset the visit properties to await new visit details
         this.Visit.Clear();
@@ -313,8 +281,6 @@ public class Slot : MonoBehaviour
 
         // Remove onClick delegate from slot button
         this.SlotButton.onClick.RemoveAllListeners();
-
-        // TODO add onClick listener to open guest summary if it is visiting
     }
 
     // Set the sprite of the slot image

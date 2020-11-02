@@ -9,7 +9,7 @@ public class Meal : MonoBehaviour
     public VisitSchedule VisitSchedule { get; private set; }
 
     // Time remaining before this food turns from fresh to empty
-    private float RemainingDuration;
+    private TimeSpan RemainingDuration;
 
     // Date time at which food turns empty
     private DateTime Completion;
@@ -25,6 +25,12 @@ public class Meal : MonoBehaviour
     void Awake()
     {
         this.MealButton = this.gameObject.GetComponent<Button>();
+    }
+
+    // Assign place food delegate from active biome
+    public void DelegatePlaceFood(PlaceFoodDelegate callback)
+    {
+        this.PlaceFood = callback;
     }
 
     // Initialize a brand new Meal with fresh food
@@ -44,7 +50,7 @@ public class Meal : MonoBehaviour
     }
 
     // Restore state of meal from save data
-    public void RestoreMeal(SerializedActiveBiome biomeState, Slot[] slots)
+    public void RestoreMeal(SerializedActiveBiome biomeState)
     {
         // Create and cache this food from food name string
         this.Food = new Food(biomeState.FoodName);
@@ -52,15 +58,15 @@ public class Meal : MonoBehaviour
         // TODO use time utility to update remaining duration
         this.SetFoodImageSprite(this.Food.GetFreshFoodSprite());
 
-        // Initialize a new visit schedule if there are no saved visits
+        // Create empty visit schedule if save data do not exist
         if (biomeState.Visits == null || biomeState.Visits.Length == 0)
         {
-            this.VisitSchedule = new VisitSchedule(this.Food, slots);
+            this.VisitSchedule = new VisitSchedule();
             return;
         }
 
         // Restore visit schedule from serialized visit save data
-        this.VisitSchedule = new VisitSchedule(biomeState, slots);
+        this.VisitSchedule = new VisitSchedule(biomeState);
     }
 
     // TODO Open meal detail from menu manager

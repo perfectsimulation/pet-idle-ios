@@ -129,7 +129,11 @@ public class VisitSchedule
     private readonly List<Guest> Guests;
 
     /* Default no-arg constructor */
-    public VisitSchedule() { }
+    public VisitSchedule()
+    {
+        // Initialize dictionary of visits by item name
+        this.Visits = new Dictionary<string, List<Visit>>();
+    }
 
     /* Initialize a brand new VisitSchedule */
     public VisitSchedule(Food food, Slot[] slots)
@@ -192,7 +196,7 @@ public class VisitSchedule
     }
 
     /* Create a VisitSchedule from save data */
-    public VisitSchedule(SerializedActiveBiome biomeState, Slot[] slots)
+    public VisitSchedule(SerializedActiveBiome biomeState)
     {
         // Initialize dictionary of visits by item name
         this.Visits = new Dictionary<string, List<Visit>>();
@@ -204,13 +208,13 @@ public class VisitSchedule
         this.Guests = new List<Guest>();
 
         // Loop through slots to restore keys of visits dictionary
-        foreach (Slot slot in slots)
+        foreach (SerializedSlot serializedSlot in biomeState.Slots)
         {
             // Skip this slot if it has no item
-            if (!slot.HasItem()) continue;
+            if (!serializedSlot.HasItem()) continue;
 
             // Initialize dictionary entry with this item name as the key
-            this.Visits.Add(slot.Item.Name, new List<Visit>());
+            this.Visits.Add(serializedSlot.ItemName, new List<Visit>());
         }
 
         // Cache a reference to reuse for restoring each visit
