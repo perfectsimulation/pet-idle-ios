@@ -33,24 +33,16 @@ public class ActiveBiome : MonoBehaviour
         this.SaveBiome = callback;
     }
 
-    // Assign each slot a save visit delegate from game manager
-    public void DelegateSaveVisit(Slot.SaveVisitDelegate callback)
+    // Assign save visits delegate from game manager to meal
+    public void DelegateSaveVisits(VisitSchedule.SaveVisitsDelegate callback)
     {
-        foreach (Slot slot in this.Slots)
-        {
-            slot.DelegateSaveVisit(callback);
-        }
-
+        this.Meal.DelegateSaveVisits(callback);
     }
 
-    // Assign each slot a save gift delegate from game manager
-    public void DelegateSaveGift(Slot.SaveGiftDelegate callback)
+    // Assign save gifts delegate from game manager to meal
+    public void DelegateSaveGifts(VisitSchedule.SaveGiftsDelegate callback)
     {
-        foreach (Slot slot in this.Slots)
-        {
-            slot.DelegateSaveGift(callback);
-        }
-
+        this.Meal.DelegateSaveGifts(callback);
     }
 
     // Restore biome state from saved biome state on app start
@@ -62,19 +54,47 @@ public class ActiveBiome : MonoBehaviour
         // Restore meal and its visit schedule
         this.Meal.RestoreMeal(biomeState);
 
-        // Restore state of each slot and prepare it for gameplay
+        // Restore state of slot items
         for (int i = 0; i < this.Slots.Length; i++)
         {
-            // Restore item and guest of this slot from serialized slot
-            this.RestoreSlot(this.Slots[i], biomeState.Slots[i]);
+            // Restore item of this slot from serialized slot
+            this.RestoreItem(this.Slots[i], biomeState.Slots[i]);
         }
 
-        // TODO move this init to trigger on app quit/pause only
-        // remove test case
+        // TODO move this to trigger on meal placement
         //this.Meal.InitializeMeal(biomeState.FoodName, this.Slots);
+
+        // Restore state of slot visits
+        this.RestoreVisits();
 
         // Tell game manager to save restored biome state
         this.SaveBiome(new SerializedActiveBiome(this));
+    }
+
+    // Restore state of visits for each slot on app start
+    private void RestoreVisits()
+    {
+        // Do not continue if there are no visits to recover
+        if (this.Meal.VisitSchedule == null) return;
+
+        // Cache a reference to reuse for restoring each active visit
+        Visit activeVisit;
+
+        // Restore the visit state of each slot
+        foreach (Slot slot in this.Slots)
+        {
+            // Skip slot if it has no restored item
+            if (!slot.HasItem()) continue;
+
+            // Skip slot if it has no active visit
+            if (!this.Meal.VisitSchedule.HasActiveVisit(slot.Item)) continue;
+
+            // Get the active visit for this slot from visit schedule
+            activeVisit = this.Meal.VisitSchedule.GetActiveVisit(slot.Item);
+
+            // Restore the visit state in this slot
+            slot.RestoreVisit(activeVisit);
+        }
     }
 
     // Assign focus active biome delegate from menu manager
@@ -150,20 +170,14 @@ public class ActiveBiome : MonoBehaviour
 
     }
 
-    // Restore slot state from serialized slot save data on app start
-    private void RestoreSlot(Slot slot, SerializedSlot serializedSlot)
+    // Restore slot item state from serialized slot save data on app start
+    private void RestoreItem(Slot slot, SerializedSlot serializedSlot)
     {
         // Do not continue if there is no item to restore
         if (!serializedSlot.HasItem()) return;
 
         // Restore the item state of this slot
         slot.RestoreItem(serializedSlot.ItemName);
-
-        // Do not continue if there is no guest to restore
-        if (!serializedSlot.HasGuest()) return;
-
-        // Restore the visit state of this slot
-        slot.RestoreVisit(serializedSlot);
     }
 
     // Call from slot to assign the item pending placement to itself

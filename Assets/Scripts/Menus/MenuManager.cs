@@ -152,16 +152,16 @@ public class MenuManager : MonoBehaviour
         this.ActiveBiome.DelegateSaveBiome(callback);
     }
 
-    // Assign save guest visit delegate from game manager to active biome
-    public void DelegateSaveVisit(Slot.SaveVisitDelegate callback)
+    // Assign save visits delegate from game manager to active biome
+    public void DelegateSaveVisits(VisitSchedule.SaveVisitsDelegate callback)
     {
-        this.ActiveBiome.DelegateSaveVisit(callback);
+        this.ActiveBiome.DelegateSaveVisits(callback);
     }
 
-    // Assign save gift delegate from game manager to active biome
-    public void DelegateSaveGift(Slot.SaveGiftDelegate callback)
+    // Assign save gifts delegate from game manager to active biome
+    public void DelegateSaveGifts(VisitSchedule.SaveGiftsDelegate callback)
     {
-        this.ActiveBiome.DelegateSaveGift(callback);
+        this.ActiveBiome.DelegateSaveGifts(callback);
     }
 
     // Assign claim gifts delegate from game manager to gifts content
@@ -194,12 +194,6 @@ public class MenuManager : MonoBehaviour
         this.InventoryContent.AddItem(item);
     }
 
-    // Add a newly received gift to gifts content
-    public void AddGift(Gift gift)
-    {
-        this.GiftsContent.AddGift(gift);
-    }
-
     // Update one note in notes content
     public void UpdateNote(string guestName, Notes notes)
     {
@@ -212,6 +206,12 @@ public class MenuManager : MonoBehaviour
     public void UpdateNotes(Notes notes)
     {
         this.NotesContent.UpdateNotes(notes);
+    }
+
+    // Update gifts in gifts content with new gifts from game manager
+    public void UpdateGifts(Gifts gifts)
+    {
+        this.GiftsContent.AddGifts(gifts);
     }
 
     // Display the main menu panel and close button

@@ -11,16 +11,6 @@ public class Slot : MonoBehaviour
     // The slot button component
     private Button SlotButton;
 
-    // Save a visit from game manager
-    [HideInInspector]
-    public delegate void SaveVisitDelegate(Visit visit);
-    private SaveVisitDelegate SaveVisit;
-
-    // Save gift from game manager upon guest departure
-    [HideInInspector]
-    public delegate void SaveGiftDelegate(Gift gift);
-    private SaveGiftDelegate SaveGift;
-
     // Place an item in this slot from active biome
     [HideInInspector]
     public delegate void PlaceItemDelegate(Slot slot);
@@ -39,18 +29,6 @@ public class Slot : MonoBehaviour
     {
         // Remove the sprite of this slot
         this.RemoveSprite();
-    }
-
-    // Assign save visit delegate from active biome
-    public void DelegateSaveVisit(SaveVisitDelegate callback)
-    {
-        this.SaveVisit = callback;
-    }
-
-    // Assign save gift delegate from active biome
-    public void DelegateSaveGift(SaveGiftDelegate callback)
-    {
-        this.SaveGift = callback;
     }
 
     // Assign place item delegate from active biome to slot button
@@ -101,13 +79,13 @@ public class Slot : MonoBehaviour
     }
 
     // Restore saved visit state for this session on app start
-    public void RestoreVisit(SerializedSlot serializedSlot)
+    public void RestoreVisit(Visit visit)
     {
-        // Restore visit state from serialized slot
-        //this.Visit = new Visit(serializedSlot);
+        // Cache the visit from save data
+        this.Visit = visit;
 
-        // Check the status of the visit
-        this.CheckVisit();
+        // Show the interaction of guest and item
+        this.SetSprite(this.Visit.Guest.GetInteractionSprite(this.Item));
     }
 
     // Remove the item from this slot along with its guest
@@ -172,7 +150,7 @@ public class Slot : MonoBehaviour
         if (this.Visit.Guest == null) return;
 
         // Do not continue if the guest is not currently visiting
-        if (!this.Visit.IsVisiting()) return;
+        if (!this.Visit.IsActive()) return;
 
         // Make sure the eligible slot is interactable
         this.SlotButton.interactable = true;
@@ -208,62 +186,14 @@ public class Slot : MonoBehaviour
         return serializedSlots;
     }
 
-    // Add newly arrived guests and remove departed guests on app start
-    private void CheckVisit()
-    {
-        // Do not continue if there is no guest
-        if (this.Visit.Guest == null) return;
-
-        // Save the visit if the guest has already arrived
-        if (this.Visit.IsArrived())
-        {
-            // Tell the game manager to save the guest visit
-            this.SaveVisit(this.Visit);
-        }
-
-        // Check if there is currently a guest in the active biome
-        if (this.Visit.IsVisiting())
-        {
-            // Show the interaction of guest and item
-            this.SetSprite(this.Visit.Guest.GetInteractionSprite(this.Item));
-        }
-
-        // Remove the guest if it has departed
-        else if (this.Visit.IsDeparted())
-        {
-            // Remove the departed guest
-            this.RemoveGuest();
-
-            // Reset the slot image to show the item only
-            this.SetSprite(this.Item.GetItemSprite());
-        }
-
-    }
-
     // Remove the guest from this slot and save its gift in game manager
     private void RemoveGuest()
     {
         // Do not continue if there is already no guest
         if (this.Visit.Guest == null) return;
 
-        // Create and save a new gift from this guest departure
-        this.CreateGift();
-
         // Reset the visit properties to await new visit details
         this.Visit.Clear();
-    }
-
-    // Create a new gift and save it in game manager
-    private void CreateGift()
-    {
-        // Do not continue if the guest has not yet arrived
-        if (!this.Visit.IsArrived()) return;
-
-        // Create the new gift from the departing guest and the item it visited
-        Gift gift = new Gift(this.Visit.Guest, this.Item);
-
-        // Save the gift in game manager
-        this.SaveGift(gift);
     }
 
     // Indicate eligible slot during item placement or photo capture

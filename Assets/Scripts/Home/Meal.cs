@@ -22,9 +22,25 @@ public class Meal : MonoBehaviour
     public delegate void PlaceFoodDelegate(Food food);
     private PlaceFoodDelegate PlaceFood;
 
+    // Cache visit schedule callbacks in case a new visit schedule is created
+    private VisitSchedule.SaveVisitsDelegate SaveVisits;
+    private VisitSchedule.SaveGiftsDelegate SaveGifts;
+
     void Awake()
     {
         this.MealButton = this.gameObject.GetComponent<Button>();
+    }
+
+    // Assign save visits delegate from active biome to visit schedule
+    public void DelegateSaveVisits(VisitSchedule.SaveVisitsDelegate callback)
+    {
+        this.SaveVisits = callback;
+    }
+
+    // Assign save gifts delegate from active biome to visit schedule
+    public void DelegateSaveGifts(VisitSchedule.SaveGiftsDelegate callback)
+    {
+        this.SaveGifts = callback;
     }
 
     // Assign place food delegate from active biome
@@ -45,6 +61,10 @@ public class Meal : MonoBehaviour
         // Initialize a new visit schedule for this new meal
         this.VisitSchedule = new VisitSchedule(this.Food, slots);
 
+        // Assign delegates to save visits and gifts to new visit schedule
+        this.VisitSchedule.DelegateSaveVisits(this.SaveVisits);
+        this.VisitSchedule.DelegateSaveGifts(this.SaveGifts);
+
         // Show the fresh image sprite in food image
         this.SetFoodImageSprite(this.Food.GetFreshFoodSprite());
     }
@@ -58,15 +78,18 @@ public class Meal : MonoBehaviour
         // TODO use time utility to update remaining duration
         this.SetFoodImageSprite(this.Food.GetFreshFoodSprite());
 
-        // Create empty visit schedule if save data do not exist
-        if (biomeState.Visits == null || biomeState.Visits.Length == 0)
-        {
-            this.VisitSchedule = new VisitSchedule();
-            return;
-        }
+        // Do not continue if save data do not exist
+        if (biomeState.Visits == null || biomeState.Visits.Length == 0) return;
 
         // Restore visit schedule from serialized visit save data
         this.VisitSchedule = new VisitSchedule(biomeState);
+
+        // Assign delegates to save visits and gifts to restored visit schedule
+        this.VisitSchedule.DelegateSaveVisits(this.SaveVisits);
+        this.VisitSchedule.DelegateSaveGifts(this.SaveGifts);
+
+        // Process visits in the restored schedule
+        this.VisitSchedule.ProcessVisits();
     }
 
     // TODO Open meal detail from menu manager

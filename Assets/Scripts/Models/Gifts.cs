@@ -44,10 +44,59 @@ public class Gifts
         return this.GiftList.ToArray();
     }
 
-    // Add the gift to the gift list
-    public void Add(Gift gift)
+    // Create and add gifts from each visit
+    public void Create(Visit[] visits)
     {
-        this.GiftList.Add(gift);
+        // Cache a reference to reuse when generating each gift
+        Gift gift;
+
+        // Add new gift from each visit to this gift list
+        foreach (Visit visit in visits)
+        {
+            // Generate the new gift from the guest and item of this visit
+            gift = new Gift(visit.Guest, visit.Item);
+
+            // Add the new gift to this gift list
+            this.GiftList.Add(gift);
+        }
+
+    }
+
+    // Add gifts to this gift list
+    public void Add(Gift[] giftArray)
+    {
+        // Add each gift in the array
+        foreach (Gift gift in giftArray)
+        {
+            this.GiftList.Add(gift);
+        }
+
+    }
+
+    // Get all gifts of updated gift list that are not included in this list
+    public List<Gift> GetLatestGifts(Gifts updatedGifts)
+    {
+        // Initilize list for gifts that have not yet been added to this list
+        List<Gift> latestGifts = new List<Gift>();
+
+        // Get the difference in gift count with the updated gift list
+        int additionalGiftCount = updatedGifts.Count - this.Count;
+
+        // Do not continue if there were fewer or equal gifts in updated list
+        if (additionalGiftCount <= 0)
+        {
+            // Return the empty gift list
+            return latestGifts;
+        }
+
+        // Add gifts from the updated list starting at index of first new gift
+        for (int i = this.Count; i < updatedGifts.Count; i++)
+        {
+            // Add the latest gift to the list
+            latestGifts.Add(updatedGifts[i]);
+        }
+
+        return latestGifts;
     }
 
     // Empty the gift list

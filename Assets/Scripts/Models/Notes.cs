@@ -105,19 +105,27 @@ public class Notes
     }
 
     // Increment the visit count of this guest when it departs
-    public void UpdateVisitCount(Visit visit)
+    public void UpdateVisitCounts(Visit[] visits)
     {
-        // Get the note for this guest
-        Note note = this[visit.Guest.Name];
+        // Cache a reference to reuse when accessing the note for each visit
+        Note note;
 
-        // Do not continue if there was an issue getting the note
-        if (note == null) return;
+        // Update notes for each guest of these visits
+        foreach (Visit visit in visits)
+        {
+            // Get the note for the guest of this visit
+            note = this[visit.Guest.Name];
 
-        // Check if this is the first encounter with this guest
-        this.CheckForFirstEncounter(note, visit);
+            // Skip this visit if there was an issue getting the note
+            if (note == null) continue;
 
-        // Increase the visit count for this guest
-        note.IncrementVisitCount();
+            // Check if this is the first encounter with this guest
+            this.CheckForFirstEncounter(note, visit);
+
+            // Increase the visit count for this guest
+            note.IncrementVisitCount();
+        }
+
     }
 
     // Update the friendships of these guests with gift rewards
@@ -174,7 +182,7 @@ public class Notes
     private void CheckForFirstEncounter(Note note, Visit visit)
     {
         // Check if guest is currently in the active biome for the first time
-        if (!note.HasBeenSeen && visit.IsVisiting())
+        if (!note.HasBeenSeen && visit.IsActive())
         {
             // Record the first encounter of this guest
             note.RecordFirstEncounter();

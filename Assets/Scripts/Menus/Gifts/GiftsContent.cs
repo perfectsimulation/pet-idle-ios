@@ -81,14 +81,20 @@ public class GiftsContent : MonoBehaviour
         this.Populate(this.Gifts.ToArray());
     }
 
-    // Add gift to gifts and create a new menu item for it
-    public void AddGift(Gift gift)
+    // Add new gifts to this gifts and create a new menu item for each gift
+    public void AddGifts(Gifts gifts)
     {
+        // Get an array of the latest gifts that need to be added
+        Gift[] additionalGifts = this.Gifts.GetLatestGifts(gifts).ToArray();
+
+        // Add the latest gifts to this gifts
+        this.Gifts.Add(additionalGifts);
+
         // Size the scroll view to accommodate all gift menu items
         this.PrepareScrollViewForLayout();
 
         // Add the new gift to the scroll view
-        this.Populate(gift);
+        this.Populate(additionalGifts);
     }
 
     // Claim all gifts at once
@@ -134,12 +140,6 @@ public class GiftsContent : MonoBehaviour
 
         // Set the height of the rect transform for proper scroll behavior
         this.RectTransform.sizeDelta = new Vector2(screenWidth, height);
-    }
-
-    // Create and add a new gift menu item for this gift
-    private void Populate(Gift gift)
-    {
-        this.Populate(new Gift[] { gift });
     }
 
     // Populate the gifts menu with menu items using the gift array

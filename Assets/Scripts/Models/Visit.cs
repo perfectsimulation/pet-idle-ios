@@ -50,7 +50,7 @@ public class Visit
     }
 
     // Check if the arrival datetime is in the past
-    public bool IsArrived()
+    public bool IsStarted()
     {
         // Return false if there is no guest
         if (this.Guest == null) return false;
@@ -60,7 +60,7 @@ public class Visit
     }
 
     // Check if the departure datetime is in the past
-    public bool IsDeparted()
+    public bool IsEnded()
     {
         // Return false if there is no guest
         if (this.Guest == null) return false;
@@ -70,13 +70,13 @@ public class Visit
     }
 
     // Check if guest has arrived and has not departed
-    public bool IsVisiting()
+    public bool IsActive()
     {
         // Return false if there is no guest
         if (this.Guest == null) return false;
 
         // Return true if game start time is between arrival and departure
-        return (this.IsArrived() && !this.IsDeparted());
+        return (this.IsStarted() && !this.IsEnded());
     }
 
     // Convert list of visits to array of serialized visits
@@ -128,6 +128,14 @@ public class VisitSchedule
     // Keep track of all guests selected to visit in this schedule
     private readonly List<Guest> Guests;
 
+    // Save started visits in game manager
+    public delegate void SaveVisitsDelegate(Visit[] startedVisits);
+    private SaveVisitsDelegate SaveVisits;
+
+    // Save gifts from ended visits in game manager
+    public delegate void SaveGiftsDelegate(Visit[] endedVisits);
+    private SaveGiftsDelegate SaveGifts;
+
     /* Default no-arg constructor */
     public VisitSchedule()
     {
@@ -177,22 +185,8 @@ public class VisitSchedule
         // Remove overlapping visits for each guest to finalize schedule
         this.ArbitrateOverlappingVisits();
 
-        // TODO remove debug logs
-        string visits;
-        string v;
-        foreach (KeyValuePair<string, List<Visit>> entry in this.Visits)
-        {
-            visits = string.Format("{0}:\n", entry.Key);
-            foreach (Visit visit in entry.Value)
-            {
-                v = string.Format("{0} {1} {2}\n",
-                    visit.Guest.Name.ToString(),
-                    visit.Arrival.ToString(),
-                    visit.Departure.ToString());
-                visits += v;
-            }
-            UnityEngine.Debug.Log(visits);
-        }
+        // TODO remove
+        this.PrintVisits();
     }
 
     /* Create a VisitSchedule from save data */
@@ -233,23 +227,100 @@ public class VisitSchedule
             this.Visits[visit.Item.Name].Add(visit);
         }
 
-        // TODO remove debug logs
-        string visits;
-        string v;
-        foreach (KeyValuePair<string, List<Visit>> entry in this.Visits)
+        // TODO remove
+        this.PrintVisits();
+    }
+
+    // Assign save visits delegate from game manager
+    public void DelegateSaveVisits(SaveVisitsDelegate callback)
+    {
+        this.SaveVisits = callback;
+    }
+
+    // Assign save gifts delegate from game manager
+    public void DelegateSaveGifts(SaveGiftsDelegate callback)
+    {
+        this.SaveGifts = callback;
+    }
+
+    // Check if this item has an active visit in the active biome
+    public bool HasActiveVisit(Item item)
+    {
+        // Check if the item has visits in this schedule
+        if (this.Visits.ContainsKey(item.Name))
         {
-            visits = string.Format("{0}:\n", entry.Key);
-            foreach (Visit val in entry.Value)
+            // Check the status of each visit for this item
+            foreach (Visit visit in this.Visits[item.Name])
             {
-                v = string.Format("{0} {1} {2}\n",
-                    val.Guest.Name.ToString(),
-                    val.Arrival.ToString(),
-                    val.Departure.ToString());
-                visits += v;
+                // Check if the visit has an active status
+                if (visit.IsActive())
+                {
+                    // Confirm active visit
+                    return true;
+                }
             }
-            UnityEngine.Debug.Log(visits);
+
         }
 
+        return false;
+    }
+
+    // Get the active visit for this item in the active biome
+    public Visit GetActiveVisit(Item item)
+    {
+        // Check if the item has visits in this schedule
+        if (this.Visits.ContainsKey(item.Name))
+        {
+            // Check the status of each visit for this item
+            foreach (Visit visit in this.Visits[item.Name])
+            {
+                // Check if the visit has an active status
+                if (visit.IsActive())
+                {
+                    // Return active visit
+                    return visit;
+                }
+            }
+
+        }
+
+        // Return a default visit if no active visit exists for this item
+        return new Visit();
+    }
+
+    // Process each visit in the schedule according to its status
+    public void ProcessVisits()
+    {
+        // Initialize lists for started visits and ended visits
+        List<Visit> startedVisits = new List<Visit>();
+        List<Visit> endedVisits = new List<Visit>();
+
+        // Check the visits for each item in the active biome
+        foreach (List<Visit> itemVisits in this.Visits.Values)
+        {
+            // Check each visit of the item
+            foreach (Visit visit in itemVisits)
+            {
+                // Check if the visit has started
+                if (visit.IsStarted())
+                {
+                    // Add the started visit to list
+                    startedVisits.Add(visit);
+                }
+
+                // Check if the visit has ended
+                if (visit.IsEnded())
+                {
+                    // Add the ended visit to list
+                    endedVisits.Add(visit);
+                }
+            }
+
+        }
+
+        // Process the started and ended visits
+        this.ProcessStartedVisits(startedVisits);
+        this.ProcessEndedVisits(endedVisits);
     }
 
     // Serialize visit schedule into array of serialized visits
@@ -278,6 +349,26 @@ public class VisitSchedule
 
         // Convert the list of serialized visits to an array
         return serializedVisits.ToArray();
+    }
+
+    // TODO remove
+    private void PrintVisits()
+    {
+        string visits;
+        string v;
+        foreach (KeyValuePair<string, List<Visit>> entry in this.Visits)
+        {
+            visits = string.Format("{0}:\n", entry.Key);
+            foreach (Visit visit in entry.Value)
+            {
+                v = string.Format("{0} {1} {2}\n",
+                    visit.Guest.Name.ToString(),
+                    visit.Arrival.ToString(),
+                    visit.Departure.ToString());
+                visits += v;
+            }
+            UnityEngine.Debug.Log(visits);
+        }
     }
 
     // Generate all visits for this item over this entire food duration
@@ -582,6 +673,18 @@ public class VisitSchedule
         }
 
         return selectedVisit;
+    }
+
+    // Update visit count in notes for started visits from game manager
+    private void ProcessStartedVisits(List<Visit> startedVisits)
+    {
+        this.SaveVisits(startedVisits.ToArray());
+    }
+
+    // Create and save gifts for ended visits from game manager
+    private void ProcessEndedVisits(List<Visit> endedVisits)
+    {
+        this.SaveGifts(endedVisits.ToArray());
     }
 
 }
