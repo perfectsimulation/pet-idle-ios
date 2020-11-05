@@ -208,10 +208,10 @@ public class MenuManager : MonoBehaviour
         this.NotesContent.UpdateNotes(notes);
     }
 
-    // Update gifts in gifts content with new gifts from game manager
-    public void UpdateGifts(Gifts gifts)
+    // Update gifts content with new gifts from game manager
+    public void UpdateGifts()
     {
-        this.GiftsContent.AddGifts(gifts);
+        this.GiftsContent.AddGiftMenuItems();
     }
 
     // Display the main menu panel and close button

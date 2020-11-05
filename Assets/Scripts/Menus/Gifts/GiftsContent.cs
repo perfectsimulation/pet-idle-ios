@@ -81,20 +81,17 @@ public class GiftsContent : MonoBehaviour
         this.Populate(this.Gifts.ToArray());
     }
 
-    // Add new gifts to this gifts and create a new menu item for each gift
-    public void AddGifts(Gifts gifts)
+    // Create new menu item for each added gift after update in game manager
+    public void AddGiftMenuItems()
     {
-        // Get an array of the latest gifts that need to be added
-        Gift[] additionalGifts = this.Gifts.GetLatestGifts(gifts).ToArray();
-
-        // Add the latest gifts to this gifts
-        this.Gifts.Add(additionalGifts);
+        // Get latest gifts added in game manager
+        List<Gift> addedGifts = this.Gifts.GetGifts(this.MenuItemClones.Count);
 
         // Size the scroll view to accommodate all gift menu items
         this.PrepareScrollViewForLayout();
 
-        // Add the new gift to the scroll view
-        this.Populate(additionalGifts);
+        // Add the new gifts to the scroll view
+        this.Populate(addedGifts.ToArray());
     }
 
     // Claim all gifts at once

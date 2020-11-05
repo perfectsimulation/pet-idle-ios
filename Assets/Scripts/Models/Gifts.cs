@@ -73,30 +73,23 @@ public class Gifts
 
     }
 
-    // Get all gifts of updated gift list that are not included in this list
-    public List<Gift> GetLatestGifts(Gifts updatedGifts)
+    // Get all gifts from this index through the end of the list
+    public List<Gift> GetGifts(int startIndex)
     {
-        // Initilize list for gifts that have not yet been added to this list
-        List<Gift> latestGifts = new List<Gift>();
+        // Initilize list for gifts
+        List<Gift> gifts = new List<Gift>();
 
-        // Get the difference in gift count with the updated gift list
-        int additionalGiftCount = updatedGifts.Count - this.Count;
+        // Avoid index out of bounds error by bounding the start index
+        startIndex = System.Math.Max(startIndex, 0);
 
-        // Do not continue if there were fewer or equal gifts in updated list
-        if (additionalGiftCount <= 0)
-        {
-            // Return the empty gift list
-            return latestGifts;
-        }
-
-        // Add gifts from the updated list starting at index of first new gift
-        for (int i = this.Count; i < updatedGifts.Count; i++)
+        // Add gifts starting at this index through to the end of this list
+        for (int i = startIndex; i < this.Count; i++)
         {
             // Add the latest gift to the list
-            latestGifts.Add(updatedGifts[i]);
+            gifts.Add(this[i]);
         }
 
-        return latestGifts;
+        return gifts;
     }
 
     // Empty the gift list

@@ -112,7 +112,7 @@ public class GameManager : MonoBehaviour
         this.User.Gifts.Create(visits);
 
         // Update gifts in gifts content with new gifts
-        this.MenuManager.UpdateGifts(this.User.Gifts);
+        this.MenuManager.UpdateGifts();
 
         Persistence.SaveUser(this.User);
     }
@@ -136,7 +136,7 @@ public class GameManager : MonoBehaviour
         this.MenuManager.UpdateNotes(this.User.Notes);
 
         // Update gifts in gifts content
-        this.MenuManager.HydrateGifts(this.User.Gifts);
+        this.MenuManager.UpdateGifts();
 
         Persistence.SaveUser(this.User);
     }

@@ -9,6 +9,7 @@ public class Visit
     public Guest Guest;
     public DateTime Arrival;
     public DateTime Departure;
+    public bool IsCounted;
 
     public Visit() { }
 
@@ -19,6 +20,7 @@ public class Visit
         this.Guest = guest;
         this.Arrival = arrival;
         this.Departure = departure;
+        this.IsCounted = false;
     }
 
     /* Create Visit from save data */
@@ -39,6 +41,9 @@ public class Visit
         // Recreate departure date time from serialized date time string
         string departure = serializedVisit.Departure;
         this.Departure = Convert.ToDateTime(departure);
+
+        // Recreate process status of arrival
+        this.IsCounted = serializedVisit.IsCounted;
     }
 
     // Reset assigned visit properties
@@ -295,23 +300,30 @@ public class VisitSchedule
         List<Visit> startedVisits = new List<Visit>();
         List<Visit> endedVisits = new List<Visit>();
 
-        // Check the visits for each item in the active biome
+        // Check the list of visits of each item in the active biome
         foreach (List<Visit> itemVisits in this.Visits.Values)
         {
-            // Check each visit of the item
+            // Check the status of each visit
             foreach (Visit visit in itemVisits)
             {
-                // Check if the visit has started
+                // Check if this visit has started
                 if (visit.IsStarted())
                 {
-                    // Add the started visit to list
-                    startedVisits.Add(visit);
+                    // Check if the started status has already been recorded
+                    if (!visit.IsCounted)
+                    {
+                        // Indicate this visit status has been processesed
+                        visit.IsCounted = true;
+
+                        // Add visit to list to process new started status
+                        startedVisits.Add(visit);
+                    }
                 }
 
-                // Check if the visit has ended
+                // Check if this visit has ended
                 if (visit.IsEnded())
                 {
-                    // Add the ended visit to list
+                    // Add visit to list to process new ended status
                     endedVisits.Add(visit);
                 }
             }
@@ -675,16 +687,23 @@ public class VisitSchedule
         return selectedVisit;
     }
 
-    // Update visit count in notes for started visits from game manager
+    // Update visit count in notes for newly started visits from game manager
     private void ProcessStartedVisits(List<Visit> startedVisits)
     {
         this.SaveVisits(startedVisits.ToArray());
     }
 
-    // Create and save gifts for ended visits from game manager
+    // Create and save gifts for newly ended visits from game manager
     private void ProcessEndedVisits(List<Visit> endedVisits)
     {
         this.SaveGifts(endedVisits.ToArray());
+
+        // Remove the ended visits from this schedule
+        foreach (Visit visit in endedVisits)
+        {
+            this.Visits[visit.Item.Name].Remove(visit);
+        }
+
     }
 
 }
@@ -696,6 +715,7 @@ public class SerializedVisit
     public string GuestName;
     public string Arrival;
     public string Departure;
+    public bool IsCounted;
 
     public SerializedVisit(Visit visit)
     {
@@ -703,6 +723,7 @@ public class SerializedVisit
         this.GuestName = visit.Guest.Name;
         this.Arrival = visit.Arrival.ToString();
         this.Departure = visit.Departure.ToString();
+        this.IsCounted = visit.IsCounted;
     }
 
 }
