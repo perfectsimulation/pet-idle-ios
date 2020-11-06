@@ -188,6 +188,12 @@ public class MenuManager : MonoBehaviour
         this.ActiveBiome.RestoreState(biomeState);
     }
 
+    // Make adjustments to biome visit schedule on app quit
+    public void ProcessBiomeStateChanges()
+    {
+        this.ActiveBiome.AuditVisitSchedule();
+    }
+
     // Add a newly purchased item to inventory content
     public void AddInventoryItem(Item item)
     {

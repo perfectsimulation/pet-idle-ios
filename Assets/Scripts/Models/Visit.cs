@@ -294,7 +294,7 @@ public class VisitSchedule
     }
 
     // Process each visit in the schedule according to its status
-    public void ProcessVisits()
+    public void Process()
     {
         // Initialize lists for started visits and ended visits
         List<Visit> startedVisits = new List<Visit>();
@@ -333,6 +333,74 @@ public class VisitSchedule
         // Process the started and ended visits
         this.ProcessStartedVisits(startedVisits);
         this.ProcessEndedVisits(endedVisits);
+    }
+
+    // Review schedule viability and make necessary adjustments
+    public void Audit(Slot[] slots)
+    {
+        // Get names of items with visits in this dictionary
+        string[] visitItemNames = this.Visits.Keys.ToArray();
+
+        // Initialize array for names of items in the active biome
+        string[] activeItemNames = new string[slots.Length];
+
+        // Initialize list for items in biome without visits in dictionary
+        List<Item> addedItems = new List<Item>();
+
+        // Cache reference to reuse for names of active items
+        string itemName;
+
+        // Check each item in the active biome
+        for (int i = 0; i < slots.Length; i++)
+        {
+            // Skip slots with no item
+            if (!slots[i].HasItem()) continue;
+
+            // Get the name of the active item
+            itemName = slots[i].Item.Name;
+
+            // Add the item name to the array of item names in active biome
+            activeItemNames[i] = itemName;
+
+            // Check if the schedule contains visits for this item
+            if (visitItemNames.Contains(itemName)) continue;
+
+            // Add item to list to generate visits for this newly active item
+            addedItems.Add(slots[i].Item);
+        }
+
+        // Initialize list for keys of entries to remove from this dictionary
+        List<string> removedItemNames = new List<string>();
+
+        // Check each item name key in this current schedule dictionary
+        foreach (string visitItem in visitItemNames)
+        {
+            // Skip if the item remains in the active biome
+            if (activeItemNames.Contains(visitItem)) continue;
+
+            // Add key to list of keys of dictionary entries to remove
+            removedItemNames.Add(visitItem);
+        }
+
+        // Remove visits in schedule with items recently removed from biome
+        foreach (string removedItemName in removedItemNames)
+        {
+            this.Visits.Remove(removedItemName);
+        }
+
+        // Cache reference to reuse for generating new visit lists
+        List<Visit> itemVisits;
+
+        // Create dictionary entries for each new item in the active biome
+        foreach (Item addedItem in addedItems)
+        {
+            // Generate a visit list for the item added to the active biome
+            itemVisits = this.GenerateVisits(addedItem);
+
+            // Add dictionary entry to this schedule with new item visit list
+            this.Visits.Add(addedItem.Name, itemVisits);
+        }
+
     }
 
     // Serialize visit schedule into array of serialized visits

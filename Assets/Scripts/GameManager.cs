@@ -171,6 +171,9 @@ public class GameManager : MonoBehaviour
     // Save the current user data before closing the application
     void OnApplicationQuit()
     {
+        // Make any necessary visit schedule adjustments
+        this.MenuManager.ProcessBiomeStateChanges();
+
         Persistence.SaveUser(this.User);
     }
 

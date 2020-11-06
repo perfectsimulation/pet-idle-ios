@@ -89,7 +89,13 @@ public class Meal : MonoBehaviour
         this.VisitSchedule.DelegateSaveGifts(this.SaveGifts);
 
         // Process visits in the restored schedule
-        this.VisitSchedule.ProcessVisits();
+        this.VisitSchedule.Process();
+    }
+
+    // Review schedule viability and make necessary adjustments on app quit
+    public void AuditVisitSchedule(Slot[] slots)
+    {
+        this.VisitSchedule.Audit(slots);
     }
 
     // TODO Open meal detail from menu manager

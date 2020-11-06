@@ -71,32 +71,6 @@ public class ActiveBiome : MonoBehaviour
         this.SaveBiome(new SerializedActiveBiome(this));
     }
 
-    // Restore state of visits for each slot on app start
-    private void RestoreVisits()
-    {
-        // Do not continue if there are no visits to recover
-        if (this.Meal.VisitSchedule == null) return;
-
-        // Cache a reference to reuse for restoring each active visit
-        Visit activeVisit;
-
-        // Restore the visit state of each slot
-        foreach (Slot slot in this.Slots)
-        {
-            // Skip slot if it has no restored item
-            if (!slot.HasItem()) continue;
-
-            // Skip slot if it has no active visit
-            if (!this.Meal.VisitSchedule.HasActiveVisit(slot.Item)) continue;
-
-            // Get the active visit for this slot from visit schedule
-            activeVisit = this.Meal.VisitSchedule.GetActiveVisit(slot.Item);
-
-            // Restore the visit state in this slot
-            slot.RestoreVisit(activeVisit);
-        }
-    }
-
     // Assign focus active biome delegate from menu manager
     public void DelegateFocusBiome(FocusBiomeDelegate callback)
     {
@@ -113,6 +87,16 @@ public class ActiveBiome : MonoBehaviour
     public void DelegatePlaceFood()
     {
         //this.Meal.DelegatePlaceFood();
+    }
+
+    // Save any necessary adjustments on app quit
+    public void AuditVisitSchedule()
+    {
+        // Review schedule viability
+        this.Meal.AuditVisitSchedule(this.Slots);
+
+        // Save updates to visit schedule
+        this.SaveBiome(new SerializedActiveBiome(this));
     }
 
     // Begin item placement flow upon item selection in inventory content
@@ -178,6 +162,33 @@ public class ActiveBiome : MonoBehaviour
 
         // Restore the item state of this slot
         slot.RestoreItem(serializedSlot.ItemName);
+    }
+
+    // Restore state of visits for each slot on app start
+    private void RestoreVisits()
+    {
+        // Do not continue if there are no visits to recover
+        if (this.Meal.VisitSchedule == null) return;
+
+        // Cache a reference to reuse for restoring each active visit
+        Visit activeVisit;
+
+        // Restore the visit state of each slot
+        foreach (Slot slot in this.Slots)
+        {
+            // Skip slot if it has no restored item
+            if (!slot.HasItem()) continue;
+
+            // Skip slot if it has no active visit
+            if (!this.Meal.VisitSchedule.HasActiveVisit(slot.Item)) continue;
+
+            // Get the active visit for this slot from visit schedule
+            activeVisit = this.Meal.VisitSchedule.GetActiveVisit(slot.Item);
+
+            // Restore the visit state in this slot
+            slot.RestoreVisit(activeVisit);
+        }
+
     }
 
     // Call from slot to assign the item pending placement to itself
