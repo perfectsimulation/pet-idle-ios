@@ -19,8 +19,8 @@ public class Meal : MonoBehaviour
 
     // Save newly placed food from game manager to active biome
     [HideInInspector]
-    public delegate void PlaceFoodDelegate(Food food);
-    private PlaceFoodDelegate PlaceFood;
+    public delegate void InitializeMealDelegate(string foodName);
+    private InitializeMealDelegate InitializeMeal;
 
     // Cache visit schedule callbacks in case a new visit schedule is created
     private VisitSchedule.SaveVisitsDelegate SaveVisits;
@@ -43,14 +43,21 @@ public class Meal : MonoBehaviour
         this.SaveGifts = callback;
     }
 
-    // Assign place food delegate from active biome
-    public void DelegatePlaceFood(PlaceFoodDelegate callback)
+    // Assign initialize meal delegate from active biome
+    public void DelegateInitializeMeal(InitializeMealDelegate callback)
     {
-        this.PlaceFood = callback;
+        this.InitializeMeal = callback;
+    }
+
+    // TODO Open meal detail from menu manager
+    public void OnPressMealButton()
+    {
+        // TODO remove default test case
+        this.InitializeMeal("Salad");
     }
 
     // Initialize a brand new Meal with fresh food
-    public void InitializeMeal(string foodName, Slot[] slots)
+    public void StartSchedule(string foodName, Slot[] slots)
     {
         // Create and cache this food from food name string
         this.Food = new Food(foodName);
@@ -69,8 +76,8 @@ public class Meal : MonoBehaviour
         this.SetFoodImageSprite(this.Food.GetFreshFoodSprite());
     }
 
-    // Restore state of meal from save data
-    public void RestoreMeal(SerializedActiveBiome biomeState)
+    // Restore state of meal and visit schedule from save data
+    public void RestoreSchedule(SerializedActiveBiome biomeState)
     {
         // Create and cache this food from food name string
         this.Food = new Food(biomeState.FoodName);
@@ -96,12 +103,6 @@ public class Meal : MonoBehaviour
     public void AuditVisitSchedule(Slot[] slots)
     {
         this.VisitSchedule.Audit(slots);
-    }
-
-    // TODO Open meal detail from menu manager
-    public void OnPressMealButton()
-    {
-        this.PlaceFood(this.Food);
     }
 
     // Set the sprite of the food image

@@ -206,14 +206,14 @@ public class VisitSchedule
         // Initialize list of guests to visit over this visit schedule
         this.Guests = new List<Guest>();
 
-        // Loop through slots to restore keys of visits dictionary
-        foreach (SerializedSlot serializedSlot in biomeState.Slots)
+        // Loop through slots to restore item name keys of visits dictionary
+        foreach (string serializedSlotItemName in biomeState.SlotItemNames)
         {
             // Skip this slot if it has no item
-            if (!serializedSlot.HasItem()) continue;
+            if (!Item.IsValid(serializedSlotItemName)) continue;
 
             // Initialize dictionary entry with this item name as the key
-            this.Visits.Add(serializedSlot.ItemName, new List<Visit>());
+            this.Visits.Add(serializedSlotItemName, new List<Visit>());
         }
 
         // Cache a reference to reuse for restoring each visit
@@ -770,6 +770,32 @@ public class VisitSchedule
         foreach (Visit visit in endedVisits)
         {
             this.Visits[visit.Item.Name].Remove(visit);
+        }
+
+        // Refresh list of guests in this schedule after visit removals
+        this.RefreshGuestList();
+
+    }
+
+    // Check each visit to reconstruct list of guests for this schedule
+    private void RefreshGuestList()
+    {
+        // Clear all guests from guest list
+        this.Guests.Clear();
+
+        // Check all visits for each item to add all scheduled guests
+        foreach (List<Visit> itemVisits in this.Visits.Values)
+        {
+            // Check each visit for this item
+            foreach (Visit visit in itemVisits)
+            {
+                // Check if this guest has already been added to list
+                if (!this.Guests.Contains(visit.Guest))
+                {
+                    // Add guest to list of guests for this visit schedule
+                    this.Guests.Add(visit.Guest);
+                }
+            }
         }
 
     }

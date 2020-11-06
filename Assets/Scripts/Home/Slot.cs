@@ -61,13 +61,6 @@ public class Slot : MonoBehaviour
         this.SlotButton.onClick.RemoveAllListeners();
     }
 
-    // Initialize a visit with the newly selected guest for this slot
-    public void InitializeVisit(Guest guest)
-    {
-        // TODO
-        //this.Visit = new Visit(guest);
-    }
-
     // Restore saved item state for this session on app start
     public void RestoreItem(string itemName)
     {
@@ -170,20 +163,23 @@ public class Slot : MonoBehaviour
         this.SlotButton.interactable = true;
     }
 
-    // Convert array of slots to array of serialized slots
-    public static SerializedSlot[] Serialize(Slot[] slots)
+    // Serialize slot array with minimum properties required to deserialize
+    public static string[] Serialize(Slot[] slots)
     {
-        // Initialize a serialized slot array
-        SerializedSlot[] serializedSlots = new SerializedSlot[slots.Length];
+        // Initialize array for slot item names
+        string[] slotItemNames = new string[slots.Length];
 
-        // Each Slot needs to be converted to a SerializedSlot
+        // Check each slot for an item
         for (int i = 0; i < slots.Length; i++)
         {
-            // Serialize the slot and add it to the serialized slot array
-            serializedSlots[i] = new SerializedSlot(slots[i]);
+            // Skip if no item exists in this slot
+            if (!slots[i].HasItem()) continue;
+
+            // Add the item name of this slot to the array
+            slotItemNames[i] = slots[i].Item.Name;
         }
 
-        return serializedSlots;
+        return slotItemNames;
     }
 
     // Remove the guest from this slot and save its gift in game manager
@@ -226,56 +222,6 @@ public class Slot : MonoBehaviour
     {
         this.SlotImage.color = Color.clear;
         this.SlotImage.sprite = null;
-    }
-
-}
-
-[System.Serializable]
-public class SerializedSlot
-{
-    public string ItemName;
-    public string GuestName;
-    public string VisitArrivalDateTime;
-    public string VisitDepartureDateTime;
-
-    public SerializedSlot() { }
-
-    /* Serialize a slot */
-    public SerializedSlot(Slot slot)
-    {
-        // Initialize values for all serialized slot properties
-        this.ItemName = string.Empty;
-        this.GuestName = string.Empty;
-        this.VisitArrivalDateTime = string.Empty;
-        this.VisitDepartureDateTime = string.Empty;
-
-        // Assign item name if the slot has an item
-        if (slot.Item != null)
-        {
-            this.ItemName = slot.Item.Name;
-        }
-
-        // Assign visit properties if the slot has a guest
-        if (slot.Visit.Guest != null)
-        {
-            this.GuestName = slot.Visit.Guest.Name;
-            this.VisitArrivalDateTime = slot.Visit.Arrival.ToString();
-            this.VisitDepartureDateTime = slot.Visit.Departure.ToString();
-        }
-    }
-
-    // Check if serialized slot has a valid item
-    public bool HasItem()
-    {
-        // Return true when the item is valid
-        return Item.IsValid(this.ItemName);
-    }
-
-    // Check if serialized slot has a valid guest
-    public bool HasGuest()
-    {
-        // Return true when the guest is valid
-        return Guest.IsValid(this.GuestName);
     }
 
 }

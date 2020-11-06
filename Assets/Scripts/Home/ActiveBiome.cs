@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ActiveBiome : MonoBehaviour
 {
@@ -27,6 +26,12 @@ public class ActiveBiome : MonoBehaviour
     public delegate void SelectSlotForPhotoDelegate(Slot slot);
     private SelectSlotForPhotoDelegate SelectSlotForPhoto;
 
+    void Start()
+    {
+        // Assign initialize meal delegate to this meal
+        this.Meal.DelegateInitializeMeal(this.InitializeMeal);
+    }
+
     // Assign save active biome state delegate from game manager
     public void DelegateSaveBiome(SaveBiomeDelegate callback)
     {
@@ -49,20 +54,20 @@ public class ActiveBiome : MonoBehaviour
     public void RestoreState(SerializedActiveBiome biomeState)
     {
         // Do not continue if slot counts do not match
-        if (this.Slots.Length != biomeState.Slots.Length) return;
+        if (this.Slots.Length != biomeState.SlotItemNames.Length) return;
 
         // Restore meal and its visit schedule
-        this.Meal.RestoreMeal(biomeState);
+        this.Meal.RestoreSchedule(biomeState);
 
         // Restore state of slot items
         for (int i = 0; i < this.Slots.Length; i++)
         {
             // Restore item of this slot from serialized slot
-            this.RestoreItem(this.Slots[i], biomeState.Slots[i]);
+            this.RestoreItem(this.Slots[i], biomeState.SlotItemNames[i]);
         }
 
         // TODO move this to trigger on meal placement
-        //this.Meal.InitializeMeal(biomeState.FoodName, this.Slots);
+        //this.Meal.StartMeal(biomeState.FoodName, this.Slots);
 
         // Restore state of slot visits
         this.RestoreVisits();
@@ -81,12 +86,6 @@ public class ActiveBiome : MonoBehaviour
     public void DelegateSelectSlotForPhoto(SelectSlotForPhotoDelegate callback)
     {
         this.SelectSlotForPhoto = callback;
-    }
-
-    // TODO Assign place food delegate to meal
-    public void DelegatePlaceFood()
-    {
-        //this.Meal.DelegatePlaceFood();
     }
 
     // Save any necessary adjustments on app quit
@@ -155,13 +154,13 @@ public class ActiveBiome : MonoBehaviour
     }
 
     // Restore slot item state from serialized slot save data on app start
-    private void RestoreItem(Slot slot, SerializedSlot serializedSlot)
+    private void RestoreItem(Slot slot, string serializedSlotItemName)
     {
         // Do not continue if there is no item to restore
-        if (!serializedSlot.HasItem()) return;
+        if (!Item.IsValid(serializedSlotItemName)) return;
 
         // Restore the item state of this slot
-        slot.RestoreItem(serializedSlot.ItemName);
+        slot.RestoreItem(serializedSlotItemName);
     }
 
     // Restore state of visits for each slot on app start
@@ -189,6 +188,12 @@ public class ActiveBiome : MonoBehaviour
             slot.RestoreVisit(activeVisit);
         }
 
+    }
+
+    // Initialize a meal from meal button delegate
+    private void InitializeMeal(string foodName)
+    {
+        this.Meal.StartSchedule(foodName, this.Slots);
     }
 
     // Call from slot to assign the item pending placement to itself
@@ -268,7 +273,7 @@ public class ActiveBiome : MonoBehaviour
 public class SerializedActiveBiome
 {
     public string FoodName;
-    public SerializedSlot[] Slots;
+    public string[] SlotItemNames;
     public SerializedVisit[] Visits;
 
     /* Initialize a brand new SerializedActiveBiome for a new user */
@@ -276,7 +281,7 @@ public class SerializedActiveBiome
     {
         // TODO remove meal test case
         this.FoodName = "Fruits";
-        this.Slots = new SerializedSlot[6];
+        this.SlotItemNames = new string[6];
         this.Visits = new SerializedVisit[0];
     }
 
@@ -284,7 +289,7 @@ public class SerializedActiveBiome
     public SerializedActiveBiome(ActiveBiome activeBiome)
     {
         this.FoodName = activeBiome.Meal.Food.Name;
-        this.Slots = Slot.Serialize(activeBiome.Slots);
+        this.SlotItemNames = Slot.Serialize(activeBiome.Slots);
         this.Visits = VisitSchedule.Serialize(activeBiome.Meal.VisitSchedule);
     }
 
