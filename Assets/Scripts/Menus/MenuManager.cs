@@ -21,6 +21,7 @@ public class MenuManager : MonoBehaviour
     public NotesContent NotesContent;
     public GiftsContent GiftsContent;
     public PhotosContent PhotosContent;
+    public MealDetail MealDetail;
     public InventoryDetail InventoryDetail;
     public MarketDetail MarketDetail;
     public NoteDetail NoteDetail;
@@ -40,6 +41,12 @@ public class MenuManager : MonoBehaviour
 
         // Assign focus biome delegate to active biome
         this.ActiveBiome.DelegateFocusBiome(this.FocusActiveBiome);
+
+        // Assign meal detail to active biome
+        this.ActiveBiome.AssignMealDetail(this.MealDetail);
+
+        // Assign open meal detail delegate to active biome
+        this.ActiveBiome.DelegateOpenMealDetail(this.FocusMealDetail);
 
         // Assign inventory detail to inventory content
         this.InventoryContent.AssignInventoryDetail(this.InventoryDetail);
@@ -107,6 +114,7 @@ public class MenuManager : MonoBehaviour
     {
         this.MarketContent.HydrateCoins(coins);
         this.GiftsContent.HydrateCoins(coins);
+        this.MealDetail.HydrateCoins(coins);
     }
 
     // Assign inventory from game manager to inventory content
@@ -269,6 +277,7 @@ public class MenuManager : MonoBehaviour
         this.GiftsMenuPanel.SetActive(false);
         this.PhotosMenuPanel.SetActive(false);
         this.PhotoCapture.gameObject.SetActive(false);
+        this.MealDetail.gameObject.SetActive(false);
         this.InventoryDetail.gameObject.SetActive(false);
         this.MarketDetail.gameObject.SetActive(false);
         this.NoteDetail.gameObject.SetActive(false);
@@ -295,6 +304,7 @@ public class MenuManager : MonoBehaviour
         this.GiftsMenuPanel.SetActive(false);
         this.PhotosMenuPanel.SetActive(false);
         this.PhotoCapture.gameObject.SetActive(false);
+        this.MealDetail.gameObject.SetActive(false);
         this.InventoryDetail.gameObject.SetActive(false);
         this.MarketDetail.gameObject.SetActive(false);
         this.NoteDetail.gameObject.SetActive(false);
@@ -381,6 +391,21 @@ public class MenuManager : MonoBehaviour
 
         // Set listener of close buttons to focus the note detail
         this.SetCloseButtonListener(this.FocusNoteDetail);
+    }
+
+    // Display the meal detail panel
+    public void FocusMealDetail()
+    {
+        this.MealDetail.gameObject.SetActive(true);
+
+        // Move tap out to close button behind the inventory detail panel
+        this.PrepareTapOutToClose(this.InventoryDetail.gameObject);
+
+        // Set listener of close buttons to focus the inventory menu
+        this.SetCloseButtonListener(this.FocusActiveBiome);
+
+        // Remove the highlighted state on the item button
+        EventSystem.current.SetSelectedGameObject(null);
     }
 
     // Display the inventory item detail panel

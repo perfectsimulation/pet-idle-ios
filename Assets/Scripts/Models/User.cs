@@ -2,8 +2,8 @@
 {
     public int Coins;
     public Inventory Inventory;
-    public SerializedActiveBiome BiomeState;
     public Notes Notes;
+    public SerializedActiveBiome BiomeState;
     public Gifts Gifts;
 
     /* Initialize a brand new User */
@@ -11,8 +11,8 @@
     {
         this.Coins = 300;
         this.Inventory = new Inventory();
-        this.BiomeState = new SerializedActiveBiome();
         this.Notes = new Notes();
+        this.BiomeState = new SerializedActiveBiome();
         this.Gifts = new Gifts();
     }
 
@@ -21,8 +21,8 @@
     {
         this.Coins = serializedUser.Coins;
         this.Inventory = new Inventory(serializedUser.Inventory);
-        this.BiomeState = serializedUser.BiomeState;
         this.Notes = new Notes(serializedUser.Notes);
+        this.BiomeState = serializedUser.BiomeState;
         this.Gifts = new Gifts(serializedUser.Gifts);
     }
 
@@ -33,8 +33,8 @@ public class SerializedUser
 {
     public int Coins;
     public SerializedInventory Inventory;
-    public SerializedActiveBiome BiomeState;
     public SerializedNotes Notes;
+    public SerializedActiveBiome BiomeState;
     public SerializedGifts Gifts;
 
     /* Serialize a user */
@@ -42,8 +42,8 @@ public class SerializedUser
     {
         this.Coins = user.Coins;
         this.Inventory = new SerializedInventory(user.Inventory);
-        this.BiomeState = user.BiomeState;
         this.Notes = new SerializedNotes(user.Notes);
+        this.BiomeState = user.BiomeState;
         this.Gifts = new SerializedGifts(user.Gifts);
     }
 

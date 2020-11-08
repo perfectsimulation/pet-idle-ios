@@ -26,12 +26,6 @@ public class ActiveBiome : MonoBehaviour
     public delegate void SelectSlotForPhotoDelegate(Slot slot);
     private SelectSlotForPhotoDelegate SelectSlotForPhoto;
 
-    void Start()
-    {
-        // Assign initialize meal delegate to this meal
-        this.Meal.DelegateInitializeMeal(this.InitializeMeal);
-    }
-
     // Assign save active biome state delegate from game manager
     public void DelegateSaveBiome(SaveBiomeDelegate callback)
     {
@@ -80,6 +74,18 @@ public class ActiveBiome : MonoBehaviour
     public void DelegateFocusBiome(FocusBiomeDelegate callback)
     {
         this.FocusBiome = callback;
+    }
+
+    // Assign meal detail panel from menu manager
+    public void AssignMealDetail(MealDetail mealDetail)
+    {
+        this.Meal.AssignMealDetail(mealDetail);
+    }
+
+    // Assign open meal detail delegate from menu manager
+    public void DelegateOpenMealDetail(Meal.OpenDetailDelegate callback)
+    {
+        this.Meal.DelegateOpenDetail(callback);
     }
 
     // Assign select slot for photo delegate from menu manager

@@ -17,10 +17,13 @@ public class Meal : MonoBehaviour
     // The meal button component
     private Button MealButton;
 
-    // Save newly placed food from game manager to active biome
+    // The meal detail component of the meal detail panel
+    private MealDetail MealDetail;
+
+    // Open the meal detail panel from menu manager
     [HideInInspector]
-    public delegate void InitializeMealDelegate(string foodName);
-    private InitializeMealDelegate InitializeMeal;
+    public delegate void OpenDetailDelegate();
+    private OpenDetailDelegate OpenDetail;
 
     // Cache visit schedule callbacks in case a new visit schedule is created
     private VisitSchedule.SaveVisitsDelegate SaveVisits;
@@ -43,17 +46,23 @@ public class Meal : MonoBehaviour
         this.SaveGifts = callback;
     }
 
-    // Assign initialize meal delegate from active biome
-    public void DelegateInitializeMeal(InitializeMealDelegate callback)
+    // Assign meal detail panel from menu manager
+    public void AssignMealDetail(MealDetail mealDetail)
     {
-        this.InitializeMeal = callback;
+        this.MealDetail = mealDetail;
+        this.MealDetail.SetMeal(this);
     }
 
-    // TODO Open meal detail from menu manager
+    // Assign initialize meal delegate from active biome
+    public void DelegateOpenDetail(OpenDetailDelegate callback)
+    {
+        this.OpenDetail = callback;
+    }
+
+    // Open meal detail from menu manager
     public void OnPressMealButton()
     {
-        // TODO remove default test case
-        this.InitializeMeal("Salad");
+        this.OpenDetail();
     }
 
     // Initialize a brand new Meal with fresh food
