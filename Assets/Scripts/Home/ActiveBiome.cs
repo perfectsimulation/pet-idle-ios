@@ -76,13 +76,7 @@ public class ActiveBiome : MonoBehaviour
         this.FocusBiome = callback;
     }
 
-    // Assign meal detail panel from menu manager
-    public void AssignMealDetail(MealDetail mealDetail)
-    {
-        this.Meal.AssignMealDetail(mealDetail);
-    }
-
-    // Assign open meal detail delegate from menu manager
+    // Assign open food content delegate from menu manager
     public void DelegateOpenMealDetail(Meal.OpenDetailDelegate callback)
     {
         this.Meal.DelegateOpenDetail(callback);

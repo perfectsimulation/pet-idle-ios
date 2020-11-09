@@ -74,6 +74,30 @@ public class Food
         return false;
     }
 
+    // Get the index of this food in the array of all foods
+    public static int GetSortedIndex(Food food)
+    {
+        // Check if this food is valid
+        if (IsValid(food.Name))
+        {
+            // Get an array of all foods
+            Food[] allFoods = DataInitializer.AllFoods;
+
+            // Find the index of this food in the array of all foods
+            for (int i = 0; i < allFoods.Length; i++)
+            {
+                // Return the index this food has in the array of all foods
+                if (food.Equals(allFoods[i]))
+                {
+                    return i;
+                }
+            }
+
+        }
+
+        return -1;
+    }
+
     // Create sprite of fresh food
     public Sprite GetFreshFoodSprite()
     {

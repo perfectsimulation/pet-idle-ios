@@ -14,25 +14,14 @@ public class Meal : MonoBehaviour
     // Date time at which food turns empty
     private DateTime Completion;
 
-    // The meal button component
-    private Button MealButton;
-
-    // The meal detail component of the meal detail panel
-    private MealDetail MealDetail;
-
-    // Open the meal detail panel from menu manager
+    // Open the food content menu from menu manager
     [HideInInspector]
-    public delegate void OpenDetailDelegate();
+    public delegate void OpenDetailDelegate(Meal meal);
     private OpenDetailDelegate OpenDetail;
 
     // Cache visit schedule callbacks in case a new visit schedule is created
     private VisitSchedule.SaveVisitsDelegate SaveVisits;
     private VisitSchedule.SaveGiftsDelegate SaveGifts;
-
-    void Awake()
-    {
-        this.MealButton = this.gameObject.GetComponent<Button>();
-    }
 
     // Assign save visits delegate from active biome to visit schedule
     public void DelegateSaveVisits(VisitSchedule.SaveVisitsDelegate callback)
@@ -46,14 +35,7 @@ public class Meal : MonoBehaviour
         this.SaveGifts = callback;
     }
 
-    // Assign meal detail panel from menu manager
-    public void AssignMealDetail(MealDetail mealDetail)
-    {
-        this.MealDetail = mealDetail;
-        this.MealDetail.SetMeal(this);
-    }
-
-    // Assign initialize meal delegate from active biome
+    // Assign open food content delegate from active biome
     public void DelegateOpenDetail(OpenDetailDelegate callback)
     {
         this.OpenDetail = callback;
@@ -62,7 +44,7 @@ public class Meal : MonoBehaviour
     // Open meal detail from menu manager
     public void OnPressMealButton()
     {
-        this.OpenDetail();
+        this.OpenDetail(this);
     }
 
     // Initialize a brand new Meal with fresh food
