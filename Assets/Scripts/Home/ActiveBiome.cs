@@ -88,6 +88,15 @@ public class ActiveBiome : MonoBehaviour
         this.SelectSlotForPhoto = callback;
     }
 
+    // Initialize a meal after food purchase from game manager
+    public void PlaceFoodInMeal(Food food)
+    {
+        this.Meal.StartSchedule(food, this.Slots);
+
+        // Tell game manager to save biome state with new meal
+        this.SaveBiome(new SerializedActiveBiome(this));
+    }
+
     // Save any necessary adjustments on app quit
     public void AuditVisitSchedule()
     {
@@ -188,12 +197,6 @@ public class ActiveBiome : MonoBehaviour
             slot.RestoreVisit(activeVisit);
         }
 
-    }
-
-    // Initialize a meal from meal button delegate
-    private void InitializeMeal(string foodName)
-    {
-        this.Meal.StartSchedule(foodName, this.Slots);
     }
 
     // Call from slot to assign the item pending placement to itself

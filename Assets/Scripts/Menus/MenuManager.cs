@@ -145,6 +145,11 @@ public class MenuManager : MonoBehaviour
         this.PhotosContent.HydratePhotos(photos);
     }
 
+    public void DelegatePurchaseFood(FoodContent.PurchaseDelegate callback)
+    {
+        this.FoodContent.DelegatePurchase(callback);
+    }
+
     // Assign purchase item delegate from game manager to market content
     public void DelegatePurchaseItem(MarketContent.PurchaseDelegate callback)
     {
@@ -197,6 +202,12 @@ public class MenuManager : MonoBehaviour
     public void ProcessBiomeStateChanges()
     {
         this.ActiveBiome.AuditVisitSchedule();
+    }
+
+    // Add a newly purchased food to the meal of active biome
+    public void AddFoodToBiome(Food food)
+    {
+        this.ActiveBiome.PlaceFoodInMeal(food);
     }
 
     // Add a newly purchased item to inventory content

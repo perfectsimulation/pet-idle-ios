@@ -48,10 +48,10 @@ public class Meal : MonoBehaviour
     }
 
     // Initialize a brand new Meal with fresh food
-    public void StartSchedule(string foodName, Slot[] slots)
+    public void StartSchedule(Food food, Slot[] slots)
     {
-        // Create and cache this food from food name string
-        this.Food = new Food(foodName);
+        // Cache this food
+        this.Food = food;
 
         // TODO Get the datetime of food initialization
         //DateTime StartTime = DateTime.UtcNow;

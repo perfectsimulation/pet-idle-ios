@@ -8,6 +8,7 @@ public class FoodContent : MonoBehaviour
 
     public Button PreviousButton;
     public Button NextButton;
+    public Button BuyButton;
 
     private Food[] AllFoods;
     private Meal Meal;
@@ -15,9 +16,19 @@ public class FoodContent : MonoBehaviour
 
     private int CurrentFoodIndex;
 
+    // Purchase food from game manager
+    [HideInInspector]
+    public delegate void PurchaseDelegate(Food food);
+    private PurchaseDelegate Purchase;
+
     void Start()
     {
         this.AllFoods = DataInitializer.AllFoods;
+    }
+
+    public void DelegatePurchase(PurchaseDelegate callback)
+    {
+        this.Purchase = callback;
     }
 
     // Assign coins to user coins
@@ -73,6 +84,16 @@ public class FoodContent : MonoBehaviour
 
         // Decrement current food index
         this.UpdateCurrentFoodIndex(this.CurrentFoodIndex - 1);
+    }
+
+    // Purchase the focused food in game manager
+    public void OnPressBuyButton()
+    {
+        // Call delegate to purchase food
+        this.Purchase(this.AllFoods[this.CurrentFoodIndex]);
+
+        // Show meal detail for newly purchased food
+        this.DisplayDetails();
     }
 
     // Update the focused food index

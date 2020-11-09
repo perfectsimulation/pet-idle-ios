@@ -7,7 +7,6 @@ public class FoodDetail : MonoBehaviour
     public TextMeshProUGUI NameText;
     public Image FoodImage;
     public TextMeshProUGUI PriceText;
-    public Button BuyButton;
 
     private Food Food;
 

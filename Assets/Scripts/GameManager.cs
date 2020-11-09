@@ -30,6 +30,9 @@ public class GameManager : MonoBehaviour
         // Give the gifts to the gifts content
         this.MenuManager.HydrateGifts(this.User.Gifts);
 
+        // Give the menu manager a callback to save food purchases
+        this.MenuManager.DelegatePurchaseFood(this.SaveFoodPurchase);
+
         // Give the menu manager a callback to save item purchases
         this.MenuManager.DelegatePurchaseItem(this.SaveItemPurchase);
 
@@ -55,8 +58,23 @@ public class GameManager : MonoBehaviour
         this.MenuManager.RestoreBiomeState(this.User.BiomeState);
     }
 
+    // Delegate called in food menu to refill meal in active biome
+    private void SaveFoodPurchase(Food food)
+    {
+        // Subtract the newly purchased food price from the user coin balance
+        this.User.Coins -= food.Price;
+
+        // Give the updated coin balance to the menus that use it
+        this.MenuManager.HydrateCoins(this.User.Coins);
+
+        // Give the new food to the active biome
+        this.MenuManager.AddFoodToBiome(food);
+
+        Persistence.SaveUser(this.User);
+    }
+
     // Delegate called in market content to update user inventory and coins
-    public void SaveItemPurchase(Item item)
+    private void SaveItemPurchase(Item item)
     {
         // Add the newly purchased item to the user inventory
         this.User.Inventory.Add(item);
@@ -74,27 +92,15 @@ public class GameManager : MonoBehaviour
     }
 
     // Delegate called in active biome to update user biome state
-    public void SaveActiveBiome(SerializedActiveBiome updatedBiomeState)
+    private void SaveActiveBiome(SerializedActiveBiome updatedBiomeState)
     {
         this.User.BiomeState = updatedBiomeState;
 
         Persistence.SaveUser(this.User);
     }
 
-    // Delegate called when a departing guest leaves a coin award for the user
-    public void SaveCoins(int coins)
-    {
-        // Add the coins to user balance
-        this.User.Coins += coins;
-
-        // Update the updated coin balance in menus
-        this.MenuManager.HydrateCoins(this.User.Coins);
-
-        Persistence.SaveUser(this.User);
-    }
-
     // Delegate called when started visits are processed in visit schedule
-    public void SaveVisits(Visit[] visits)
+    private void SaveVisits(Visit[] visits)
     {
         // Update visit counts for each guest of a started visit
         this.User.Notes.UpdateVisitCounts(visits);
@@ -106,7 +112,7 @@ public class GameManager : MonoBehaviour
     }
 
     // Delegate called when ended visits are processed in visit schedule
-    public void SaveGifts(Visit[] visits)
+    private void SaveGifts(Visit[] visits)
     {
         // Create a new gift from each ended visit
         this.User.Gifts.Create(visits);
@@ -118,7 +124,7 @@ public class GameManager : MonoBehaviour
     }
 
     // Delegate called to save all rewards when gifts are claimed
-    public void ClaimGifts(Gifts gifts)
+    private void ClaimGifts(Gifts gifts)
     {
         // Add coin reward to user coin balance
         this.User.Coins += gifts.GetTotalCoins();
@@ -142,7 +148,7 @@ public class GameManager : MonoBehaviour
     }
 
     // Delegate called when a photo is saved to a guest note
-    public void SavePhoto(string guestName, Photo photo)
+    private void SavePhoto(string guestName, Photo photo)
     {
         // Add the photo to the note in user data
         this.User.Notes.AddPhoto(guestName, photo);
@@ -155,7 +161,7 @@ public class GameManager : MonoBehaviour
     }
 
     // Delegate called when a photo is deleted from photo detail panel
-    public void DeletePhoto(string guestName, Photo photo)
+    private void DeletePhoto(string guestName, Photo photo)
     {
         Persistence.DeletePhoto(guestName, photo);
 
