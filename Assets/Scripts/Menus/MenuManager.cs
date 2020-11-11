@@ -228,6 +228,7 @@ public class MenuManager : MonoBehaviour
     public void UpdateNotes(Notes notes)
     {
         this.NotesContent.UpdateNotes(notes);
+        this.GiftsContent.HydrateSeenGuests(notes.GetSeenGuestNames());
     }
 
     // Update gifts content with new gifts from game manager

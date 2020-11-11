@@ -21,7 +21,6 @@ public class Slot : MonoBehaviour
 
     void Awake()
     {
-        this.Visit = new Visit();
         this.SlotButton = this.gameObject.GetComponent<Button>();
     }
 
@@ -88,7 +87,7 @@ public class Slot : MonoBehaviour
         if (this.Item == null) return;
 
         // Remove guest immediately and automatically
-        this.RemoveGuest();
+        this.RemoveVisit();
 
         // Clear cache of item
         this.Item = null;
@@ -100,27 +99,15 @@ public class Slot : MonoBehaviour
     // Check if slot has a valid item
     public bool HasItem()
     {
-        // Return false when the item property is null
-        if (this.Item == null)
-        {
-            return false;
-        }
-
         // Return true when the item is valid
-        return Item.IsValid(this.Item.Name);
+        return Item.IsValid(this.Item);
     }
 
-    // Check if slot has a valid guest
-    public bool HasGuest()
+    // Check if slot has a valid visit
+    public bool HasVisit()
     {
-        // Return false when the guest property of visit is null
-        if (this.Visit.Guest == null)
-        {
-            return false;
-        }
-
-        // Return true when the guest is valid
-        return Guest.IsValid(this.Visit.Guest.Name);
+        // Return true when this visit is valid
+        return Visit.IsValid(this.Visit);
     }
 
     // Show indicator for item placement
@@ -140,7 +127,7 @@ public class Slot : MonoBehaviour
         this.SlotButton.interactable = false;
 
         // Do not continue if there is no guest assigned to the slot
-        if (this.Visit.Guest == null) return;
+        if (!Visit.IsValid(this.Visit)) return;
 
         // Do not continue if the guest is not currently visiting
         if (!this.Visit.IsActive()) return;
@@ -183,13 +170,13 @@ public class Slot : MonoBehaviour
     }
 
     // Remove the guest from this slot and save its gift in game manager
-    private void RemoveGuest()
+    private void RemoveVisit()
     {
-        // Do not continue if there is already no guest
-        if (this.Visit.Guest == null) return;
+        // Do not continue if there is no active visit
+        if (this.Visit == null) return;
 
-        // Reset the visit properties to await new visit details
-        this.Visit.Clear();
+        // Clear cache of visit
+        this.Visit = null;
     }
 
     // Indicate eligible slot during item placement or photo capture

@@ -55,6 +55,12 @@ public static class DataInitializer
     /* Check if string represents a valid guest name */
     public static bool IsValidGuest(string name)
     {
+        // Return false if the string is null
+        if (name == null) return false;
+
+        // Return false if the string is empty
+        if (name == string.Empty) return false;
+
         // Get guest name enum from guest name string
         GuestName guestName =
             (GuestName)Enum.Parse(typeof(GuestName), name, true);
@@ -469,6 +475,12 @@ public static class DataInitializer
     /* Check if string represents a valid item name */
     public static bool IsValidItem(string name)
     {
+        // Return false if the string is null
+        if (name == null) return false;
+
+        // Return false if the string is empty
+        if (name == string.Empty) return false;
+
         // Get enum from item name string
         ItemName itemName =
             (ItemName)Enum.Parse(typeof(ItemName), name, true);
@@ -1302,6 +1314,12 @@ public static class DataInitializer
     /* Check if string represents a valid food name */
     public static bool IsValidFood(string name)
     {
+        // Return false if the string is null
+        if (name == null) return false;
+
+        // Return false if the string is empty
+        if (name == string.Empty) return false;
+
         // Get enum from food name string
         FoodName foodName =
             (FoodName)Enum.Parse(typeof(FoodName), name, true);

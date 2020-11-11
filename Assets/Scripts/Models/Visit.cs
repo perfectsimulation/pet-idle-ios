@@ -46,14 +46,6 @@ public class Visit
         this.IsCounted = serializedVisit.IsCounted;
     }
 
-    // Reset assigned visit properties
-    public void Clear()
-    {
-        this.Guest = null;
-        this.Arrival = DateTime.MinValue;
-        this.Departure = DateTime.MinValue;
-    }
-
     // Check if the arrival datetime is in the past
     public bool IsStarted()
     {
@@ -82,6 +74,22 @@ public class Visit
 
         // Return true if game start time is between arrival and departure
         return (this.IsStarted() && !this.IsEnded());
+    }
+
+    // Check whether this visit has a valid item and a valid guest
+    public static bool IsValid(Visit visit)
+    {
+        // Return false if the visit is null
+        if (visit == null) return false;
+
+        // Return false if the item of the visit is not valid
+        if (!Item.IsValid(visit.Item)) return false;
+
+        // Return false if the guest of the visit is not valid
+        if (!Guest.IsValid(visit.Guest.Name)) return false;
+
+        // Return true if the visit has a valid item and a valid guest
+        return true;
     }
 
     // Convert list of visits to array of serialized visits
@@ -338,6 +346,13 @@ public class VisitSchedule
     // Review schedule viability and make necessary adjustments
     public void Audit(Slot[] slots)
     {
+        // Check if this schedule is empty
+        if (this.IsEmpty())
+        {
+            // Do not continue if there are no visits to audit
+            return;
+        }
+
         // Get names of items with visits in this dictionary
         string[] visitItemNames = this.Visits.Keys.ToArray();
 
@@ -403,6 +418,46 @@ public class VisitSchedule
 
     }
 
+    // Check if all visit lists are empty in this schedule
+    public bool IsEmpty()
+    {
+        // TODO ensure valid food duration
+        // Check the list of visits for each item
+        foreach (List<Visit> itemVisits in this.Visits.Values)
+        {
+            // Return false if any visit list is nonempty
+            if (itemVisits.Count > 0)
+            {
+                return false;
+            }
+        }
+
+        // Return true when all visit lists are empty
+        return true;
+    }
+
+    // Remove item and its visits from this schedule
+    public void Remove(Item item)
+    {
+        // Do not continue if the schedule does not contain visits for this item
+        if (!this.Visits.ContainsKey(item.Name)) return;
+
+        // Check if the item has an active visit
+        if (this.HasActiveVisit(item))
+        {
+            // Get the active visit for this item
+            Visit abortedVisit = this.GetActiveVisit(item);
+
+            // Create and save a gift for the shortened visit
+            this.ProcessEndedVisits(new List<Visit>() { abortedVisit });
+
+            // TODO give a smaller gift for visits ended early
+        }
+
+        // Remove the dictionary entry with this key
+        this.Visits.Remove(item.Name);
+    }
+
     // Serialize visit schedule into array of serialized visits
     public static SerializedVisit[] Serialize(VisitSchedule visitSchedule)
     {
@@ -418,6 +473,9 @@ public class VisitSchedule
             // Loop through each visit in the list of item visits
             foreach (Visit visit in itemVisits)
             {
+                // Skip if the visit is not valid
+                if (!Visit.IsValid(visit)) continue;
+
                 // Create a serialized visit from the item visit
                 serializedVisit = new SerializedVisit(visit);
 
@@ -582,7 +640,7 @@ public class VisitSchedule
         float arrivalDelay = UnityEngine.Random.Range(min, max);
 
         // Add the delay to the start time to create an arrival date time
-        DateTime arrival = startTime.AddSeconds(arrivalDelay);
+        DateTime arrival = startTime.AddMinutes(arrivalDelay);
         return arrival;
     }
 
@@ -592,10 +650,10 @@ public class VisitSchedule
         // Randomly select a departure delay within range allowed by guest
         float min = guest.EarliestDepartureInMinutes;
         float max = guest.LatestDepartureInMinutes;
-        float departureDelay = UnityEngine.Random.Range(min, max) * 10f;
+        float departureDelay = UnityEngine.Random.Range(min, max);
 
         // Add the delay to the arrival time to create a departure date time
-        DateTime departure = arrival.AddSeconds(departureDelay);
+        DateTime departure = arrival.AddMinutes(departureDelay);
         return departure;
     }
 

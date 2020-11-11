@@ -41,30 +41,20 @@ public class Meal : MonoBehaviour
         this.OpenDetail = callback;
     }
 
-    // Open meal detail from menu manager
-    public void OnPressMealButton()
-    {
-        this.OpenDetail(this);
-    }
-
-    // Initialize a brand new Meal with fresh food
-    public void StartSchedule(Food food, Slot[] slots)
+    // Assign food of this meal
+    public void SetFood(Food food)
     {
         // Cache this food
         this.Food = food;
 
-        // TODO Get the datetime of food initialization
-        //DateTime StartTime = DateTime.UtcNow;
-
-        // Initialize a new visit schedule for this new meal
-        this.VisitSchedule = new VisitSchedule(this.Food, slots);
-
-        // Assign delegates to save visits and gifts to new visit schedule
-        this.VisitSchedule.DelegateSaveVisits(this.SaveVisits);
-        this.VisitSchedule.DelegateSaveGifts(this.SaveGifts);
-
-        // Show the fresh image sprite in food image
+        // Set the sprite of the food image
         this.SetFoodImageSprite(this.Food.GetFreshFoodSprite());
+    }
+
+    // Open meal detail from menu manager
+    public void OnPressMealButton()
+    {
+        this.OpenDetail(this);
     }
 
     // Restore state of meal and visit schedule from save data
@@ -77,7 +67,7 @@ public class Meal : MonoBehaviour
         this.SetFoodImageSprite(this.Food.GetFreshFoodSprite());
 
         // Do not continue if save data do not exist
-        if (biomeState.Visits == null || biomeState.Visits.Length == 0) return;
+        if (biomeState.Visits == null) return;
 
         // Restore visit schedule from serialized visit save data
         this.VisitSchedule = new VisitSchedule(biomeState);
@@ -93,6 +83,14 @@ public class Meal : MonoBehaviour
     // Review schedule viability and make necessary adjustments on app quit
     public void AuditVisitSchedule(Slot[] slots)
     {
+        // Check if this visit schedule is empty
+        if (this.VisitSchedule.IsEmpty())
+        {
+            // Generate a new visit schedule
+            this.VisitSchedule = new VisitSchedule(this.Food, slots);
+        }
+
+        // Audit all the visit lists in this schedule
         this.VisitSchedule.Audit(slots);
     }
 

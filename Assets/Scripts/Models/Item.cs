@@ -56,18 +56,6 @@ public class Item
         return base.GetHashCode();
     }
 
-    // Check whether this string represents a valid item
-    public static bool IsValid(string name)
-    {
-        if (name != null && name != string.Empty)
-        {
-            // Return true when the name is included in valid item names
-            return DataInitializer.IsValidItem(name);
-        }
-
-        return false;
-    }
-
     // Create sprite of item
     public Sprite GetItemSprite()
     {
@@ -78,6 +66,23 @@ public class Item
     public int GetGuestAffinity(Guest guest)
     {
         return DataInitializer.GetGuestAffinityForItem(this, guest);
+    }
+
+    // Check whether this item is valid by its name property
+    public static bool IsValid(Item item)
+    {
+        // Return false if the item is null
+        if (item == null) return false;
+
+        // Check the validity of the item by its name
+        return IsValid(item.Name);
+    }
+
+    // Check whether this string represents a valid item
+    public static bool IsValid(string name)
+    {
+        // Return true if the name is included in valid item names
+        return DataInitializer.IsValidItem(name);
     }
 
 }

@@ -107,18 +107,6 @@ public class Guest
         return this.Name.GetHashCode();
     }
 
-    // Check whether this string represents a valid guest
-    public static bool IsValid(string name)
-    {
-        if (name != null && name != string.Empty)
-        {
-            // Return true when the name is included in valid guest names
-            return DataInitializer.IsValidGuest(name);
-        }
-
-        return false;
-    }
-
     // Create sprite of guest
     public Sprite GetGuestSprite(bool hasBeenSeen)
     {
@@ -147,6 +135,13 @@ public class Guest
 
         // Use the image path to create a sprite of this interaction
         return ImageUtility.CreateSprite(imagePath);
+    }
+
+    // Check whether this string represents a valid guest
+    public static bool IsValid(string name)
+    {
+        // Return true if the name is included in valid guest names
+        return DataInitializer.IsValidGuest(name);
     }
 
     // Get guest image path depending on previous sighting (or lack thereof)

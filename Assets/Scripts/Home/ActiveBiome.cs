@@ -60,9 +60,6 @@ public class ActiveBiome : MonoBehaviour
             this.RestoreItem(this.Slots[i], biomeState.SlotItemNames[i]);
         }
 
-        // TODO move this to trigger on meal placement
-        //this.Meal.StartMeal(biomeState.FoodName, this.Slots);
-
         // Restore state of slot visits
         this.RestoreVisits();
 
@@ -91,7 +88,7 @@ public class ActiveBiome : MonoBehaviour
     // Initialize a meal after food purchase from game manager
     public void PlaceFoodInMeal(Food food)
     {
-        this.Meal.StartSchedule(food, this.Slots);
+        this.Meal.SetFood(food);
 
         // Tell game manager to save biome state with new meal
         this.SaveBiome(new SerializedActiveBiome(this));
@@ -205,6 +202,13 @@ public class ActiveBiome : MonoBehaviour
         // Do not continue if no item is awaiting slot placement
         if (this.ItemPendingPlacement == null) return;
 
+        // Check if there is already an item in this slot
+        if (selectedSlot.HasItem())
+        {
+            // Remove visits of the soon-to-be-replaced item from the schedule
+            this.Meal.VisitSchedule.Remove(selectedSlot.Item);
+        }
+
         // Remove item from its current slot before placing it in the new one
         this.RemoveItem(this.ItemPendingPlacement);
 
@@ -242,6 +246,9 @@ public class ActiveBiome : MonoBehaviour
 
         // Do not continue if no slots currently have this item
         if (slotIndex == -1) return;
+
+        // Remove visits of the soon-to-be-removed item from the schedule
+        this.Meal.VisitSchedule.Remove(this.Slots[slotIndex].Item);
 
         // Remove this item from the slot
         this.Slots[slotIndex].RemoveItem();

@@ -65,13 +65,8 @@ public class Food
     // Check whether this string represents a valid food
     public static bool IsValid(string name)
     {
-        if (name != null && name != string.Empty)
-        {
-            // Return true when the name is included in valid food names
-            return DataInitializer.IsValidFood(name);
-        }
-
-        return false;
+        // Return true if the name is included in valid food names
+        return DataInitializer.IsValidFood(name);
     }
 
     // Get the index of this food in the array of all foods
