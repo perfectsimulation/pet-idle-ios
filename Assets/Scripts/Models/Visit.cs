@@ -76,6 +76,18 @@ public class Visit
         return (this.IsStarted() && !this.IsEnded());
     }
 
+    // Add duration to arrival time of this visit
+    public void DelayArrival(TimeSpan duration)
+    {
+        this.Arrival = this.Arrival.Add(duration);
+    }
+
+    // Add duration to departure time of this visit
+    public void DelayDeparture(TimeSpan duration)
+    {
+        this.Departure = this.Departure.Add(duration);
+    }
+
     // Check whether this visit has a valid item and a valid guest
     public static bool IsValid(Visit visit)
     {
@@ -403,6 +415,26 @@ public class VisitSchedule
             this.Visits.Remove(removedItemName);
         }
 
+        // Get the duration time span of the ending session
+        TimeSpan sessionTime = TimeInterval.SessionTime();
+
+        // Delay arrivals and departures of visits by session time
+        foreach (List<Visit> remainingVisits in this.Visits.Values)
+        {
+            // Check each visit for its current status
+            foreach (Visit visit in remainingVisits)
+            {
+                // Delay arrival if visit has not yet started
+                if (!visit.IsStarted())
+                {
+                    visit.DelayArrival(sessionTime);
+                }
+
+                // Delay departure of all visits
+                visit.DelayDeparture(sessionTime);
+            }
+        }
+
         // Cache reference to reuse for generating new visit lists
         List<Visit> itemVisits;
 
@@ -416,6 +448,8 @@ public class VisitSchedule
             this.Visits.Add(addedItem.Name, itemVisits);
         }
 
+        // Remove overlapping visits
+        this.ArbitrateOverlappingVisits();
     }
 
     // Check if all visit lists are empty in this schedule

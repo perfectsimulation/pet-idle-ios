@@ -21,7 +21,7 @@ public class FoodContent : MonoBehaviour
     public delegate void PurchaseDelegate(Food food);
     private PurchaseDelegate Purchase;
 
-    void Start()
+    void Awake()
     {
         this.AllFoods = DataInitializer.AllFoods;
     }
