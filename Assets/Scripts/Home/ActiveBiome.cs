@@ -51,17 +51,17 @@ public class ActiveBiome : MonoBehaviour
         if (this.Slots.Length != biomeState.SlotItemNames.Length) return;
 
         // Restore meal and its visit schedule
-        this.Meal.RestoreSchedule(biomeState);
+        this.Meal.Restore(biomeState);
 
         // Restore state of slot items
         for (int i = 0; i < this.Slots.Length; i++)
         {
             // Restore item of this slot from serialized slot
             this.RestoreItem(this.Slots[i], biomeState.SlotItemNames[i]);
-        }
 
-        // Restore state of slot visits
-        this.RestoreVisits();
+            // Assign active visit to this slot from restored schedule
+            this.RestoreVisit(this.Slots[i]);
+        }
 
         // Tell game manager to save restored biome state
         this.SaveBiome(new SerializedActiveBiome(this));
@@ -88,7 +88,7 @@ public class ActiveBiome : MonoBehaviour
     // Initialize a meal after food purchase from game manager
     public void PlaceFoodInMeal(Food food)
     {
-        this.Meal.SetFood(food);
+        this.Meal.Refill(food);
 
         // Tell game manager to save biome state with new meal
         this.SaveBiome(new SerializedActiveBiome(this));
@@ -113,7 +113,10 @@ public class ActiveBiome : MonoBehaviour
         // Show item placement indicator images for all the slots
         foreach (Slot slot in this.Slots)
         {
+            // Assign place item delegate to the slot button
             slot.DelegatePlaceItem(this.PlaceItemInSlot);
+
+            // Show valid indicator of slot when eligible for item placement
             slot.ValidateItemPlacementEligibility();
         }
 
@@ -169,31 +172,23 @@ public class ActiveBiome : MonoBehaviour
         slot.RestoreItem(serializedSlotItemName);
     }
 
-    // Restore state of visits for each slot on app start
-    private void RestoreVisits()
+    // Restore slot visit state from visit schedule save data on app start
+    private void RestoreVisit(Slot slot)
     {
         // Do not continue if there are no visits to recover
         if (this.Meal.VisitSchedule == null) return;
 
-        // Cache a reference to reuse for restoring each active visit
-        Visit activeVisit;
+        // Do not continue if the slot has no restored item
+        if (!slot.HasItem()) return;
 
-        // Restore the visit state of each slot
-        foreach (Slot slot in this.Slots)
-        {
-            // Skip slot if it has no restored item
-            if (!slot.HasItem()) continue;
+        // Do not continue if the slot has no active visit
+        if (!this.Meal.VisitSchedule.HasActiveVisit(slot.Item)) return;
 
-            // Skip slot if it has no active visit
-            if (!this.Meal.VisitSchedule.HasActiveVisit(slot.Item)) continue;
+        // Get the active visit for this slot from visit schedule
+        Visit activeVisit = this.Meal.VisitSchedule.GetActiveVisit(slot.Item);
 
-            // Get the active visit for this slot from visit schedule
-            activeVisit = this.Meal.VisitSchedule.GetActiveVisit(slot.Item);
-
-            // Restore the visit state in this slot
-            slot.RestoreVisit(activeVisit);
-        }
-
+        // Restore the visit state in this slot
+        slot.RestoreVisit(activeVisit);
     }
 
     // Call from slot to assign the item pending placement to itself
@@ -283,6 +278,7 @@ public class ActiveBiome : MonoBehaviour
 public class SerializedActiveBiome
 {
     public string FoodName;
+    public bool HasFreshFood;
     public string[] SlotItemNames;
     public SerializedVisit[] Visits;
 
@@ -291,6 +287,7 @@ public class SerializedActiveBiome
     {
         // TODO remove meal test case
         this.FoodName = "Fruits";
+        this.HasFreshFood = true;
         this.SlotItemNames = new string[6];
         this.Visits = new SerializedVisit[0];
     }
@@ -299,6 +296,7 @@ public class SerializedActiveBiome
     public SerializedActiveBiome(ActiveBiome activeBiome)
     {
         this.FoodName = activeBiome.Meal.Food.Name;
+        this.HasFreshFood = activeBiome.Meal.HasFreshFood;
         this.SlotItemNames = Slot.Serialize(activeBiome.Slots);
         this.Visits = VisitSchedule.Serialize(activeBiome.Meal.VisitSchedule);
     }

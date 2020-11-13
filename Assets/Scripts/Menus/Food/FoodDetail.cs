@@ -10,11 +10,6 @@ public class FoodDetail : MonoBehaviour
 
     private Food Food;
 
-    public void DelegatePurchaseFood()
-    {
-        // TODO
-    }
-
     public void Display(Food food)
     {
         this.Food = food;

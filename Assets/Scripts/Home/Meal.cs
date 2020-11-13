@@ -4,15 +4,25 @@ using UnityEngine.UI;
 
 public class Meal : MonoBehaviour
 {
+    // Food image component of meal within the active biome
     public Image FoodImage;
+
+    // Current food set for this meal
     public Food Food { get; private set; }
+
+    // True when a new food is set and a visit schedule refresh is needed
+    public bool HasFreshFood { get; private set; }
+
     public VisitSchedule VisitSchedule { get; private set; }
 
-    // Time remaining before this food turns from fresh to empty
-    private TimeSpan RemainingDuration;
+    // Date time at which food was intially set
+    private DateTime Commencement;
 
     // Date time at which food turns empty
     private DateTime Completion;
+
+    // Time remaining before this food turns from fresh to empty
+    private TimeSpan RemainingDuration;
 
     // Open the food content menu from menu manager
     [HideInInspector]
@@ -41,11 +51,17 @@ public class Meal : MonoBehaviour
         this.OpenDetail = callback;
     }
 
-    // Assign food of this meal
-    public void SetFood(Food food)
+    // Assign fresh food to this meal
+    public void Refill(Food food)
     {
         // Cache this food
         this.Food = food;
+
+        // Indicate a schedule refresh is required on start of next session
+        this.HasFreshFood = true;
+
+        // Assign the fresh food to the visit schedule
+        this.VisitSchedule.Update(food);
 
         // Set the sprite of the food image
         this.SetFoodImageSprite(this.Food.GetFreshFoodSprite());
@@ -58,7 +74,7 @@ public class Meal : MonoBehaviour
     }
 
     // Restore state of meal and visit schedule from save data
-    public void RestoreSchedule(SerializedActiveBiome biomeState)
+    public void Restore(SerializedActiveBiome biomeState)
     {
         // Create and cache this food from food name string
         this.Food = new Food(biomeState.FoodName);
@@ -72,12 +88,12 @@ public class Meal : MonoBehaviour
         // Restore visit schedule from serialized visit save data
         this.VisitSchedule = new VisitSchedule(biomeState);
 
-        // Assign delegates to save visits and gifts to restored visit schedule
+        // Assign delegates for saving visits and gifts to restored schedule
         this.VisitSchedule.DelegateSaveVisits(this.SaveVisits);
         this.VisitSchedule.DelegateSaveGifts(this.SaveGifts);
 
-        // Process visits in the restored schedule
-        this.VisitSchedule.Process();
+        // Process restored schedule to initiate or continue this meal
+        this.VisitSchedule.Process(biomeState);
     }
 
     // Review schedule viability and make necessary adjustments on app quit
@@ -88,6 +104,7 @@ public class Meal : MonoBehaviour
         {
             // Generate a new visit schedule
             this.VisitSchedule = new VisitSchedule(this.Food, slots);
+            return;
         }
 
         // Audit all the visit lists in this schedule

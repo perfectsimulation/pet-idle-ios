@@ -146,9 +146,10 @@ public class Visit
 public class VisitSchedule
 {
     // Dictionary of visit lists by item name
-    public Dictionary<string, List<Visit>> Visits;
+    public Dictionary<string, List<Visit>> Schedule;
 
-    private readonly Food Food;
+    // Food to use for basis of this schedule
+    private Food Food;
 
     // Keep track of all guests selected to visit in this schedule
     private readonly List<Guest> Guests;
@@ -165,14 +166,14 @@ public class VisitSchedule
     public VisitSchedule()
     {
         // Initialize dictionary of visits by item name
-        this.Visits = new Dictionary<string, List<Visit>>();
+        this.Schedule = new Dictionary<string, List<Visit>>();
     }
 
     /* Initialize a brand new VisitSchedule */
     public VisitSchedule(Food food, Slot[] slots)
     {
         // Initialize dictionary of visits by item name
-        this.Visits = new Dictionary<string, List<Visit>>();
+        this.Schedule = new Dictionary<string, List<Visit>>();
 
         // Cache this food
         this.Food = food;
@@ -180,35 +181,11 @@ public class VisitSchedule
         // Initialize list of guests to visit over this visit schedule
         this.Guests = new List<Guest>();
 
-        // Initialize a list for all items in all slots
-        List<Item> items = new List<Item>();
-        items.Capacity = slots.Length;
+        // Initialize new dictionary keys with active slot item names
+        this.CreateKeys(slots);
 
-        // Loop through the slots and add each item to list of items
-        foreach (Slot slot in slots)
-        {
-            // Skip this slot if it has no item
-            if (!slot.HasItem()) continue;
-
-            // Add the item in this slot to list of items
-            items.Add(slot.Item);
-        }
-
-        // Cache a reference to reuse for making visit lists for each item
-        List<Visit> itemVisits;
-
-        // Generate and add each item visit list to dictionary
-        foreach (Item item in items)
-        {
-            // Generate a list of visits for each item
-            itemVisits = this.GenerateVisits(item);
-
-            // Add a dictionary entry for this schedule by item name
-            this.Visits.Add(item.Name, itemVisits);
-        }
-
-        // Remove overlapping visits for each guest to finalize schedule
-        this.ArbitrateOverlappingVisits();
+        // Generate new visits for each active item in the biome
+        this.CreateValues();
 
         // TODO remove
         this.PrintVisits();
@@ -218,7 +195,7 @@ public class VisitSchedule
     public VisitSchedule(SerializedActiveBiome biomeState)
     {
         // Initialize dictionary of visits by item name
-        this.Visits = new Dictionary<string, List<Visit>>();
+        this.Schedule = new Dictionary<string, List<Visit>>();
 
         // Cache this food
         this.Food = new Food(biomeState.FoodName);
@@ -226,31 +203,11 @@ public class VisitSchedule
         // Initialize list of guests to visit over this visit schedule
         this.Guests = new List<Guest>();
 
-        // Loop through slots to restore item name keys of visits dictionary
-        foreach (string serializedSlotItemName in biomeState.SlotItemNames)
-        {
-            // Skip this slot if it has no item
-            if (!Item.IsValid(serializedSlotItemName)) continue;
+        // Restore keys of this schedule with item names of biome state
+        this.HydrateKeys(biomeState.SlotItemNames);
 
-            // Initialize dictionary entry with this item name as the key
-            this.Visits.Add(serializedSlotItemName, new List<Visit>());
-        }
-
-        // Cache a reference to reuse for restoring each visit
-        Visit visit;
-
-        // Loop through serialized visits to restore values of visits dictionary
-        foreach (SerializedVisit serializedVisit in biomeState.Visits)
-        {
-            // Reconstruct each visit from save data
-            visit = new Visit(serializedVisit);
-
-            // Do not continue if the saved item is not in the biome state
-            if (!this.Visits.Keys.Contains(visit.Item.Name)) continue;
-
-            // Add the newly restored visit to the dictionary
-            this.Visits[visit.Item.Name].Add(visit);
-        }
+        // Restore values of this schedule with serialized visit save data
+        this.HydrateValues(biomeState.Visits);
 
         // TODO remove
         this.PrintVisits();
@@ -272,10 +229,10 @@ public class VisitSchedule
     public bool HasActiveVisit(Item item)
     {
         // Check if the item has visits in this schedule
-        if (this.Visits.ContainsKey(item.Name))
+        if (this.Schedule.ContainsKey(item.Name))
         {
             // Check the status of each visit for this item
-            foreach (Visit visit in this.Visits[item.Name])
+            foreach (Visit visit in this.Schedule[item.Name])
             {
                 // Check if the visit has an active status
                 if (visit.IsActive())
@@ -294,10 +251,10 @@ public class VisitSchedule
     public Visit GetActiveVisit(Item item)
     {
         // Check if the item has visits in this schedule
-        if (this.Visits.ContainsKey(item.Name))
+        if (this.Schedule.ContainsKey(item.Name))
         {
             // Check the status of each visit for this item
-            foreach (Visit visit in this.Visits[item.Name])
+            foreach (Visit visit in this.Schedule[item.Name])
             {
                 // Check if the visit has an active status
                 if (visit.IsActive())
@@ -313,15 +270,33 @@ public class VisitSchedule
         return new Visit();
     }
 
-    // Process each visit in the schedule according to its status
-    public void Process()
+    // Prepare schedule for new food on start of next session
+    public void Update(Food food)
     {
+        // Cache this food
+        this.Food = food;
+
+        // Remove visits that have not yet started
+        this.Expedite();
+    }
+
+    // Process each visit in the schedule according to its status on app start
+    public void Process(SerializedActiveBiome biomeState)
+    {
+        // Check if fresh food was added to biome during last session
+        if (biomeState.HasFreshFood)
+        {
+            // Remove remaining visits and create a new schedule
+            this.Refresh(biomeState);
+            return;
+        }
+
         // Initialize lists for started visits and ended visits
         List<Visit> startedVisits = new List<Visit>();
         List<Visit> endedVisits = new List<Visit>();
 
         // Check the list of visits of each item in the active biome
-        foreach (List<Visit> itemVisits in this.Visits.Values)
+        foreach (List<Visit> itemVisits in this.Schedule.Values)
         {
             // Check the status of each visit
             foreach (Visit visit in itemVisits)
@@ -365,8 +340,8 @@ public class VisitSchedule
             return;
         }
 
-        // Get names of items with visits in this dictionary
-        string[] visitItemNames = this.Visits.Keys.ToArray();
+        // Get names of active items in this schedule
+        string[] visitItemNames = this.Schedule.Keys.ToArray();
 
         // Initialize array for names of items in the active biome
         string[] activeItemNames = new string[slots.Length];
@@ -399,7 +374,7 @@ public class VisitSchedule
         // Initialize list for keys of entries to remove from this dictionary
         List<string> removedItemNames = new List<string>();
 
-        // Check each item name key in this current schedule dictionary
+        // Check each item name key in this current visits dictionary
         foreach (string visitItem in visitItemNames)
         {
             // Skip if the item remains in the active biome
@@ -412,14 +387,40 @@ public class VisitSchedule
         // Remove visits in schedule with items recently removed from biome
         foreach (string removedItemName in removedItemNames)
         {
-            this.Visits.Remove(removedItemName);
+            this.Schedule.Remove(removedItemName);
         }
 
-        // Get the duration time span of the ending session
+        // Delay all scheduled visits by the duration of this session
+        this.Delay();
+
+        // Cache reference to reuse for generating new visit lists
+        List<Visit> itemVisits;
+
+        // Create dictionary entries for each new item in the active biome
+        foreach (Item addedItem in addedItems)
+        {
+            // Generate a visit list for the item added to the active biome
+            itemVisits = this.GenerateVisits(addedItem);
+
+            // Add dictionary entry to this schedule with new item visit list
+            this.Schedule.Add(addedItem.Name, itemVisits);
+        }
+
+        // Refresh list of guests in this schedule after visit removals
+        this.UpdateGuestList();
+
+        // Remove overlapping visits
+        this.ArbitrateOverlappingVisits();
+    }
+
+    // Extend scheduled visit times by game session time on app quit
+    private void Delay()
+    {
+        // Adjust all scheduled visits by the duration of this session
         TimeSpan sessionTime = TimeInterval.SessionTime();
 
-        // Delay arrivals and departures of visits by session time
-        foreach (List<Visit> remainingVisits in this.Visits.Values)
+        // Delay all departures and delay arrivals of visits not yet started
+        foreach (List<Visit> remainingVisits in this.Schedule.Values)
         {
             // Check each visit for its current status
             foreach (Visit visit in remainingVisits)
@@ -435,21 +436,6 @@ public class VisitSchedule
             }
         }
 
-        // Cache reference to reuse for generating new visit lists
-        List<Visit> itemVisits;
-
-        // Create dictionary entries for each new item in the active biome
-        foreach (Item addedItem in addedItems)
-        {
-            // Generate a visit list for the item added to the active biome
-            itemVisits = this.GenerateVisits(addedItem);
-
-            // Add dictionary entry to this schedule with new item visit list
-            this.Visits.Add(addedItem.Name, itemVisits);
-        }
-
-        // Remove overlapping visits
-        this.ArbitrateOverlappingVisits();
     }
 
     // Check if all visit lists are empty in this schedule
@@ -457,7 +443,7 @@ public class VisitSchedule
     {
         // TODO ensure valid food duration
         // Check the list of visits for each item
-        foreach (List<Visit> itemVisits in this.Visits.Values)
+        foreach (List<Visit> itemVisits in this.Schedule.Values)
         {
             // Return false if any visit list is nonempty
             if (itemVisits.Count > 0)
@@ -474,7 +460,7 @@ public class VisitSchedule
     public void Remove(Item item)
     {
         // Do not continue if the schedule does not contain visits for this item
-        if (!this.Visits.ContainsKey(item.Name)) return;
+        if (!this.Schedule.ContainsKey(item.Name)) return;
 
         // Check if the item has an active visit
         if (this.HasActiveVisit(item))
@@ -489,7 +475,10 @@ public class VisitSchedule
         }
 
         // Remove the dictionary entry with this key
-        this.Visits.Remove(item.Name);
+        this.Schedule.Remove(item.Name);
+
+        // Refresh list of guests in this schedule after visit removals
+        this.UpdateGuestList();
     }
 
     // Serialize visit schedule into array of serialized visits
@@ -502,7 +491,7 @@ public class VisitSchedule
         SerializedVisit serializedVisit;
 
         // Loop through the list of visits for each item
-        foreach (List<Visit> itemVisits in visitSchedule.Visits.Values)
+        foreach (List<Visit> itemVisits in visitSchedule.Schedule.Values)
         {
             // Loop through each visit in the list of item visits
             foreach (Visit visit in itemVisits)
@@ -528,7 +517,7 @@ public class VisitSchedule
     {
         string visits;
         string v;
-        foreach (KeyValuePair<string, List<Visit>> entry in this.Visits)
+        foreach (KeyValuePair<string, List<Visit>> entry in this.Schedule)
         {
             visits = string.Format("{0}:\n", entry.Key);
             foreach (Visit visit in entry.Value)
@@ -541,6 +530,90 @@ public class VisitSchedule
             }
             UnityEngine.Debug.Log(visits);
         }
+    }
+
+    // Create keys in visits dictionary with each active item in the biome
+    private void CreateKeys(Slot[] slots)
+    {
+        // Loop through slot item to initialize entries in this schedule
+        foreach (Slot slot in slots)
+        {
+            // Skip if there is no active item in this slot
+            if (!slot.HasItem()) continue;
+
+            // Initialize dictionary entry with this slot item name as the key
+            this.Schedule.Add(slot.Item.Name, new List<Visit>());
+        }
+
+    }
+
+    // Generate new visits for each key in visits dictionary
+    private void CreateValues()
+    {
+        // Cache references to reuse for making visit lists for each item
+        Item item;
+        List<Visit> itemVisits;
+
+        // Get array of item name keys in this schedule
+        string[] itemNames = this.Schedule.Keys.ToArray();
+
+        // Generate a new list of visits for each existing item name key
+        foreach (string itemName in itemNames)
+        {
+            // Skip this item if it is not valid
+            if (!Item.IsValid(itemName)) continue;
+
+            // Create an item from the item name key
+            item = new Item(itemName);
+
+            // Generate a list of visits for each item
+            itemVisits = this.GenerateVisits(item);
+
+            // Set the value of this dictionary entry using the item name key
+            this.Schedule[itemName] = itemVisits;
+        }
+
+        // Remove overlapping visits for each guest to finalize schedule
+        this.ArbitrateOverlappingVisits();
+    }
+
+    // Create keys in visits dictionary with each item name
+    private void HydrateKeys(string[] itemNames)
+    {
+        // Loop through item names to initialize entries in this schedule
+        foreach (string itemName in itemNames)
+        {
+            // Skip if the item name is not valid
+            if (!Item.IsValid(itemName)) continue;
+
+            // Skip if the key already exists
+            if (this.Schedule.ContainsKey(itemName)) continue;
+
+            // Initialize dictionary entry with this item name as the key
+            this.Schedule.Add(itemName, new List<Visit>());
+        }
+
+    }
+
+    // Recover dictionary values from serialized visits save data
+    private void HydrateValues(SerializedVisit[] serializedVisits)
+    {
+        // Cache a reference to reuse for adding visits to dictionary values
+        Visit visit;
+
+        // Loop through serialized visits to restore visit values in dictionary
+        foreach (SerializedVisit serializedVisit in serializedVisits)
+        {
+            // Reconstruct each visit from save data
+            visit = new Visit(serializedVisit);
+
+            // Skip if the saved item is not in the biome state
+            if (!this.Schedule.Keys.Contains(visit.Item.Name)) continue;
+
+            // Add the newly restored visit to the schedule
+            this.Schedule[visit.Item.Name].Add(visit);
+        }
+
     }
 
     // Generate all visits for this item over this entire food duration
@@ -703,10 +776,15 @@ public class VisitSchedule
             // Get list of visits by each guest across all items
             guestVisits = this.GetVisitsByGuest(guest);
 
+            // Do not continue if there are no visits remaining for this guest
+            if (guestVisits.Count == 0) continue;
+
             // Remove overlapping visits for this guest
             this.TrimVisitOverlap(guestVisits);
         }
 
+        // Refresh list of guests in this schedule after visit removals
+        this.UpdateGuestList();
     }
 
     // Get a list of all visits across all items with this guest
@@ -716,7 +794,7 @@ public class VisitSchedule
         List<Visit> guestVisits = new List<Visit>();
 
         // Check each list of visits by item
-        foreach (List<Visit> visits in this.Visits.Values)
+        foreach (List<Visit> visits in this.Schedule.Values)
         {
             // Check the guest of each visit for this item
             foreach (Visit visit in visits)
@@ -847,6 +925,37 @@ public class VisitSchedule
         return selectedVisit;
     }
 
+    // Generate visits upon food refill
+    private void Refresh(SerializedActiveBiome biomeState)
+    {
+        // Initialize list for active visits left over from last meal
+        List<Visit> remainingVisits = new List<Visit>();
+
+        // Add each remaining visit to list
+        foreach (List<Visit> itemVisits in this.Schedule.Values)
+        {
+            foreach (Visit visit in itemVisits)
+            {
+                remainingVisits.Add(visit);
+            }
+        }
+
+        // Serialize the visits active before the food was replaced
+        SerializedVisit[] leftoverVisits = Visit.Serialize(remainingVisits);
+
+        // Clear all visits from last meal
+        this.Schedule.Clear();
+
+        // Restore keys of visits dictionary with item names of biome state
+        this.HydrateKeys(biomeState.SlotItemNames);
+
+        // Generate brand new visit lists for each restored key
+        this.CreateValues();
+
+        // Add back the active meals from the last session into this schedule
+        this.HydrateValues(leftoverVisits);
+    }
+
     // Update visit count in notes for newly started visits from game manager
     private void ProcessStartedVisits(List<Visit> startedVisits)
     {
@@ -861,22 +970,22 @@ public class VisitSchedule
         // Remove the ended visits from this schedule
         foreach (Visit visit in endedVisits)
         {
-            this.Visits[visit.Item.Name].Remove(visit);
+            this.Schedule[visit.Item.Name].Remove(visit);
         }
 
         // Refresh list of guests in this schedule after visit removals
-        this.RefreshGuestList();
+        this.UpdateGuestList();
 
     }
 
     // Check each visit to reconstruct list of guests for this schedule
-    private void RefreshGuestList()
+    private void UpdateGuestList()
     {
         // Clear all guests from guest list
         this.Guests.Clear();
 
         // Check all visits for each item to add all scheduled guests
-        foreach (List<Visit> itemVisits in this.Visits.Values)
+        foreach (List<Visit> itemVisits in this.Schedule.Values)
         {
             // Check each visit for this item
             foreach (Visit visit in itemVisits)
@@ -887,6 +996,42 @@ public class VisitSchedule
                     // Add guest to list of guests for this visit schedule
                     this.Guests.Add(visit.Guest);
                 }
+            }
+        }
+
+    }
+
+    // Prepare to generate visits for fresh food on start of next session
+    private void Expedite()
+    {
+        // Initialize list for visits with arrivals in the future
+        List<Visit> approachingArrivals = new List<Visit>();
+
+        // Find all visits that have not started
+        foreach (List<Visit> itemVisits in this.Schedule.Values)
+        {
+            // Check each visit in the list of visits for this item
+            foreach (Visit visit in itemVisits)
+            {
+                // Add visit to list if it has not started
+                if (!visit.IsStarted())
+                {
+                    approachingArrivals.Add(visit);
+
+                    // Skip to the next visit
+                    continue;
+                }
+            }
+        }
+
+        // Remove visits with future arrivals to prevent gift creation
+        foreach (Visit visit in approachingArrivals)
+        {
+            // Make sure the visit exists before removing it
+            if (this.Schedule[visit.Item.Name].Contains(visit))
+            {
+                // Remove visit from schedule
+                this.Schedule[visit.Item.Name].Remove(visit);
             }
         }
 
