@@ -21,6 +21,24 @@ namespace TimeUtility
 
     public class TimeInterval
     {
+        // Get a time span representing the current duration of this session
+        public static TimeSpan SessionTime
+        {
+            get
+            {
+                // Get elapsed seconds since game started
+                double elapsedSeconds = UnityEngine.Time.realtimeSinceStartup;
+
+                // Round elapsed seconds to ceiling integer value
+                int seconds = (int)Math.Ceiling(elapsedSeconds);
+
+                // Create a time span from the elapsed time since game started
+                TimeSpan sessionTime = new TimeSpan(0, 0, seconds);
+
+                return sessionTime;
+            }
+        }
+
         // Check if there is an overlap during datetime sets of A and B
         public static bool HasOverlap(
             DateTime ArrivalA, DateTime DepartureA,
@@ -59,21 +77,6 @@ namespace TimeUtility
             // A:      <------------>
             // B: <------------->
             return ArrivalA < DepartureB;
-        }
-
-        // Get a time span representing the current duration of this session
-        public static TimeSpan SessionTime()
-        {
-            // Get elapsed seconds since game started
-            double elapsedSeconds = UnityEngine.Time.realtimeSinceStartup;
-
-            // Round elapsed seconds to ceiling integer value
-            int seconds = (int)Math.Ceiling(elapsedSeconds);
-
-            // Create a time span from the elapsed time since game started
-            TimeSpan sessionTime = new TimeSpan(0, 0, seconds);
-
-            return sessionTime;
         }
 
     }

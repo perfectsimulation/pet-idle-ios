@@ -409,6 +409,7 @@ public class MenuManager : MonoBehaviour
         this.MainMenuButton.gameObject.SetActive(false);
         this.CloseButton.gameObject.SetActive(true);
 
+        // Show food of current meal
         this.FoodContent.SetMeal(meal);
 
         // Move tap out to close button behind the food menu panel

@@ -100,6 +100,9 @@ public class ActiveBiome : MonoBehaviour
         // Review schedule viability
         this.Meal.AuditVisitSchedule(this.Slots);
 
+        // Resume meal progress until start of next session
+        this.Meal.Resume();
+
         // Save updates to visit schedule
         this.SaveBiome(new SerializedActiveBiome(this));
     }
@@ -279,6 +282,9 @@ public class SerializedActiveBiome
 {
     public string FoodName;
     public bool HasFreshFood;
+    public string MealTimeCompletion;
+    public string MealTimeRemaining;
+    public string LastSessionEnd;
     public string[] SlotItemNames;
     public SerializedVisit[] Visits;
 
@@ -288,6 +294,9 @@ public class SerializedActiveBiome
         // TODO remove meal test case
         this.FoodName = "Fruits";
         this.HasFreshFood = true;
+        this.MealTimeCompletion = string.Empty;
+        this.MealTimeRemaining = string.Empty;
+        this.LastSessionEnd = string.Empty;
         this.SlotItemNames = new string[6];
         this.Visits = new SerializedVisit[0];
     }
@@ -297,6 +306,9 @@ public class SerializedActiveBiome
     {
         this.FoodName = activeBiome.Meal.Food.Name;
         this.HasFreshFood = activeBiome.Meal.HasFreshFood;
+        this.MealTimeCompletion = activeBiome.Meal.Completion.ToString();
+        this.MealTimeRemaining = activeBiome.Meal.TimeRemaining.ToString();
+        this.LastSessionEnd = activeBiome.Meal.LastSessionEnd.ToString();
         this.SlotItemNames = Slot.Serialize(activeBiome.Slots);
         this.Visits = VisitSchedule.Serialize(activeBiome.Meal.VisitSchedule);
     }

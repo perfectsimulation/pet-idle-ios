@@ -7,37 +7,47 @@ public class MealDetail : MonoBehaviour
 
     private Meal Meal;
 
-    private RectTransform DurationRectTransform;
+    private RectTransform DurationRect;
+    private float FullBarLength;
+    private float MinimumNonEmptyBarLength;
+
+    void Awake()
+    {
+        this.DurationRect = this.DurationImage.GetComponent<RectTransform>();
+        this.FullBarLength = this.DurationRect.sizeDelta.x;
+
+        Outline outline = this.DurationRect.gameObject.GetComponent<Outline>();
+        this.MinimumNonEmptyBarLength = outline.effectDistance.x;
+    }
 
     public void SetMeal(Meal meal)
     {
         this.Meal = meal;
-        //this.ShowDuration();
+
+        this.UpdateDurationBar();
     }
 
     public void Display(bool shouldShow)
     {
-        // TODO
-        if (shouldShow)
-        {
-            this.Show();
-        }
-        else
-        {
-            this.Hide();
-        }
+        this.gameObject.SetActive(shouldShow);
     }
 
-    public void Show()
+    private void UpdateDurationBar()
     {
-        // TODO calculate remaining width and color for duration bar
-        this.gameObject.SetActive(true);
+        float length = this.CalculateCurrentBarLength();
+        float barLength = Mathf.Max(this.MinimumNonEmptyBarLength, length);
+        float barHeight = this.DurationRect.sizeDelta.y;
+        Vector2 updatedSize = new Vector2(barLength, barHeight);
+        this.DurationRect.sizeDelta = updatedSize;
     }
 
-    public void Hide()
+    private float CalculateCurrentBarLength()
     {
-        // TODO
-        this.gameObject.SetActive(false);
+        float totalTime = this.Meal.Food.Duration;
+        float remainingTime = (float)this.Meal.TimeRemaining.TotalHours;
+        float remainingTimeRatio = remainingTime / totalTime;
+        float currentBarLength = remainingTimeRatio * this.FullBarLength;
+        return currentBarLength;
     }
 
 }

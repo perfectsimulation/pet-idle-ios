@@ -413,31 +413,6 @@ public class VisitSchedule
         this.ArbitrateOverlappingVisits();
     }
 
-    // Extend scheduled visit times by game session time on app quit
-    private void Delay()
-    {
-        // Adjust all scheduled visits by the duration of this session
-        TimeSpan sessionTime = TimeInterval.SessionTime();
-
-        // Delay all departures and delay arrivals of visits not yet started
-        foreach (List<Visit> remainingVisits in this.Schedule.Values)
-        {
-            // Check each visit for its current status
-            foreach (Visit visit in remainingVisits)
-            {
-                // Delay arrival if visit has not yet started
-                if (!visit.IsStarted())
-                {
-                    visit.DelayArrival(sessionTime);
-                }
-
-                // Delay departure of all visits
-                visit.DelayDeparture(sessionTime);
-            }
-        }
-
-    }
-
     // Check if all visit lists are empty in this schedule
     public bool IsEmpty()
     {
@@ -614,6 +589,8 @@ public class VisitSchedule
             this.Schedule[visit.Item.Name].Add(visit);
         }
 
+        // Remove overlapping visits for each guest to finalize schedule
+        this.ArbitrateOverlappingVisits();
     }
 
     // Generate all visits for this item over this entire food duration
@@ -996,6 +973,31 @@ public class VisitSchedule
                     // Add guest to list of guests for this visit schedule
                     this.Guests.Add(visit.Guest);
                 }
+            }
+        }
+
+    }
+
+    // Extend scheduled visit times by game session time on app quit
+    private void Delay()
+    {
+        // Adjust all scheduled visits by the duration of this session
+        TimeSpan sessionTime = TimeInterval.SessionTime;
+
+        // Delay all departures and delay arrivals of visits not yet started
+        foreach (List<Visit> remainingVisits in this.Schedule.Values)
+        {
+            // Check each visit for its current status
+            foreach (Visit visit in remainingVisits)
+            {
+                // Delay arrival if visit has not yet started
+                if (!visit.IsStarted())
+                {
+                    visit.DelayArrival(sessionTime);
+                }
+
+                // Delay departure of all visits
+                visit.DelayDeparture(sessionTime);
             }
         }
 
