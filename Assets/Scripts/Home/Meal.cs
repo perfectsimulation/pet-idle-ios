@@ -86,10 +86,10 @@ public class Meal : MonoBehaviour
         // Restore last session end time and calculate remaining duration
         this.RestoreProgress(biomeState);
 
-        // TODO use time utility to update remaining duration
-        this.SetFoodImageSprite(this.Food.GetFreshFoodSprite());
+        // Set food image sprite according to remaining duration
+        this.CheckCompletion();
 
-        // Do not continue if save data do not exist
+        // Do not continue if schedule save data do not exist
         if (biomeState.Visits == null) return;
 
         // Restore visit schedule from serialized visit save data
@@ -106,16 +106,10 @@ public class Meal : MonoBehaviour
     // Review schedule viability and make necessary adjustments on app quit
     public void AuditVisitSchedule(Slot[] slots)
     {
-        // Check if this visit schedule is empty
-        if (this.VisitSchedule.IsEmpty())
-        {
-            // TODO check remaining duration
-            // Generate a new visit schedule
-            this.VisitSchedule = new VisitSchedule(this.Food, slots);
-            return;
-        }
+        // Do not continue if there is no time left for this meal
+        if (this.TimeRemaining <= TimeSpan.Zero) return;
 
-        // Audit all the visit lists in this schedule
+        // Audit all the visit lists in this schedule for progressing meal
         this.VisitSchedule.Audit(slots);
     }
 
@@ -173,11 +167,11 @@ public class Meal : MonoBehaviour
         this.TimeRemaining = remainingTime - mealProgress;
 
         // Check if the total food duration has elapsed
-        this.CheckForEmpty();
+        this.CheckCompletion();
     }
 
-    // Set empty food sprite to food image if total duration has elapsed
-    private void CheckForEmpty()
+    // Set food sprite to food image after checking if meal is complete
+    private void CheckCompletion()
     {
         // Check if the total food duration has elapsed
         if (this.TimeRemaining < TimeSpan.Zero)
@@ -187,6 +181,11 @@ public class Meal : MonoBehaviour
 
             // Change the food image to reflect the finished meal
             this.SetFoodImageSprite(this.Food.GetEmptyFoodSprite());
+        }
+        else
+        {
+            // Set food image to fresh food sprite
+            this.SetFoodImageSprite(this.Food.GetFreshFoodSprite());
         }
     }
 

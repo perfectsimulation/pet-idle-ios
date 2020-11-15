@@ -37,8 +37,8 @@ public class FoodContent : MonoBehaviour
         this.UserCoins = coins;
     }
 
-    // Assign meal to detail components
-    public void SetMeal(Meal meal)
+    // Assign meal to meal detail component and focus the food of the meal
+    public void Hydrate(Meal meal)
     {
         // Cache this meal
         this.Meal = meal;
@@ -50,7 +50,7 @@ public class FoodContent : MonoBehaviour
         if (mealIndex < 0) return;
 
         // Assign meal to the meal detail component
-        this.MealDetail.SetMeal(meal);
+        this.MealDetail.Hydrate(meal);
 
         // Update the current food index with the meal food index
         this.UpdateCurrentFoodIndex(mealIndex);

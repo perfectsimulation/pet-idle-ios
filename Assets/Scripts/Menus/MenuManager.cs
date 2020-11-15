@@ -208,6 +208,9 @@ public class MenuManager : MonoBehaviour
     public void AddFoodToBiome(Food food)
     {
         this.ActiveBiome.PlaceFoodInMeal(food);
+
+        // Hydrate meal in food menu
+        this.FoodContent.Hydrate(this.ActiveBiome.Meal);
     }
 
     // Add a newly purchased item to inventory content
@@ -409,8 +412,8 @@ public class MenuManager : MonoBehaviour
         this.MainMenuButton.gameObject.SetActive(false);
         this.CloseButton.gameObject.SetActive(true);
 
-        // Show food of current meal
-        this.FoodContent.SetMeal(meal);
+        // Assign meal to menu components
+        this.FoodContent.Hydrate(meal);
 
         // Move tap out to close button behind the food menu panel
         this.PrepareTapOutToClose(this.FoodContent.gameObject);
