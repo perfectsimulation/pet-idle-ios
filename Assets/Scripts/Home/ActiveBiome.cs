@@ -282,7 +282,6 @@ public class SerializedActiveBiome
 {
     public string FoodName;
     public bool HasFreshFood;
-    public string MealTimeCompletion;
     public string MealTimeRemaining;
     public string LastSessionEnd;
     public string[] SlotItemNames;
@@ -294,7 +293,6 @@ public class SerializedActiveBiome
         // TODO remove meal test case
         this.FoodName = "Fruits";
         this.HasFreshFood = true;
-        this.MealTimeCompletion = string.Empty;
         this.MealTimeRemaining = string.Empty;
         this.LastSessionEnd = string.Empty;
         this.SlotItemNames = new string[6];
@@ -306,7 +304,6 @@ public class SerializedActiveBiome
     {
         this.FoodName = activeBiome.Meal.Food.Name;
         this.HasFreshFood = activeBiome.Meal.HasFreshFood;
-        this.MealTimeCompletion = activeBiome.Meal.Completion.ToString();
         this.MealTimeRemaining = activeBiome.Meal.TimeRemaining.ToString();
         this.LastSessionEnd = activeBiome.Meal.LastSessionEnd.ToString();
         this.SlotItemNames = Slot.Serialize(activeBiome.Slots);

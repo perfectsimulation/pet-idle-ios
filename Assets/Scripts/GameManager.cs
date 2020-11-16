@@ -76,11 +76,11 @@ public class GameManager : MonoBehaviour
     // Delegate called in market content to update user inventory and coins
     private void SaveItemPurchase(Item item)
     {
-        // Add the newly purchased item to the user inventory
-        this.User.Inventory.Add(item);
-
         // Subtract the newly purchased item price from the user coin balance
         this.User.Coins -= item.Price;
+
+        // Add the newly purchased item to the user inventory
+        this.User.Inventory.Add(item);
 
         // Give the updated coin balance to the menus that use it
         this.MenuManager.HydrateCoins(this.User.Coins);

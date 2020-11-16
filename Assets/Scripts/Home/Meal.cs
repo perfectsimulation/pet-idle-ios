@@ -16,9 +16,6 @@ public class Meal : MonoBehaviour
 
     public VisitSchedule VisitSchedule { get; private set; }
 
-    // Date time at which food turns empty
-    public DateTime Completion { get; private set; }
-
     // Date time at which the last session ended
     public DateTime LastSessionEnd { get; private set; }
 
@@ -109,16 +106,13 @@ public class Meal : MonoBehaviour
         // Do not continue if there is no time left for this meal
         if (this.TimeRemaining <= TimeSpan.Zero) return;
 
-        // Audit all the visit lists in this schedule for progressing meal
+        // Audit all the visit lists in this schedule before resuming time
         this.VisitSchedule.Audit(slots);
     }
 
     // Allow time passage for schedule while app is not in session
     public void Resume()
     {
-        // Delay meal completion by duration of ending session
-        this.Completion = this.Completion.Add(TimeInterval.SessionTime);
-
         // Record the time at which this session is ending
         this.LastSessionEnd = DateTime.UtcNow;
     }
@@ -128,9 +122,6 @@ public class Meal : MonoBehaviour
     {
         // Initialize value of remaining duration of this meal
         this.TimeRemaining = new TimeSpan(this.Food.Duration, 0, 0);
-
-        // Add food duration to the start time of the current session
-        this.Completion = TimeStamp.GameStart.Add(this.TimeRemaining);
     }
 
     // Set the sprite of the food image
@@ -142,10 +133,6 @@ public class Meal : MonoBehaviour
     // Set last session end time from save data
     private void RestoreProgress(SerializedActiveBiome biomeState)
     {
-        // Try parsing the saved datetime string of completion time
-        DateTime completion;
-        DateTime.TryParse(biomeState.MealTimeCompletion, out completion);
-
         // Try parsing the saved datetime string of last session end time
         DateTime lastSessionEnd;
         DateTime.TryParse(biomeState.LastSessionEnd, out lastSessionEnd);
@@ -153,9 +140,6 @@ public class Meal : MonoBehaviour
         // Try parsing the saved timespan string of remaining meal time
         TimeSpan remainingTime;
         TimeSpan.TryParse(biomeState.MealTimeRemaining, out remainingTime);
-
-        // Cache completion time
-        this.Completion = completion;
 
         // Cache last session end time
         this.LastSessionEnd = lastSessionEnd;
